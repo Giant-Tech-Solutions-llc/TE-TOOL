@@ -6,7 +6,8 @@
   "description": "AI Taper Haircut Finder - Taper Empire",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/extract-embed.mjs",
+    "build:vite": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,7 +17,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "vite-plugin-singlefile": "^2.3.3"
   },
   "engines": {
     "node": ">=20"
