@@ -1,11 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Key, ExternalLink, X, Check, AlertTriangle } from 'lucide-react';
 import { getApiKey, setStoredKey, subscribeApiKey, getStoredKey } from '../utils/apiKey';
+import { checkProxy } from '../utils/api';
 
 function useApiKeyState() {
   const [apiKey, setApiKey] = useState(getApiKey());
   useEffect(() => subscribeApiKey((value) => setApiKey(value)), []);
   return apiKey;
+}
+
+function useProxyKeyState() {
+  const [state, setState] = useState({ checked: false, ok: false, hasKey: false });
+  useEffect(() => {
+    let mounted = true;
+    checkProxy().then((result) => {
+      if (mounted) setState({ checked: true, ok: !!result.ok, hasKey: !!result.hasKey });
+    });
+    return () => { mounted = false; };
+  }, []);
+  return state;
 }
 
 function KeyDialog({ open, onClose, hasKey }) {
@@ -220,9 +233,15 @@ function KeyDialog({ open, onClose, hasKey }) {
 
 export function ApiKeyBanner() {
   const apiKey = useApiKeyState();
+  const proxy = useProxyKeyState();
   const [open, setOpen] = useState(false);
 
+  // Server proxy already has a key — visitors don't need their own. Stay silent.
+  if (proxy.checked && proxy.hasKey) return null;
+  // Local override exists — also silent.
   if (apiKey) return <KeyDialog open={open} onClose={() => setOpen(false)} hasKey />;
+  // Don't flash the banner before we've checked the server.
+  if (!proxy.checked) return null;
 
   return (
     <>
@@ -271,8 +290,12 @@ export function ApiKeyBanner() {
 
 export default function ApiKeyButton() {
   const apiKey = useApiKeyState();
+  const proxy = useProxyKeyState();
   const [open, setOpen] = useState(false);
   const hasKey = Boolean(apiKey);
+
+  // Production deployment with server-side key: hide the button.
+  if (proxy.checked && proxy.hasKey && !hasKey) return null;
 
   return (
     <>

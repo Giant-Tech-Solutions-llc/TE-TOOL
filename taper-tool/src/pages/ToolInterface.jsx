@@ -3,8 +3,9 @@ import { Upload, MessageSquare, X, Loader2 } from 'lucide-react';
 import Button from '../components/Button';
 import RadioCard from '../components/RadioCard';
 import ProgressBar from '../components/ProgressBar';
+import { prepareUploadPhoto } from '../utils/image';
 
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
 export default function ToolInterface({ onSubmit, loading }) {
   const [tab, setTab] = useState('photo');
@@ -76,7 +77,7 @@ export default function ToolInterface({ onSubmit, loading }) {
   const currentQuestion = questions.findIndex(q => !quizData[q.key]);
   const isComplete = currentQuestion === -1;
 
-  const handleFile = (file) => {
+  const handleFile = async (file) => {
     setPhotoError(null);
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -84,20 +85,22 @@ export default function ToolInterface({ onSubmit, loading }) {
       return;
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      setPhotoError('Image must be under 5 MB.');
+      setPhotoError('Image must be under 10 MB.');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
+    try {
+      const prepared = await prepareUploadPhoto(file);
       setPhoto({
         name: file.name,
-        size: file.size,
-        type: file.type,
-        dataUrl: e.target.result
+        size: prepared.size,
+        type: prepared.mimeType,
+        dataUrl: prepared.dataUrl,
+        downscaled: prepared.downscaled
       });
-    };
-    reader.onerror = () => setPhotoError('Could not read this file.');
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Could not process photo:', err);
+      setPhotoError('Could not read this file.');
+    }
   };
 
   const onDrop = (e) => {
