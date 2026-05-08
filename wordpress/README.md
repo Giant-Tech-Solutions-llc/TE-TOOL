@@ -16,6 +16,7 @@ existing `taperempire.com` WordPress site (Elementor).
 | `section-7-final-cta.html` | Homepage Section 7 |
 | `blog-sidebar-cta.html` | `/blog/` index sticky sidebar |
 | `blog-post-ctas.html` | 3 CTAs for every individual blog post |
+| `COWORK_DEPLOY.md` | Self-contained runbook a Cowork agent follows to deploy via MCPs |
 
 ## The single-file embed (Section 3)
 
