@@ -1,6 +1,8 @@
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const ENDPOINT =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const TEXT_MODEL = 'gemini-1.5-flash';
+const IMAGE_MODEL = 'gemini-2.5-flash-image-preview';
+const TEXT_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${TEXT_MODEL}:generateContent`;
+const IMAGE_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent`;
 
 const FACE_SHAPES = ['round', 'oval', 'square', 'heart', 'diamond'];
 const HAIR_TYPES = ['straight', 'wavy', 'curly', 'coily'];
@@ -62,7 +64,7 @@ function extractBase64(dataUrl) {
   return idx === -1 ? dataUrl : dataUrl.slice(idx + 1);
 }
 
-function buildBody(inputData) {
+function buildTextBody(inputData) {
   const parts = [{ text: buildPrompt(inputData) }];
 
   if (inputData.type === 'photo' && inputData.data && inputData.data.photo) {
@@ -126,7 +128,8 @@ function normalize(recs) {
       why_it_works: String(r.why_it_works || ''),
       barber_instructions: String(r.barber_instructions || ''),
       maintenance: String(r.maintenance || ''),
-      related_url: slug
+      related_url: slug,
+      image_url: null
     };
   });
 }
@@ -137,21 +140,96 @@ function clampScore(value) {
   return Math.max(70, Math.min(99, Math.round(n)));
 }
 
-export async function getRecommendations(inputData) {
-  if (!API_KEY) {
-    return getFallbackRecommendations(inputData.data || {});
+function buildEditPrompt(rec) {
+  return [
+    'Edit this photograph to show the same person with a new haircut.',
+    'CRITICAL: keep the person\'s face, skin tone, eyes, eyebrows, mouth, beard,',
+    'expression, identity, clothing, lighting, and background EXACTLY the same.',
+    `Replace ONLY the hairstyle with: ${rec.style_name}.`,
+    `Cut details: ${rec.barber_instructions || ''}`,
+    'Realistic, photorealistic, professional barbershop portrait quality,',
+    'sharp focus on the hair, natural shadows, no text, no watermark.'
+  ].join(' ');
+}
+
+function buildStockPrompt(rec) {
+  return [
+    `Generate a realistic professional barbershop portrait photograph of a man`,
+    `with a ${rec.style_name} haircut.`,
+    `Cut details: ${rec.barber_instructions || ''}`,
+    'Head-and-shoulders, neutral studio background, soft natural lighting,',
+    'photorealistic, high resolution, clean editorial style, no text, no watermark.'
+  ].join(' ');
+}
+
+function extractInlineImage(data) {
+  const candidates = data && data.candidates;
+  if (!Array.isArray(candidates) || candidates.length === 0) return null;
+  const parts = candidates[0] && candidates[0].content && candidates[0].content.parts;
+  if (!Array.isArray(parts)) return null;
+  for (const part of parts) {
+    const inline = part && (part.inline_data || part.inlineData);
+    if (inline && inline.data) {
+      const mime = inline.mime_type || inline.mimeType || 'image/png';
+      return `data:${mime};base64,${inline.data}`;
+    }
+  }
+  return null;
+}
+
+async function generateStyleImage(rec, userPhoto, userMimeType) {
+  if (!API_KEY) return null;
+
+  const parts = [];
+  if (userPhoto) {
+    parts.push({ text: buildEditPrompt(rec) });
+    parts.push({
+      inline_data: {
+        mime_type: userMimeType || 'image/jpeg',
+        data: extractBase64(userPhoto)
+      }
+    });
+  } else {
+    parts.push({ text: buildStockPrompt(rec) });
   }
 
+  const body = {
+    contents: [{ parts }],
+    generationConfig: {
+      responseModalities: ['IMAGE', 'TEXT'],
+      temperature: 0.4
+    }
+  };
+
   try {
-    const response = await fetch(`${ENDPOINT}?key=${encodeURIComponent(API_KEY)}`, {
+    const res = await fetch(`${IMAGE_ENDPOINT}?key=${encodeURIComponent(API_KEY)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(buildBody(inputData))
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      console.error('Image API error', res.status, await res.text().catch(() => ''));
+      return null;
+    }
+    const data = await res.json();
+    return extractInlineImage(data);
+  } catch (error) {
+    console.error('Image generation error:', error);
+    return null;
+  }
+}
+
+async function getTextRecommendations(inputData) {
+  if (!API_KEY) return getFallbackRecommendations(inputData.data || {});
+
+  try {
+    const response = await fetch(`${TEXT_ENDPOINT}?key=${encodeURIComponent(API_KEY)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildTextBody(inputData))
     });
 
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`API request failed: ${response.status}`);
 
     const data = await response.json();
     const text =
@@ -164,14 +242,28 @@ export async function getRecommendations(inputData) {
       data.candidates[0].content.parts[0].text;
 
     const recs = parseRecommendations(text);
-    if (recs && recs.length > 0) {
-      return normalize(recs);
-    }
+    if (recs && recs.length > 0) return normalize(recs);
     return getFallbackRecommendations(inputData.data || {});
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('Text API Error:', error);
     return getFallbackRecommendations(inputData.data || {});
   }
+}
+
+export async function getRecommendations(inputData) {
+  const recs = await getTextRecommendations(inputData);
+
+  const userPhoto = inputData && inputData.type === 'photo' && inputData.data ? inputData.data.photo : null;
+  const userMime = inputData && inputData.type === 'photo' && inputData.data ? inputData.data.mimeType : null;
+
+  const withImages = await Promise.all(
+    recs.map(async (rec) => {
+      const image = await generateStyleImage(rec, userPhoto, userMime);
+      return { ...rec, image_url: image || rec.image_url || null };
+    })
+  );
+
+  return withImages;
 }
 
 function getFallbackRecommendations(data) {
@@ -190,7 +282,8 @@ function getFallbackRecommendations(data) {
       maintenance: maintenance === 'low'
         ? 'Low - barber visit every 4 weeks, light pomade as needed.'
         : 'Medium - barber every 2-3 weeks, light styling cream daily.',
-      related_url: 'low-taper-fade'
+      related_url: 'low-taper-fade',
+      image_url: null
     },
     {
       style_name: 'Mid Taper Fade',
@@ -200,7 +293,8 @@ function getFallbackRecommendations(data) {
       barber_instructions:
         'Mid taper from the parietal ridge. #1 at the bottom, #2 mid, hand-blended to scissor work above. Top: 1.5-2 inches, point-cut for texture, fringe forward.',
       maintenance: 'Medium - reshape every 3 weeks, matte clay for finish.',
-      related_url: 'mid-taper-fade'
+      related_url: 'mid-taper-fade',
+      image_url: null
     },
     {
       style_name: 'Blowout Taper',
@@ -210,7 +304,8 @@ function getFallbackRecommendations(data) {
       barber_instructions:
         'Mid-to-high taper with a defined edge. #0.5 at the base, #2 transitioning into scissor work. Leave 3-4 inches on top, blow-dry up and back, finish with strong-hold pomade.',
       maintenance: 'High - barber every 2 weeks, daily blow-dry and product.',
-      related_url: 'blowout-taper'
+      related_url: 'blowout-taper',
+      image_url: null
     }
   ];
 }

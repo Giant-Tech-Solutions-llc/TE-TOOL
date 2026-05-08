@@ -59,8 +59,8 @@ export default function Results({ recommendations = [], onReset }) {
       }}>
         {recommendations.map((rec, i) => {
           const slug = rec.related_url || slugify(rec.style_name);
-          const imageUrl = `https://taperempire.com/wp-content/uploads/${slug}.jpg`;
           const guideUrl = `https://taperempire.com/${slug}/`;
+          const imageUrl = rec.image_url || PLACEHOLDER_IMAGE;
 
           return (
             <Card key={i} padding="lg">

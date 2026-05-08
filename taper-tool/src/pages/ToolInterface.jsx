@@ -425,12 +425,18 @@ export default function ToolInterface({ onSubmit, loading }) {
           marginTop: 'var(--space-8)',
           color: 'var(--text-secondary)',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 'var(--space-2)'
         }}>
-          <Loader2 size={16} className="tt-spin" />
-          <span>Analyzing your features...</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <Loader2 size={18} className="tt-spin" />
+            <span>{tab === 'photo' ? 'Analyzing your photo and rendering previews…' : 'Building your matches and rendering previews…'}</span>
+          </div>
+          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>
+            This can take 20–40 seconds while the AI generates your styled images.
+          </div>
         </div>
       )}
     </div>
