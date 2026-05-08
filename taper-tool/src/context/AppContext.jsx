@@ -27,6 +27,8 @@ function reducer(state, action) {
       };
     case 'ERROR':
       return { ...state, error: action.payload, loading: false };
+    case 'VALIDATION_ERROR':
+      return { ...state, step: 'input', error: action.payload, loading: false };
     case 'RESET':
       return initialState;
     default:

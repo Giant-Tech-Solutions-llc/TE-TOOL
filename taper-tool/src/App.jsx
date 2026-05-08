@@ -15,6 +15,13 @@ function AppContent() {
     dispatch({ type: 'SUBMIT', payload: inputData });
     try {
       const result = await getRecommendations(inputData);
+      if (result.validationError) {
+        dispatch({
+          type: 'VALIDATION_ERROR',
+          payload: result.validationError.message
+        });
+        return;
+      }
       dispatch({
         type: 'SUCCESS',
         payload: result.recommendations,
@@ -63,7 +70,11 @@ function AppContent() {
       <main>
         {state.step === 'hero' && <Hero onStart={handleStart} />}
         {state.step === 'input' && (
-          <ToolInterface onSubmit={handleSubmit} loading={state.loading} />
+          <ToolInterface
+            onSubmit={handleSubmit}
+            loading={state.loading}
+            error={state.error}
+          />
         )}
         {state.step === 'results' && (
           <Results

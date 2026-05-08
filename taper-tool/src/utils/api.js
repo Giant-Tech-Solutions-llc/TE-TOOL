@@ -45,12 +45,12 @@ async function fetchRecommendationsViaProxy(inputData) {
     });
     if (!res.ok) return { error: `proxy_${res.status}` };
     const data = await res.json();
-    if (!Array.isArray(data.recommendations)) return { error: 'proxy_no_recs' };
     return {
-      recs: data.recommendations,
+      recs: Array.isArray(data.recommendations) ? data.recommendations : null,
       source: data.source || 'proxy',
       reason: data.reason || null,
-      errors: data.errors || null
+      errors: data.errors || null,
+      validationError: data.validationError || null
     };
   } catch (error) {
     console.warn('recommend proxy unavailable', error);
@@ -189,6 +189,16 @@ export async function getRecommendations(inputData) {
   let recs;
   if (proxy.ok) {
     const proxyRes = await fetchRecommendationsViaProxy(inputData);
+
+    // Hard-fail on validation: do NOT generate images for non-male photos.
+    if (proxyRes && proxyRes.validationError) {
+      return {
+        recommendations: [],
+        diagnostics: { ...diagnostics, textSource: 'gemini-validation-rejected' },
+        validationError: proxyRes.validationError
+      };
+    }
+
     if (proxyRes && proxyRes.recs) {
       recs = proxyRes.recs;
       diagnostics.textSource = proxyRes.source === 'gemini' ? 'gemini-via-proxy' : 'fallback-via-proxy';

@@ -7,7 +7,7 @@ import { prepareUploadPhoto } from '../utils/image';
 
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
-export default function ToolInterface({ onSubmit, loading }) {
+export default function ToolInterface({ onSubmit, loading, error }) {
   const [tab, setTab] = useState('photo');
   const [quizData, setQuizData] = useState({
     faceShape: null,
@@ -210,6 +210,26 @@ export default function ToolInterface({ onSubmit, loading }) {
           </p>
         </div>
       </div>
+
+      {error && (
+        <div
+          role="alert"
+          style={{
+            maxWidth: '720px',
+            margin: '0 auto var(--space-6)',
+            padding: 'var(--space-4)',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--error)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--text-primary)',
+            fontSize: 'var(--text-base)',
+            lineHeight: 1.5
+          }}
+        >
+          <strong style={{ color: 'var(--error)' }}>Heads up: </strong>
+          {error}
+        </div>
+      )}
 
       {tab === 'photo' && (
         <div>

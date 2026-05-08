@@ -148,7 +148,7 @@ export default function Results({ recommendations = [], diagnostics, onReset }) 
               <div style={{
                 position: 'relative',
                 width: '100%',
-                aspectRatio: '4/3',
+                aspectRatio: '1/1',
                 borderRadius: 'var(--radius-md)',
                 marginBottom: 'var(--space-4)',
                 overflow: 'hidden',
@@ -158,7 +158,13 @@ export default function Results({ recommendations = [], diagnostics, onReset }) 
                   src={imageUrl}
                   alt={rec.style_name}
                   loading="lazy"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center top',
+                    display: 'block'
+                  }}
                   onError={(e) => {
                     if (e.currentTarget.dataset.fallback) return;
                     e.currentTarget.dataset.fallback = '1';

@@ -14,7 +14,8 @@ export const APPROVED_STYLES = [
 
 export function buildRecommendationPrompt(inputData) {
   const d = (inputData && inputData.data) || {};
-  const profile = inputData && inputData.type === 'photo'
+  const isPhoto = inputData && inputData.type === 'photo';
+  const profile = isPhoto
     ? '- Analyzing uploaded photo for face shape and hair type'
     : [
         `- Face Shape: ${d.faceShape || 'unspecified'}`,
@@ -28,14 +29,29 @@ export function buildRecommendationPrompt(inputData) {
     .map((s) => `- ${s.name} -> ${s.slug}`)
     .join('\n');
 
+  const genderInstructions = isPhoto
+    ? [
+        'GATING RULE — read this before everything else:',
+        'This is a men\'s barbershop tool. The recommendations are only valid for male-presenting subjects.',
+        'Examine the uploaded photo and set "gender_check" to one of these exact values:',
+        '  - "male"           : a male-presenting face is clearly visible. Continue and produce 3 recommendations.',
+        '  - "female"         : the subject appears female-presenting. Return an empty recommendations array.',
+        '  - "unclear"        : no clear face, multiple people, or you cannot tell. Return an empty recommendations array.',
+        'When gender_check is not "male", recommendations must be an empty array — do not invent placeholder content.'
+      ].join('\n')
+    : 'Set "gender_check" to "not_applicable" because no photo was provided.';
+
   return [
-    'You are a professional barber consultant. Analyze and recommend 3 taper haircut styles.',
+    'You are a professional barber consultant for men\'s taper haircuts.',
+    '',
+    genderInstructions,
     '',
     'Input Profile:',
     profile,
     '',
     'Return ONLY valid JSON with this schema:',
     '{',
+    '  "gender_check": "male" | "female" | "unclear" | "not_applicable",',
     '  "recommendations": [',
     '    {',
     '      "style_name": "Low Taper Fade",',
@@ -51,29 +67,36 @@ export function buildRecommendationPrompt(inputData) {
     'Approved styles with their URLs:',
     styleList,
     '',
-    'Return 3 recommendations ranked by match score. Use only the slugs above for related_url.'
+    'When gender_check is "male" or "not_applicable", return 3 recommendations ranked by match score using only the slugs above for related_url.'
   ].join('\n');
 }
 
 export function buildEditPrompt(rec) {
   return [
     'Edit this photograph to show the same person with a new haircut.',
-    'CRITICAL: keep the person\'s face, skin tone, eyes, eyebrows, mouth, beard,',
-    'expression, identity, clothing, lighting, and background EXACTLY the same.',
+    'FRAMING: produce a tight head-and-shoulders portrait. The hairstyle, full face,',
+    'and the top of the shoulders MUST be fully visible inside the frame. Do NOT include',
+    'the chest, torso, arms, or anything below the upper shoulders. Do NOT zoom out, do',
+    'NOT add or change clothing below the collar.',
+    'IDENTITY: keep the person\'s face, skin tone, eyes, eyebrows, mouth, beard,',
+    'expression, lighting, and background EXACTLY the same.',
     `Replace ONLY the hairstyle with: ${rec.style_name}.`,
     `Cut details: ${rec.barber_instructions || ''}`,
-    'Realistic, photorealistic, professional barbershop portrait quality,',
-    'sharp focus on the hair, natural shadows, no text, no watermark.'
+    'Photorealistic, professional barbershop portrait quality, sharp focus on the hair,',
+    'natural shadows, no text, no watermark.'
   ].join(' ');
 }
 
 export function buildStockPrompt(rec) {
   return [
-    `Generate a realistic professional barbershop portrait photograph of a man`,
+    'Generate a realistic professional headshot photograph of an adult man',
     `with a ${rec.style_name} haircut.`,
     `Cut details: ${rec.barber_instructions || ''}`,
-    'Head-and-shoulders, neutral studio background, soft natural lighting,',
-    'photorealistic, high resolution, clean editorial style, no text, no watermark.'
+    'FRAMING: tight head-and-shoulders portrait. The hairstyle, full face, and the',
+    'top of the shoulders MUST be fully visible. Do NOT include chest, torso, arms,',
+    'or anything below the upper shoulders.',
+    'Neutral studio background, soft natural lighting, photorealistic, high resolution,',
+    'clean editorial barbershop style, no text, no watermark.'
   ].join(' ');
 }
 
@@ -104,18 +127,18 @@ function pickArray(parsed) {
 
 function tryJsonParse(str) {
   try {
-    return pickArray(JSON.parse(str));
+    return JSON.parse(str);
   } catch {
     return null;
   }
 }
 
-export function parseRecommendations(text) {
+export function parseModelResponse(text) {
   if (!text || typeof text !== 'string') return null;
 
   // 1. Direct parse (Gemini with responseMimeType=application/json)
-  let result = tryJsonParse(text);
-  if (result) return result;
+  let parsed = tryJsonParse(text);
+  if (parsed) return parsed;
 
   // 2. Strip markdown code fences
   const stripped = text
@@ -123,30 +146,45 @@ export function parseRecommendations(text) {
     .replace(/\n?\s*```\s*$/g, '')
     .trim();
   if (stripped !== text) {
-    result = tryJsonParse(stripped);
-    if (result) return result;
+    parsed = tryJsonParse(stripped);
+    if (parsed) return parsed;
   }
 
   // 3. Extract a JSON object substring
   const objMatch = text.match(/\{[\s\S]*\}/);
   if (objMatch) {
-    result = tryJsonParse(objMatch[0]);
-    if (result) return result;
+    parsed = tryJsonParse(objMatch[0]);
+    if (parsed) return parsed;
   }
 
   // 4. Extract a JSON array substring
   const arrMatch = text.match(/\[[\s\S]*\]/);
   if (arrMatch) {
-    result = tryJsonParse(arrMatch[0]);
-    if (result) return result;
+    parsed = tryJsonParse(arrMatch[0]);
+    if (parsed) return parsed;
   }
 
+  return null;
+}
+
+export function parseRecommendations(text) {
+  return pickArray(parseModelResponse(text));
+}
+
+export function parseGenderCheck(parsed) {
+  if (!parsed || typeof parsed !== 'object') return null;
+  const value = parsed.gender_check || parsed.genderCheck;
+  if (typeof value === 'string') return value.toLowerCase();
   return null;
 }
 
 export const RECOMMENDATION_RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
+    gender_check: {
+      type: 'STRING',
+      enum: ['male', 'female', 'unclear', 'not_applicable']
+    },
     recommendations: {
       type: 'ARRAY',
       items: {
@@ -163,7 +201,7 @@ export const RECOMMENDATION_RESPONSE_SCHEMA = {
       }
     }
   },
-  required: ['recommendations']
+  required: ['gender_check', 'recommendations']
 };
 
 export function normalizeRecommendations(recs) {

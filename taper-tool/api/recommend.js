@@ -1,12 +1,29 @@
 import {
   buildRecommendationPrompt,
-  parseRecommendations,
+  parseModelResponse,
+  parseGenderCheck,
   normalizeRecommendations,
   getFallbackRecommendations,
   extractBase64,
   TEXT_MODEL_FALLBACKS,
   RECOMMENDATION_RESPONSE_SCHEMA
 } from './_lib/prompts.js';
+
+const VALIDATION_MESSAGES = {
+  female: 'Taper Empire is a men\'s barbershop tool, so we can only match male-presenting subjects. Please upload a different photo, or try the quick quiz to get matched without one.',
+  unclear: 'We couldn\'t make out a clear face in that photo. Try a sharper headshot taken in good light, or use the quick quiz instead.'
+};
+
+function pickArrayLocal(parsed) {
+  if (!parsed) return null;
+  if (Array.isArray(parsed)) return parsed;
+  if (Array.isArray(parsed.recommendations)) return parsed.recommendations;
+  if (Array.isArray(parsed.results)) return parsed.results;
+  if (Array.isArray(parsed.styles)) return parsed.styles;
+  if (Array.isArray(parsed.items)) return parsed.items;
+  if (Array.isArray(parsed.data)) return parsed.data;
+  return null;
+}
 
 const PRIMARY_TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || TEXT_MODEL_FALLBACKS[0];
 
@@ -117,7 +134,24 @@ export default async function handler(req, res) {
         data.candidates[0].content && data.candidates[0].content.parts &&
         data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
 
-      const recs = parseRecommendations(text);
+      const parsed = parseModelResponse(text);
+      const genderCheck = parseGenderCheck(parsed);
+      const recs = pickArrayLocal(parsed);
+
+      // Photo flow: hard-fail when the gating rule says non-male.
+      if (inputData.type === 'photo' && (genderCheck === 'female' || genderCheck === 'unclear')) {
+        res.status(200).json({
+          recommendations: [],
+          source: 'gemini',
+          model,
+          validationError: {
+            type: genderCheck === 'female' ? 'not_male' : 'unclear_subject',
+            message: VALIDATION_MESSAGES[genderCheck]
+          }
+        });
+        return;
+      }
+
       if (recs && recs.length > 0) {
         res.status(200).json({
           recommendations: normalizeRecommendations(recs),
