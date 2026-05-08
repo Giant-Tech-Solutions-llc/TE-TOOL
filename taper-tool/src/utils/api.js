@@ -5,43 +5,54 @@ const ENDPOINT =
 const FACE_SHAPES = ['round', 'oval', 'square', 'heart', 'diamond'];
 const HAIR_TYPES = ['straight', 'wavy', 'curly', 'coily'];
 
+const APPROVED_STYLES = [
+  { name: 'Low Taper Fade', slug: 'low-taper-fade' },
+  { name: 'Mid Taper Fade', slug: 'mid-taper-fade' },
+  { name: 'High Taper Fade', slug: 'high-taper-fade' },
+  { name: 'Blowout Taper', slug: 'blowout-taper' },
+  { name: 'Low Blowout Taper', slug: 'low-blowout-taper' }
+];
+
 function buildPrompt(inputData) {
   const d = inputData.data || {};
-  const lines = [
-    'You are an expert barber and men\'s grooming stylist.',
-    'Recommend exactly 3 taper haircuts tailored to the following client profile.',
-    '',
-    'Client profile:',
-    `- Face shape: ${d.faceShape || 'unspecified'}`,
-    `- Hair type: ${d.hairType || 'unspecified'}`,
-    `- Lifestyle: ${d.lifestyle || 'unspecified'}`,
-    `- Age range: ${d.age || 'unspecified'}`,
-    `- Maintenance preference: ${d.maintenance || 'unspecified'}`,
-    '',
-    'For each recommendation include: style_name (string), match_score (integer 70-99),',
-    'why_it_works (1-2 sentences), barber_instructions (specific cut directions including',
-    'guard sizes and length on top), maintenance (frequency and at-home routine).',
-    '',
-    'Respond ONLY with valid JSON in this exact shape:',
-    '{ "recommendations": [ { "style_name": "...", "match_score": 0,',
-    '"why_it_works": "...", "barber_instructions": "...", "maintenance": "..." } ] }'
-  ];
-  return lines.join('\n');
-}
+  const profile = inputData.type === 'photo'
+    ? '- Analyzing uploaded photo for face shape and hair type'
+    : [
+        `- Face Shape: ${d.faceShape || 'unspecified'}`,
+        `- Hair Type: ${d.hairType || 'unspecified'}`,
+        `- Lifestyle: ${d.lifestyle || 'unspecified'}`,
+        `- Age Range: ${d.age || 'unspecified'}`,
+        `- Maintenance Preference: ${d.maintenance || 'unspecified'}`
+      ].join('\n');
 
-function buildPhotoPrompt() {
+  const styleList = APPROVED_STYLES
+    .map((s) => `- ${s.name} -> ${s.slug}`)
+    .join('\n');
+
   return [
-    'You are an expert barber and men\'s grooming stylist.',
-    'Analyze the attached photo to estimate the client\'s face shape and hair type,',
-    'then recommend exactly 3 taper haircuts tailored to those features.',
+    'You are a professional barber consultant. Analyze and recommend 3 taper haircut styles.',
     '',
-    'For each recommendation include: style_name, match_score (integer 70-99),',
-    'why_it_works, barber_instructions (with guard sizes and length on top),',
-    'and maintenance.',
+    'Input Profile:',
+    profile,
     '',
-    'Respond ONLY with valid JSON:',
-    '{ "recommendations": [ { "style_name": "...", "match_score": 0,',
-    '"why_it_works": "...", "barber_instructions": "...", "maintenance": "..." } ] }'
+    'Return ONLY valid JSON with this schema:',
+    '{',
+    '  "recommendations": [',
+    '    {',
+    '      "style_name": "Low Taper Fade",',
+    '      "match_score": 92,',
+    '      "why_it_works": "2 sentences explaining match",',
+    '      "barber_instructions": "Exact technical instructions including guard sizes and length",',
+    '      "maintenance": "Frequency and effort",',
+    '      "related_url": "low-taper-fade"',
+    '    }',
+    '  ]',
+    '}',
+    '',
+    'Approved styles with their URLs:',
+    styleList,
+    '',
+    'Return 3 recommendations ranked by match score. Use only the slugs above for related_url.'
   ].join('\n');
 }
 
@@ -52,28 +63,19 @@ function extractBase64(dataUrl) {
 }
 
 function buildBody(inputData) {
+  const parts = [{ text: buildPrompt(inputData) }];
+
   if (inputData.type === 'photo' && inputData.data && inputData.data.photo) {
-    return {
-      contents: [{
-        parts: [
-          { text: buildPhotoPrompt() },
-          {
-            inline_data: {
-              mime_type: inputData.data.mimeType || 'image/jpeg',
-              data: extractBase64(inputData.data.photo)
-            }
-          }
-        ]
-      }],
-      generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 2048,
-        responseMimeType: 'application/json'
+    parts.push({
+      inline_data: {
+        mime_type: inputData.data.mimeType || 'image/jpeg',
+        data: extractBase64(inputData.data.photo)
       }
-    };
+    });
   }
+
   return {
-    contents: [{ parts: [{ text: buildPrompt(inputData) }] }],
+    contents: [{ parts }],
     generationConfig: {
       temperature: 0.3,
       maxOutputTokens: 2048,
@@ -105,15 +107,28 @@ function parseRecommendations(text) {
   return null;
 }
 
+function slugify(name) {
+  return String(name || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function normalize(recs) {
   if (!Array.isArray(recs)) return [];
-  return recs.slice(0, 3).map((r) => ({
-    style_name: String(r.style_name || 'Taper Style'),
-    match_score: clampScore(r.match_score),
-    why_it_works: String(r.why_it_works || ''),
-    barber_instructions: String(r.barber_instructions || ''),
-    maintenance: String(r.maintenance || '')
-  }));
+  return recs.slice(0, 3).map((r) => {
+    const styleName = String(r.style_name || 'Taper Style');
+    const slug = r.related_url ? String(r.related_url) : slugify(styleName);
+    return {
+      style_name: styleName,
+      match_score: clampScore(r.match_score),
+      why_it_works: String(r.why_it_works || ''),
+      barber_instructions: String(r.barber_instructions || ''),
+      maintenance: String(r.maintenance || ''),
+      related_url: slug
+    };
+  });
 }
 
 function clampScore(value) {
@@ -164,7 +179,7 @@ function getFallbackRecommendations(data) {
   const hair = HAIR_TYPES.includes(data.hairType) ? data.hairType : 'straight';
   const maintenance = data.maintenance || 'medium';
 
-  const catalog = [
+  return [
     {
       style_name: 'Low Taper Fade',
       match_score: 92,
@@ -174,27 +189,28 @@ function getFallbackRecommendations(data) {
         'Low taper fade starting at the temple. Use a #1 guard at the base, blend up to a #2 around the ears, leave 2-3 inches on top scissor-cut for natural movement.',
       maintenance: maintenance === 'low'
         ? 'Low - barber visit every 4 weeks, light pomade as needed.'
-        : 'Medium - barber every 2-3 weeks, light styling cream daily.'
+        : 'Medium - barber every 2-3 weeks, light styling cream daily.',
+      related_url: 'low-taper-fade'
     },
     {
-      style_name: 'Mid Taper with Textured Crop',
+      style_name: 'Mid Taper Fade',
       match_score: 88,
       why_it_works:
-        `A mid taper draws focus upward and a textured crop adds dimension that flatters a ${face} face with ${hair} hair.`,
+        `A mid taper draws focus upward and adds dimension that flatters a ${face} face with ${hair} hair.`,
       barber_instructions:
         'Mid taper from the parietal ridge. #1 at the bottom, #2 mid, hand-blended to scissor work above. Top: 1.5-2 inches, point-cut for texture, fringe forward.',
-      maintenance: 'Medium - reshape every 3 weeks, matte clay for finish.'
+      maintenance: 'Medium - reshape every 3 weeks, matte clay for finish.',
+      related_url: 'mid-taper-fade'
     },
     {
-      style_name: 'High Taper Pompadour',
+      style_name: 'Blowout Taper',
       match_score: 84,
       why_it_works:
-        `A high taper combined with a pompadour adds height and a sharp silhouette that suits ${face} features and works well with ${hair} hair.`,
+        `A blowout taper adds height and a sharp silhouette that suits ${face} features and works well with ${hair} hair.`,
       barber_instructions:
-        'High taper with a defined edge above the temples. #0.5 at the base, #2 transitioning into scissor work. Leave 3-4 inches on top, blow-dry back and up, finish with strong-hold pomade.',
-      maintenance: 'High - barber every 2 weeks, daily blow-dry and product.'
+        'Mid-to-high taper with a defined edge. #0.5 at the base, #2 transitioning into scissor work. Leave 3-4 inches on top, blow-dry up and back, finish with strong-hold pomade.',
+      maintenance: 'High - barber every 2 weeks, daily blow-dry and product.',
+      related_url: 'blowout-taper'
     }
   ];
-
-  return catalog;
 }
