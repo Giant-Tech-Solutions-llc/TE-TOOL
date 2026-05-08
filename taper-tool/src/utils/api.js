@@ -15,8 +15,8 @@ const TEXT_MODEL = import.meta.env.VITE_GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
 const IMAGE_MODEL = import.meta.env.VITE_GEMINI_IMAGE_MODEL || IMAGE_MODEL_FALLBACKS[0];
 const TEXT_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${TEXT_MODEL}:generateContent`;
 
-const RECOMMEND_PROXY = '/api/recommend';
-const IMAGE_PROXY = '/api/generate-image';
+const RECOMMEND_PROXY = 'https://te-tool-app.vercel.app/api/recommend';
+const IMAGE_PROXY = 'https://te-tool-app.vercel.app/api/generate-image';
 
 let proxyAvailable = null;
 
