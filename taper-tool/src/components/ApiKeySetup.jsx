@@ -243,6 +243,11 @@ export function ApiKeyBanner() {
   // Don't flash the banner before we've checked the server.
   if (!proxy.checked) return null;
 
+  // Differentiate "deployed without server key" vs "no proxy at all (Vite dev)"
+  const message = proxy.ok
+    ? 'Server is missing GEMINI_API_KEY — set it in your Vercel project env vars to enable AI previews.'
+    : 'Local dev mode — paste a Gemini key to test, or run `vercel dev` to use the server proxy.';
+
   return (
     <>
       <div
@@ -262,7 +267,7 @@ export function ApiKeyBanner() {
         }}
       >
         <AlertTriangle size={16} />
-        <span>AI photo previews are off — add your free Gemini API key to enable them.</span>
+        <span>{message}</span>
         <button
           type="button"
           onClick={() => setOpen(true)}

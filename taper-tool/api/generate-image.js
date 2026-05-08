@@ -4,7 +4,7 @@ import {
   extractInlineImage,
   extractBase64,
   IMAGE_MODEL_FALLBACKS
-} from '../shared/prompts.js';
+} from './_lib/prompts.js';
 
 const PRIMARY_IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || IMAGE_MODEL_FALLBACKS[0];
 

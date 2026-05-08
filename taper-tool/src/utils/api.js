@@ -9,7 +9,7 @@ import {
   extractInlineImage,
   extractBase64,
   IMAGE_MODEL_FALLBACKS
-} from '../../shared/prompts.js';
+} from '../../api/_lib/prompts.js';
 
 const TEXT_MODEL = import.meta.env.VITE_GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
 const IMAGE_MODEL = import.meta.env.VITE_GEMINI_IMAGE_MODEL || IMAGE_MODEL_FALLBACKS[0];
@@ -168,21 +168,33 @@ async function generateStyleImageDirect(rec, userPhoto, userMimeType) {
 
 export async function getRecommendations(inputData) {
   const proxy = await checkProxy();
+  const diagnostics = {
+    proxy: proxy.ok ? (proxy.hasKey ? 'server-key' : 'server-no-key') : 'no-proxy',
+    textSource: 'fallback',
+    imageSource: 'illustration',
+    errors: []
+  };
 
   let recs;
   if (proxy.ok) {
     const proxyRes = await fetchRecommendationsViaProxy(inputData);
-    recs = proxyRes && proxyRes.recs ? proxyRes.recs : null;
+    if (proxyRes && proxyRes.recs) {
+      recs = proxyRes.recs;
+      diagnostics.textSource = proxyRes.source === 'gemini' ? 'gemini-via-proxy' : 'fallback-via-proxy';
+    }
   }
   if (!recs) {
     recs = await getTextRecommendationsDirect(inputData);
+    diagnostics.textSource = getApiKey() ? 'gemini-direct' : 'fallback-local';
   }
   if (!Array.isArray(recs) || recs.length === 0) {
     recs = getFallbackRecommendations(inputData.data || {});
+    diagnostics.textSource = 'fallback';
   }
 
   const userPhoto = inputData && inputData.type === 'photo' && inputData.data ? inputData.data.photo : null;
   const userMime = inputData && inputData.type === 'photo' && inputData.data ? inputData.data.mimeType : null;
+  let imageHits = 0;
 
   const withImages = await Promise.all(
     recs.map(async (rec) => {
@@ -193,9 +205,16 @@ export async function getRecommendations(inputData) {
       if (!image) {
         image = await generateStyleImageDirect(rec, userPhoto, userMime);
       }
+      if (image) imageHits += 1;
       return { ...rec, image_url: image || rec.image_url || null };
     })
   );
 
-  return withImages;
+  diagnostics.imageSource = imageHits === recs.length
+    ? 'gemini-all'
+    : imageHits > 0
+      ? `gemini-${imageHits}-of-${recs.length}`
+      : 'illustration';
+
+  return { recommendations: withImages, diagnostics };
 }

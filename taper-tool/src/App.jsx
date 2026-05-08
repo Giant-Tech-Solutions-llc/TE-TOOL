@@ -14,8 +14,12 @@ function AppContent() {
   const handleSubmit = async (inputData) => {
     dispatch({ type: 'SUBMIT', payload: inputData });
     try {
-      const recommendations = await getRecommendations(inputData);
-      dispatch({ type: 'SUCCESS', payload: recommendations });
+      const result = await getRecommendations(inputData);
+      dispatch({
+        type: 'SUCCESS',
+        payload: result.recommendations,
+        diagnostics: result.diagnostics
+      });
     } catch (error) {
       dispatch({ type: 'ERROR', payload: error && error.message ? error.message : 'Something went wrong.' });
     }
@@ -62,7 +66,11 @@ function AppContent() {
           <ToolInterface onSubmit={handleSubmit} loading={state.loading} />
         )}
         {state.step === 'results' && (
-          <Results recommendations={state.recommendations} onReset={handleReset} />
+          <Results
+            recommendations={state.recommendations}
+            diagnostics={state.diagnostics}
+            onReset={handleReset}
+          />
         )}
       </main>
 

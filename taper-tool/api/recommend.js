@@ -4,7 +4,7 @@ import {
   normalizeRecommendations,
   getFallbackRecommendations,
   extractBase64
-} from '../shared/prompts.js';
+} from './_lib/prompts.js';
 
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
 

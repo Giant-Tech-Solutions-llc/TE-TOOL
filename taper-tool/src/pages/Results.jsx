@@ -1,16 +1,8 @@
 import { useState } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import { ChevronDown, ExternalLink } from 'lucide-react';
-
-const PLACEHOLDER_IMAGE =
-  'data:image/svg+xml;utf8,' +
-  encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">' +
-      '<rect fill="#A39382" width="400" height="300"/>' +
-      '<text x="50%" y="50%" fill="#FBF7F4" text-anchor="middle" dy=".3em" font-size="20">No Image</text>' +
-    '</svg>'
-  );
+import { ChevronDown, ExternalLink, Sparkles } from 'lucide-react';
+import { getStyleIllustration } from '../utils/styleIllustrations';
 
 function slugify(name) {
   return String(name || '')
@@ -20,7 +12,50 @@ function slugify(name) {
     .replace(/^-+|-+$/g, '');
 }
 
-export default function Results({ recommendations = [], onReset }) {
+function DiagnosticBanner({ diagnostics }) {
+  if (!diagnostics) return null;
+  const { textSource, imageSource, proxy } = diagnostics;
+  const aiUsed = textSource && textSource.startsWith('gemini');
+  const aiImages = imageSource && imageSource.startsWith('gemini');
+  if (aiUsed && aiImages === true && imageSource === 'gemini-all') return null;
+
+  let title;
+  let detail;
+  if (proxy === 'no-proxy') {
+    title = 'Running locally without the API proxy.';
+    detail = 'Generic illustrations are shown. To get on-face AI previews, paste a Gemini key in the gear icon, or run `vercel dev`.';
+  } else if (proxy === 'server-no-key') {
+    title = 'AI is off — server has no GEMINI_API_KEY.';
+    detail = 'Set GEMINI_API_KEY in your Vercel project settings, then redeploy. Until then, illustrations are shown.';
+  } else if (!aiUsed) {
+    title = 'Showing curated recommendations.';
+    detail = 'AI text generation is unavailable right now — the curated catalog is being used instead.';
+  } else if (!aiImages) {
+    title = 'AI text worked but image generation did not.';
+    detail = 'Check that your Gemini key has access to gemini-2.5-flash-image-preview, or check the Vercel function logs.';
+  } else {
+    title = `Some images couldn't be generated (${imageSource}).`;
+    detail = 'Curated illustrations are used where AI rendering failed.';
+  }
+
+  return (
+    <div style={{
+      maxWidth: '720px',
+      margin: '0 auto var(--space-8)',
+      padding: 'var(--space-3) var(--space-4)',
+      background: 'var(--bg-secondary)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-md)',
+      color: 'var(--text-secondary)',
+      fontSize: 'var(--text-sm)',
+      textAlign: 'center'
+    }}>
+      <strong style={{ color: 'var(--text-primary)' }}>{title}</strong> {detail}
+    </div>
+  );
+}
+
+export default function Results({ recommendations = [], diagnostics, onReset }) {
   const [expandedCard, setExpandedCard] = useState(null);
 
   return (
@@ -28,7 +63,7 @@ export default function Results({ recommendations = [], onReset }) {
       className="tt-fade-in"
       style={{ maxWidth: '1200px', margin: '0 auto', padding: 'var(--space-8) var(--space-4)' }}
     >
-      <div style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>
+      <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
         <h2 style={{
           fontSize: 'var(--text-3xl)',
           marginBottom: 'var(--space-2)',
@@ -41,6 +76,8 @@ export default function Results({ recommendations = [], onReset }) {
           Based on your unique features and preferences
         </p>
       </div>
+
+      <DiagnosticBanner diagnostics={diagnostics} />
 
       {recommendations.length === 0 && (
         <div style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
@@ -60,7 +97,9 @@ export default function Results({ recommendations = [], onReset }) {
         {recommendations.map((rec, i) => {
           const slug = rec.related_url || slugify(rec.style_name);
           const guideUrl = `https://taperempire.com/${slug}/`;
-          const imageUrl = rec.image_url || PLACEHOLDER_IMAGE;
+          const fallbackImage = getStyleIllustration(slug);
+          const imageUrl = rec.image_url || fallbackImage;
+          const isAiImage = Boolean(rec.image_url);
 
           return (
             <Card key={i} padding="lg">
@@ -81,9 +120,28 @@ export default function Results({ recommendations = [], onReset }) {
                   onError={(e) => {
                     if (e.currentTarget.dataset.fallback) return;
                     e.currentTarget.dataset.fallback = '1';
-                    e.currentTarget.src = PLACEHOLDER_IMAGE;
+                    e.currentTarget.src = fallbackImage;
                   }}
                 />
+                {isAiImage && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 'var(--space-2)',
+                    left: 'var(--space-2)',
+                    background: 'rgba(0,0,0,0.6)',
+                    color: '#fff',
+                    padding: 'var(--space-1) var(--space-3)',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 'var(--font-semibold)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-1)',
+                    backdropFilter: 'blur(4px)'
+                  }}>
+                    <Sparkles size={12} /> AI preview
+                  </div>
+                )}
                 <div style={{
                   position: 'absolute',
                   top: 'var(--space-2)',

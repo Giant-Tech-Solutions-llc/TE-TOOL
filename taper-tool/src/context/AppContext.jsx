@@ -6,6 +6,7 @@ const initialState = {
   step: 'hero',
   inputData: null,
   recommendations: [],
+  diagnostics: null,
   loading: false,
   error: null
 };
@@ -17,7 +18,13 @@ function reducer(state, action) {
     case 'SUBMIT':
       return { ...state, loading: true, error: null, inputData: action.payload || state.inputData };
     case 'SUCCESS':
-      return { ...state, step: 'results', recommendations: action.payload, loading: false };
+      return {
+        ...state,
+        step: 'results',
+        recommendations: action.payload,
+        diagnostics: action.diagnostics || null,
+        loading: false
+      };
     case 'ERROR':
       return { ...state, error: action.payload, loading: false };
     case 'RESET':

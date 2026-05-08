@@ -46,11 +46,18 @@ taper-tool/
 
 ## Production deploy (Vercel)
 
-1. Push this repo to GitHub (already done).
-2. Import the repo in Vercel. Set **Root Directory** to `taper-tool`.
-3. In **Settings → Environment Variables** add:
+> ⚠️ **Critical:** the Vercel project's **Root Directory** must be `taper-tool` (this folder), not the repo root. Otherwise Vercel won't find `api/` or `package.json`.
+
+1. In Vercel → **Add New → Project** → import the GitHub repo.
+2. **Configure Project**:
+   - **Root Directory**: click **Edit** and choose `taper-tool`.
+   - Framework Preset: **Vite** (auto-detected).
+   - Build & Output: leave defaults.
+3. **Environment Variables**: add
    - `GEMINI_API_KEY` = your Google AI Studio key (https://aistudio.google.com/app/apikey)
-4. Deploy. That's it — visitors don't need their own key.
+4. Click **Deploy**. Visitors will use the tool with no setup.
+
+Verify it's working: open `https://your-app.vercel.app/api/health` — you should see `"hasKey": true`. If `false`, the env var isn't set or the deploy didn't pick it up; redeploy after saving.
 
 Optional server-side overrides:
 - `GEMINI_TEXT_MODEL` (default `gemini-2.5-flash`)
