@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { ChevronDown, ExternalLink, Sparkles } from 'lucide-react';
 import { getStyleIllustration } from '../utils/styleIllustrations';
+import FeedbackPrompt from '../components/FeedbackPrompt';
+import ExitIntentModal from '../components/ExitIntentModal';
+import { hasGivenFeedback } from '../utils/feedback';
 
 function slugify(name) {
   return String(name || '')
@@ -99,6 +102,24 @@ function DiagnosticBanner({ diagnostics }) {
 
 export default function Results({ recommendations = [], diagnostics, onReset }) {
   const [expandedCard, setExpandedCard] = useState(null);
+  const [feedbackGiven, setFeedbackGiven] = useState(false);
+  const [softStop, setSoftStop] = useState(false);
+
+  useEffect(() => {
+    setFeedbackGiven(hasGivenFeedback());
+  }, []);
+
+  const flow = diagnostics && diagnostics.proxy ? diagnostics.proxy : 'unknown';
+
+  const handleReset = () => {
+    if (!feedbackGiven && !softStop) {
+      setSoftStop(true);
+      const el = document.getElementById('tt-feedback');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    onReset();
+  };
 
   return (
     <div
@@ -134,7 +155,8 @@ export default function Results({ recommendations = [], diagnostics, onReset }) 
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         gap: 'var(--space-6)',
-        marginBottom: 'var(--space-12)'
+        marginBottom: 'var(--space-12)',
+        alignItems: 'start'
       }}>
         {recommendations.map((rec, i) => {
           const slug = rec.related_url || slugify(rec.style_name);
@@ -305,9 +327,32 @@ export default function Results({ recommendations = [], diagnostics, onReset }) 
         })}
       </div>
 
-      <div style={{ textAlign: 'center' }}>
-        <Button onClick={onReset}>Start Over</Button>
+      <div id="tt-feedback">
+        <FeedbackPrompt
+          recommendations={recommendations}
+          flow={flow}
+          onSubmitted={() => setFeedbackGiven(true)}
+        />
       </div>
+
+      {softStop && !feedbackGiven && (
+        <p style={{
+          textAlign: 'center',
+          color: 'var(--accent)',
+          fontSize: 'var(--text-sm)',
+          marginTop: 'calc(-1 * var(--space-8))',
+          marginBottom: 'var(--space-6)',
+          fontWeight: 'var(--font-semibold)'
+        }}>
+          One quick tap above and we'll get out of your way ↑
+        </p>
+      )}
+
+      <div style={{ textAlign: 'center' }}>
+        <Button onClick={handleReset}>Start Over</Button>
+      </div>
+
+      <ExitIntentModal recommendations={recommendations} flow={flow} />
     </div>
   );
 }

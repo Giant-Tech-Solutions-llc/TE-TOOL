@@ -133,7 +133,7 @@ export default function ToolInterface({ onSubmit, loading, error }) {
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         gap: 'var(--space-4)',
-        alignItems: 'center',
+        alignItems: 'stretch',
         marginBottom: 'var(--space-12)'
       }}>
         <div
@@ -149,27 +149,39 @@ export default function ToolInterface({ onSubmit, loading, error }) {
             transition: 'all var(--transition)',
             background: tab === 'photo' ? 'var(--bg-secondary)' : 'transparent',
             textAlign: 'center',
-            outline: 'none'
+            outline: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative'
           }}
         >
-          <Upload size={48} style={{ margin: '0 auto var(--space-4)', color: 'var(--accent)', display: 'block' }} />
-          <h3 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-2)', fontWeight: 'var(--font-semibold)' }}>
-            Upload Photo
-          </h3>
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--text-secondary)' }}>
-            Most accurate results
-          </p>
-          <div style={{
-            display: 'inline-block',
-            marginTop: 'var(--space-3)',
-            padding: 'var(--space-1) var(--space-3)',
-            background: 'var(--accent)',
-            color: 'var(--bg-primary)',
-            borderRadius: 'var(--radius-full)',
-            fontSize: 'var(--text-sm)',
-            fontWeight: 'var(--font-semibold)'
-          }}>
+          <span
+            aria-label="Recommended"
+            style={{
+              position: 'absolute',
+              top: 'var(--space-3)',
+              right: 'var(--space-3)',
+              padding: 'var(--space-1) var(--space-3)',
+              background: 'var(--accent)',
+              color: 'var(--bg-primary)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: 'var(--text-xs)',
+              fontWeight: 'var(--font-semibold)',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase'
+            }}
+          >
             Recommended
+          </span>
+          <div>
+            <Upload size={48} style={{ margin: '0 auto var(--space-4)', color: 'var(--accent)', display: 'block' }} />
+            <h3 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-2)', fontWeight: 'var(--font-semibold)' }}>
+              Upload Photo
+            </h3>
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--text-secondary)' }}>
+              Most accurate results
+            </p>
           </div>
         </div>
 
@@ -179,7 +191,8 @@ export default function ToolInterface({ onSubmit, loading, error }) {
             fontSize: 'var(--text-lg)',
             color: 'var(--text-tertiary)',
             fontWeight: 'var(--font-semibold)',
-            textAlign: 'center'
+            textAlign: 'center',
+            alignSelf: 'center'
           }}
         >
           OR
@@ -198,16 +211,21 @@ export default function ToolInterface({ onSubmit, loading, error }) {
             transition: 'all var(--transition)',
             background: tab === 'quiz' ? 'var(--bg-secondary)' : 'transparent',
             textAlign: 'center',
-            outline: 'none'
+            outline: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
           }}
         >
-          <MessageSquare size={48} style={{ margin: '0 auto var(--space-4)', color: 'var(--text-secondary)', display: 'block' }} />
-          <h3 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-2)', fontWeight: 'var(--font-semibold)' }}>
-            Take Quiz
-          </h3>
-          <p style={{ fontSize: 'var(--text-base)', color: 'var(--text-secondary)' }}>
-            5 quick questions
-          </p>
+          <div>
+            <MessageSquare size={48} style={{ margin: '0 auto var(--space-4)', color: 'var(--text-secondary)', display: 'block' }} />
+            <h3 style={{ fontSize: 'var(--text-xl)', marginBottom: 'var(--space-2)', fontWeight: 'var(--font-semibold)' }}>
+              Take Quiz
+            </h3>
+            <p style={{ fontSize: 'var(--text-base)', color: 'var(--text-secondary)' }}>
+              5 quick questions
+            </p>
+          </div>
         </div>
       </div>
 
