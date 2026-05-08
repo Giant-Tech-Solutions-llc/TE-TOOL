@@ -1,5 +1,6 @@
 import { AppProvider, useApp } from './context/AppContext';
 import ThemeToggle from './components/ThemeToggle';
+import ApiKeyButton, { ApiKeyBanner } from './components/ApiKeySetup';
 import Hero from './pages/Hero';
 import ToolInterface from './pages/ToolInterface';
 import Results from './pages/Results';
@@ -23,7 +24,8 @@ function AppContent() {
   const handleReset = () => dispatch({ type: 'RESET' });
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative', paddingTop: 'var(--space-4)' }}>
+    <div style={{ minHeight: '100vh', position: 'relative' }}>
+      <ApiKeyBanner />
       <header style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -48,7 +50,10 @@ function AppContent() {
         >
           Taper Empire
         </button>
-        <ThemeToggle />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <ApiKeyButton />
+          <ThemeToggle />
+        </div>
       </header>
 
       <main>

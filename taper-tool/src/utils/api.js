@@ -1,8 +1,8 @@
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+import { getApiKey } from './apiKey';
+
 const TEXT_MODEL = import.meta.env.VITE_GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
 const IMAGE_MODEL = import.meta.env.VITE_GEMINI_IMAGE_MODEL || 'gemini-2.5-flash-image-preview';
 const TEXT_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${TEXT_MODEL}:generateContent`;
-const IMAGE_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent`;
 
 const FACE_SHAPES = ['round', 'oval', 'square', 'heart', 'diamond'];
 const HAIR_TYPES = ['straight', 'wavy', 'curly', 'coily'];
@@ -184,9 +184,9 @@ const IMAGE_MODEL_FALLBACKS = [
   'gemini-2.0-flash-exp-image-generation'
 ].filter((value, index, arr) => value && arr.indexOf(value) === index);
 
-async function callImageModel(model, body) {
+async function callImageModel(model, body, apiKey) {
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-  const res = await fetch(`${endpoint}?key=${encodeURIComponent(API_KEY)}`, {
+  const res = await fetch(`${endpoint}?key=${encodeURIComponent(apiKey)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
@@ -195,7 +195,8 @@ async function callImageModel(model, body) {
 }
 
 async function generateStyleImage(rec, userPhoto, userMimeType) {
-  if (!API_KEY) return null;
+  const apiKey = getApiKey();
+  if (!apiKey) return null;
 
   const parts = [];
   if (userPhoto) {
@@ -220,7 +221,7 @@ async function generateStyleImage(rec, userPhoto, userMimeType) {
 
   for (const model of IMAGE_MODEL_FALLBACKS) {
     try {
-      const res = await callImageModel(model, body);
+      const res = await callImageModel(model, body, apiKey);
       if (!res.ok) {
         const text = await res.text().catch(() => '');
         console.warn(`Image model ${model} returned ${res.status}: ${text.slice(0, 300)}`);
@@ -239,10 +240,11 @@ async function generateStyleImage(rec, userPhoto, userMimeType) {
 }
 
 async function getTextRecommendations(inputData) {
-  if (!API_KEY) return getFallbackRecommendations(inputData.data || {});
+  const apiKey = getApiKey();
+  if (!apiKey) return getFallbackRecommendations(inputData.data || {});
 
   try {
-    const response = await fetch(`${TEXT_ENDPOINT}?key=${encodeURIComponent(API_KEY)}`, {
+    const response = await fetch(`${TEXT_ENDPOINT}?key=${encodeURIComponent(apiKey)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(buildTextBody(inputData))
