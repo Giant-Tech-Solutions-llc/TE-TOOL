@@ -23,7 +23,7 @@ function summarizeError(err) {
 
 function DiagnosticBanner({ diagnostics }) {
   if (!diagnostics) return null;
-  const { textSource, imageSource, proxy, errors } = diagnostics;
+  const { textSource, imageSource, proxy, textReason, imageReason, errors } = diagnostics;
   const aiUsed = textSource && textSource.startsWith('gemini');
   const aiAllImages = imageSource === 'gemini-all';
   if (aiUsed && aiAllImages) return null;
@@ -36,14 +36,20 @@ function DiagnosticBanner({ diagnostics }) {
   } else if (proxy === 'server-no-key') {
     title = 'AI is off — server has no GEMINI_API_KEY.';
     detail = 'Set GEMINI_API_KEY in your Vercel project settings, then redeploy. Until then, illustrations are shown.';
+  } else if (!aiUsed && textReason === 'quota_exceeded') {
+    title = 'Gemini text quota exhausted on this API key.';
+    detail = 'Free-tier quota for the chosen text models is used up. Enable billing in Google AI Studio (https://aistudio.google.com/app/apikey) or wait for daily reset. Curated catalog is shown until then.';
   } else if (!aiUsed) {
     title = 'AI text generation failed — showing curated recommendations.';
-    detail = 'The Gemini text call returned an error for every model in the fallback chain. The actual upstream messages are listed below — most often this means the API key isn\'t enabled for these model IDs in Google AI Studio.';
+    detail = 'The Gemini text call returned an error for every model in the fallback chain. See upstream messages below.';
+  } else if (!aiAllImages && imageReason === 'quota_exceeded') {
+    title = 'Gemini image quota exhausted on this API key.';
+    detail = 'Free-tier quota for Gemini 2.5 Flash Image is very limited (~10/day). Enable billing in Google AI Studio for unlimited generation, or wait for daily reset. Curated illustrations are shown for now.';
   } else if (!aiAllImages) {
     title = imageSource === 'illustration'
       ? 'AI text worked but image generation did not.'
       : `Some images couldn't be generated (${imageSource}).`;
-    detail = 'Make sure your Gemini key has access to gemini-2.5-flash-image-preview (it needs to be enabled in your Google AI Studio account). Curated illustrations are shown where AI rendering failed.';
+    detail = 'Make sure your Gemini key has access to gemini-2.5-flash-image-preview. See upstream messages below.';
   }
 
   const errorList = (errors || []).slice(0, 8).map(summarizeError).filter(Boolean);

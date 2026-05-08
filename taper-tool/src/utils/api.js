@@ -69,6 +69,7 @@ async function fetchImageViaProxy(rec, userPhoto, userMimeType) {
     const data = await res.json();
     return {
       url: data && data.image_url ? data.image_url : null,
+      reason: data && data.reason ? data.reason : null,
       errors: data && data.errors ? data.errors : null
     };
   } catch (error) {
@@ -180,6 +181,8 @@ export async function getRecommendations(inputData) {
     proxy: proxy.ok ? (proxy.hasKey ? 'server-key' : 'server-no-key') : 'no-proxy',
     textSource: 'fallback',
     imageSource: 'illustration',
+    textReason: null,
+    imageReason: null,
     errors: []
   };
 
@@ -215,8 +218,13 @@ export async function getRecommendations(inputData) {
         const proxyImage = await fetchImageViaProxy(rec, userPhoto, userMime);
         if (proxyImage && proxyImage.url) {
           image = proxyImage.url;
-        } else if (proxyImage && proxyImage.errors) {
-          diagnostics.errors.push(...proxyImage.errors.map(e => ({ where: 'image', style: rec.style_name, ...e })));
+        } else if (proxyImage) {
+          if (proxyImage.errors) {
+            diagnostics.errors.push(...proxyImage.errors.map(e => ({ where: 'image', style: rec.style_name, ...e })));
+          }
+          if (proxyImage.reason && !diagnostics.imageReason) {
+            diagnostics.imageReason = proxyImage.reason;
+          }
         }
       }
       if (!image) {

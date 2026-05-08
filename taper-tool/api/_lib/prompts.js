@@ -91,24 +91,80 @@ export function clampScore(value) {
   return Math.max(70, Math.min(99, Math.round(n)));
 }
 
-export function parseRecommendations(text) {
-  if (!text || typeof text !== 'string') return null;
-  try {
-    const parsed = JSON.parse(text);
-    if (parsed && Array.isArray(parsed.recommendations)) return parsed.recommendations;
-  } catch {
-    const match = text.match(/\{[\s\S]*\}/);
-    if (match) {
-      try {
-        const parsed = JSON.parse(match[0]);
-        if (parsed && Array.isArray(parsed.recommendations)) return parsed.recommendations;
-      } catch {
-        return null;
-      }
-    }
-  }
+function pickArray(parsed) {
+  if (!parsed) return null;
+  if (Array.isArray(parsed)) return parsed;
+  if (Array.isArray(parsed.recommendations)) return parsed.recommendations;
+  if (Array.isArray(parsed.results)) return parsed.results;
+  if (Array.isArray(parsed.styles)) return parsed.styles;
+  if (Array.isArray(parsed.items)) return parsed.items;
+  if (Array.isArray(parsed.data)) return parsed.data;
   return null;
 }
+
+function tryJsonParse(str) {
+  try {
+    return pickArray(JSON.parse(str));
+  } catch {
+    return null;
+  }
+}
+
+export function parseRecommendations(text) {
+  if (!text || typeof text !== 'string') return null;
+
+  // 1. Direct parse (Gemini with responseMimeType=application/json)
+  let result = tryJsonParse(text);
+  if (result) return result;
+
+  // 2. Strip markdown code fences
+  const stripped = text
+    .replace(/^\s*```(?:json|JSON)?\s*\n?/g, '')
+    .replace(/\n?\s*```\s*$/g, '')
+    .trim();
+  if (stripped !== text) {
+    result = tryJsonParse(stripped);
+    if (result) return result;
+  }
+
+  // 3. Extract a JSON object substring
+  const objMatch = text.match(/\{[\s\S]*\}/);
+  if (objMatch) {
+    result = tryJsonParse(objMatch[0]);
+    if (result) return result;
+  }
+
+  // 4. Extract a JSON array substring
+  const arrMatch = text.match(/\[[\s\S]*\]/);
+  if (arrMatch) {
+    result = tryJsonParse(arrMatch[0]);
+    if (result) return result;
+  }
+
+  return null;
+}
+
+export const RECOMMENDATION_RESPONSE_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    recommendations: {
+      type: 'ARRAY',
+      items: {
+        type: 'OBJECT',
+        properties: {
+          style_name: { type: 'STRING' },
+          match_score: { type: 'INTEGER' },
+          why_it_works: { type: 'STRING' },
+          barber_instructions: { type: 'STRING' },
+          maintenance: { type: 'STRING' },
+          related_url: { type: 'STRING' }
+        },
+        required: ['style_name', 'match_score', 'why_it_works', 'barber_instructions', 'maintenance']
+      }
+    }
+  },
+  required: ['recommendations']
+};
 
 export function normalizeRecommendations(recs) {
   if (!Array.isArray(recs)) return [];
@@ -202,11 +258,9 @@ export const IMAGE_MODEL_FALLBACKS = [
 
 export const TEXT_MODEL_FALLBACKS = [
   'gemini-2.5-flash',
-  'gemini-2.5-flash-002',
-  'gemini-2.0-flash',
-  'gemini-2.0-flash-001',
-  'gemini-2.0-flash-exp',
-  'gemini-1.5-flash-latest',
-  'gemini-1.5-flash-002',
-  'gemini-1.5-flash'
+  'gemini-2.5-flash-lite',
+  'gemini-2.5-pro',
+  'gemini-flash-latest',
+  'gemini-flash-lite-latest',
+  'gemini-2.0-flash'
 ];

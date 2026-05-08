@@ -87,6 +87,7 @@ export default async function handler(req, res) {
   };
 
   const errors = [];
+  let quotaHit = false;
   for (const model of MODEL_CHAIN) {
     try {
       const response = await callImageModel(model, requestBody, apiKey);
@@ -95,6 +96,7 @@ export default async function handler(req, res) {
         const summary = `${response.status} ${errText.slice(0, 240)}`.trim();
         console.warn(`image model ${model} -> ${summary}`);
         errors.push({ model, status: response.status, summary });
+        if (response.status === 429) quotaHit = true;
         continue;
       }
       const data = await response.json();
@@ -110,5 +112,10 @@ export default async function handler(req, res) {
     }
   }
 
-  res.status(200).json({ image_url: null, source: 'unavailable', errors });
+  res.status(200).json({
+    image_url: null,
+    source: 'unavailable',
+    reason: quotaHit ? 'quota_exceeded' : 'upstream_error',
+    errors
+  });
 }

@@ -4,7 +4,8 @@ import {
   normalizeRecommendations,
   getFallbackRecommendations,
   extractBase64,
-  TEXT_MODEL_FALLBACKS
+  TEXT_MODEL_FALLBACKS,
+  RECOMMENDATION_RESPONSE_SCHEMA
 } from './_lib/prompts.js';
 
 const PRIMARY_TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || TEXT_MODEL_FALLBACKS[0];
@@ -92,11 +93,13 @@ export default async function handler(req, res) {
     generationConfig: {
       temperature: 0.3,
       maxOutputTokens: 2048,
-      responseMimeType: 'application/json'
+      responseMimeType: 'application/json',
+      responseSchema: RECOMMENDATION_RESPONSE_SCHEMA
     }
   };
 
   const errors = [];
+  let quotaHit = false;
   for (const model of TEXT_CHAIN) {
     try {
       const response = await callTextModel(model, requestBody, apiKey);
@@ -105,8 +108,7 @@ export default async function handler(req, res) {
         const summary = `${response.status} ${errText.slice(0, 240)}`.trim();
         console.error(`Gemini text model ${model} -> ${summary}`);
         errors.push({ model, status: response.status, summary });
-        // 404 / 400 = wrong model name or bad request body — try next.
-        // 429 / 5xx = transient — try next anyway, sometimes a different model works.
+        if (response.status === 429) quotaHit = true;
         continue;
       }
       const data = await response.json();
@@ -124,7 +126,8 @@ export default async function handler(req, res) {
         });
         return;
       }
-      errors.push({ model, status: 200, summary: 'no_recommendations_parsed' });
+      const snippet = text ? text.slice(0, 280) : '(empty response)';
+      errors.push({ model, status: 200, summary: `no_recommendations_parsed: ${snippet}` });
     } catch (error) {
       console.error(`Gemini text model ${model} threw`, error);
       errors.push({ model, status: 0, summary: String(error && error.message ? error.message : error) });
@@ -134,7 +137,7 @@ export default async function handler(req, res) {
   res.status(200).json({
     recommendations: getFallbackRecommendations(inputData.data || {}),
     source: 'fallback',
-    reason: 'upstream_error',
+    reason: quotaHit ? 'quota_exceeded' : 'upstream_error',
     errors
   });
 }
