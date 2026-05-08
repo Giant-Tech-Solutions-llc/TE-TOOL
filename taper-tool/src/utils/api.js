@@ -1,6 +1,6 @@
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const TEXT_MODEL = 'gemini-1.5-flash';
-const IMAGE_MODEL = 'gemini-2.5-flash-image-preview';
+const TEXT_MODEL = import.meta.env.VITE_GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
+const IMAGE_MODEL = import.meta.env.VITE_GEMINI_IMAGE_MODEL || 'gemini-2.5-flash-image-preview';
 const TEXT_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${TEXT_MODEL}:generateContent`;
 const IMAGE_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent`;
 
@@ -177,6 +177,23 @@ function extractInlineImage(data) {
   return null;
 }
 
+const IMAGE_MODEL_FALLBACKS = [
+  IMAGE_MODEL,
+  'gemini-2.5-flash-image',
+  'gemini-2.0-flash-preview-image-generation',
+  'gemini-2.0-flash-exp-image-generation'
+].filter((value, index, arr) => value && arr.indexOf(value) === index);
+
+async function callImageModel(model, body) {
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const res = await fetch(`${endpoint}?key=${encodeURIComponent(API_KEY)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return res;
+}
+
 async function generateStyleImage(rec, userPhoto, userMimeType) {
   if (!API_KEY) return null;
 
@@ -201,22 +218,24 @@ async function generateStyleImage(rec, userPhoto, userMimeType) {
     }
   };
 
-  try {
-    const res = await fetch(`${IMAGE_ENDPOINT}?key=${encodeURIComponent(API_KEY)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    if (!res.ok) {
-      console.error('Image API error', res.status, await res.text().catch(() => ''));
-      return null;
+  for (const model of IMAGE_MODEL_FALLBACKS) {
+    try {
+      const res = await callImageModel(model, body);
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        console.warn(`Image model ${model} returned ${res.status}: ${text.slice(0, 300)}`);
+        if (res.status === 404 || res.status === 400) continue;
+        return null;
+      }
+      const data = await res.json();
+      const url = extractInlineImage(data);
+      if (url) return url;
+      console.warn(`Image model ${model} returned no inline image; trying fallback`);
+    } catch (error) {
+      console.error(`Image generation error on ${model}:`, error);
     }
-    const data = await res.json();
-    return extractInlineImage(data);
-  } catch (error) {
-    console.error('Image generation error:', error);
-    return null;
   }
+  return null;
 }
 
 async function getTextRecommendations(inputData) {
