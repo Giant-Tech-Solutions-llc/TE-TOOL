@@ -69,8 +69,8 @@ export default async function handler(req, res) {
   if (userPhoto) {
     parts.push({ text: buildEditPrompt(rec) });
     parts.push({
-      inline_data: {
-        mime_type: userMimeType,
+      inlineData: {
+        mimeType: userMimeType,
         data: extractBase64(userPhoto)
       }
     });
@@ -86,14 +86,16 @@ export default async function handler(req, res) {
     }
   };
 
+  const errors = [];
   for (const model of MODEL_CHAIN) {
     try {
       const response = await callImageModel(model, requestBody, apiKey);
       if (!response.ok) {
         const errText = await response.text().catch(() => '');
-        console.warn(`image model ${model} -> ${response.status}: ${errText.slice(0, 300)}`);
-        if (response.status === 404 || response.status === 400) continue;
-        break;
+        const summary = `${response.status} ${errText.slice(0, 240)}`.trim();
+        console.warn(`image model ${model} -> ${summary}`);
+        errors.push({ model, status: response.status, summary });
+        continue;
       }
       const data = await response.json();
       const url = extractInlineImage(data);
@@ -101,11 +103,12 @@ export default async function handler(req, res) {
         res.status(200).json({ image_url: url, source: 'gemini', model });
         return;
       }
-      console.warn(`image model ${model} returned no inline image, trying fallback`);
+      errors.push({ model, status: 200, summary: 'no_inline_image' });
     } catch (error) {
       console.error(`image model ${model} error`, error);
+      errors.push({ model, status: 0, summary: String(error && error.message ? error.message : error) });
     }
   }
 
-  res.status(200).json({ image_url: null, source: 'unavailable' });
+  res.status(200).json({ image_url: null, source: 'unavailable', errors });
 }

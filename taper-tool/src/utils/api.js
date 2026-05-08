@@ -43,13 +43,18 @@ async function fetchRecommendationsViaProxy(inputData) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inputData })
     });
-    if (!res.ok) return null;
+    if (!res.ok) return { error: `proxy_${res.status}` };
     const data = await res.json();
-    if (!Array.isArray(data.recommendations)) return null;
-    return { recs: data.recommendations, source: data.source || 'proxy' };
+    if (!Array.isArray(data.recommendations)) return { error: 'proxy_no_recs' };
+    return {
+      recs: data.recommendations,
+      source: data.source || 'proxy',
+      reason: data.reason || null,
+      errors: data.errors || null
+    };
   } catch (error) {
     console.warn('recommend proxy unavailable', error);
-    return null;
+    return { error: 'network' };
   }
 }
 
@@ -60,12 +65,15 @@ async function fetchImageViaProxy(rec, userPhoto, userMimeType) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ rec, userPhoto, userMimeType })
     });
-    if (!res.ok) return null;
+    if (!res.ok) return { error: `proxy_${res.status}` };
     const data = await res.json();
-    return data && data.image_url ? data.image_url : null;
+    return {
+      url: data && data.image_url ? data.image_url : null,
+      errors: data && data.errors ? data.errors : null
+    };
   } catch (error) {
     console.warn('image proxy unavailable', error);
-    return null;
+    return { error: 'network' };
   }
 }
 
@@ -76,8 +84,8 @@ async function getTextRecommendationsDirect(inputData) {
   const parts = [{ text: buildRecommendationPrompt(inputData) }];
   if (inputData.type === 'photo' && inputData.data && inputData.data.photo) {
     parts.push({
-      inline_data: {
-        mime_type: inputData.data.mimeType || 'image/jpeg',
+      inlineData: {
+        mimeType: inputData.data.mimeType || 'image/jpeg',
         data: extractBase64(inputData.data.photo)
       }
     });
@@ -122,8 +130,8 @@ async function generateStyleImageDirect(rec, userPhoto, userMimeType) {
   if (userPhoto) {
     parts.push({ text: buildEditPrompt(rec) });
     parts.push({
-      inline_data: {
-        mime_type: userMimeType || 'image/jpeg',
+      inlineData: {
+        mimeType: userMimeType || 'image/jpeg',
         data: extractBase64(userPhoto)
       }
     });
@@ -181,6 +189,10 @@ export async function getRecommendations(inputData) {
     if (proxyRes && proxyRes.recs) {
       recs = proxyRes.recs;
       diagnostics.textSource = proxyRes.source === 'gemini' ? 'gemini-via-proxy' : 'fallback-via-proxy';
+      if (proxyRes.errors) diagnostics.errors.push(...proxyRes.errors.map(e => ({ where: 'text', ...e })));
+      if (proxyRes.reason) diagnostics.textReason = proxyRes.reason;
+    } else if (proxyRes && proxyRes.error) {
+      diagnostics.errors.push({ where: 'text-proxy', summary: proxyRes.error });
     }
   }
   if (!recs) {
@@ -200,7 +212,12 @@ export async function getRecommendations(inputData) {
     recs.map(async (rec) => {
       let image = null;
       if (proxy.ok && proxy.hasKey) {
-        image = await fetchImageViaProxy(rec, userPhoto, userMime);
+        const proxyImage = await fetchImageViaProxy(rec, userPhoto, userMime);
+        if (proxyImage && proxyImage.url) {
+          image = proxyImage.url;
+        } else if (proxyImage && proxyImage.errors) {
+          diagnostics.errors.push(...proxyImage.errors.map(e => ({ where: 'image', style: rec.style_name, ...e })));
+        }
       }
       if (!image) {
         image = await generateStyleImageDirect(rec, userPhoto, userMime);
@@ -215,6 +232,11 @@ export async function getRecommendations(inputData) {
     : imageHits > 0
       ? `gemini-${imageHits}-of-${recs.length}`
       : 'illustration';
+
+  if (typeof window !== 'undefined') {
+    // Make the full diagnostic available in devtools for support.
+    window.__TAPER_DIAG__ = diagnostics;
+  }
 
   return { recommendations: withImages, diagnostics };
 }

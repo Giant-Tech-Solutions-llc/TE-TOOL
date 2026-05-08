@@ -3,10 +3,14 @@ import {
   parseRecommendations,
   normalizeRecommendations,
   getFallbackRecommendations,
-  extractBase64
+  extractBase64,
+  TEXT_MODEL_FALLBACKS
 } from './_lib/prompts.js';
 
-const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
+const PRIMARY_TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || TEXT_MODEL_FALLBACKS[0];
+
+const TEXT_CHAIN = [PRIMARY_TEXT_MODEL, ...TEXT_MODEL_FALLBACKS]
+  .filter((value, index, arr) => value && arr.indexOf(value) === index);
 
 function readJsonBody(req) {
   if (req.body && typeof req.body === 'object') return req.body;
@@ -23,12 +27,21 @@ function readJsonBody(req) {
   });
 }
 
+async function callTextModel(model, body, apiKey) {
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  return fetch(`${endpoint}?key=${encodeURIComponent(apiKey)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+}
+
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     res.status(200).json({
       ok: true,
       hasKey: Boolean(process.env.GEMINI_API_KEY),
-      model: TEXT_MODEL
+      model: PRIMARY_TEXT_MODEL
     });
     return;
   }
@@ -57,16 +70,18 @@ export default async function handler(req, res) {
   if (!apiKey) {
     res.status(200).json({
       recommendations: getFallbackRecommendations(inputData.data || {}),
-      source: 'fallback'
+      source: 'fallback',
+      reason: 'no_server_key'
     });
     return;
   }
 
+  // Build request body once (camelCase as per Gemini REST spec)
   const parts = [{ text: buildRecommendationPrompt(inputData) }];
   if (inputData.type === 'photo' && inputData.data && inputData.data.photo) {
     parts.push({
-      inline_data: {
-        mime_type: inputData.data.mimeType || 'image/jpeg',
+      inlineData: {
+        mimeType: inputData.data.mimeType || 'image/jpeg',
         data: extractBase64(inputData.data.photo)
       }
     });
@@ -81,51 +96,45 @@ export default async function handler(req, res) {
     }
   };
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${TEXT_MODEL}:generateContent`;
+  const errors = [];
+  for (const model of TEXT_CHAIN) {
+    try {
+      const response = await callTextModel(model, requestBody, apiKey);
+      if (!response.ok) {
+        const errText = await response.text().catch(() => '');
+        const summary = `${response.status} ${errText.slice(0, 240)}`.trim();
+        console.error(`Gemini text model ${model} -> ${summary}`);
+        errors.push({ model, status: response.status, summary });
+        // 404 / 400 = wrong model name or bad request body — try next.
+        // 429 / 5xx = transient — try next anyway, sometimes a different model works.
+        continue;
+      }
+      const data = await response.json();
+      const text =
+        data && data.candidates && data.candidates[0] &&
+        data.candidates[0].content && data.candidates[0].content.parts &&
+        data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
 
-  try {
-    const response = await fetch(`${endpoint}?key=${encodeURIComponent(apiKey)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-      const errText = await response.text().catch(() => '');
-      console.error('Gemini text API error', response.status, errText.slice(0, 500));
-      res.status(200).json({
-        recommendations: getFallbackRecommendations(inputData.data || {}),
-        source: 'fallback',
-        error: `Upstream ${response.status}`
-      });
-      return;
+      const recs = parseRecommendations(text);
+      if (recs && recs.length > 0) {
+        res.status(200).json({
+          recommendations: normalizeRecommendations(recs),
+          source: 'gemini',
+          model
+        });
+        return;
+      }
+      errors.push({ model, status: 200, summary: 'no_recommendations_parsed' });
+    } catch (error) {
+      console.error(`Gemini text model ${model} threw`, error);
+      errors.push({ model, status: 0, summary: String(error && error.message ? error.message : error) });
     }
-
-    const data = await response.json();
-    const text =
-      data && data.candidates && data.candidates[0] &&
-      data.candidates[0].content && data.candidates[0].content.parts &&
-      data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
-
-    const recs = parseRecommendations(text);
-    if (recs && recs.length > 0) {
-      res.status(200).json({
-        recommendations: normalizeRecommendations(recs),
-        source: 'gemini'
-      });
-      return;
-    }
-
-    res.status(200).json({
-      recommendations: getFallbackRecommendations(inputData.data || {}),
-      source: 'fallback'
-    });
-  } catch (error) {
-    console.error('recommend handler error', error);
-    res.status(200).json({
-      recommendations: getFallbackRecommendations(inputData.data || {}),
-      source: 'fallback',
-      error: 'handler_exception'
-    });
   }
+
+  res.status(200).json({
+    recommendations: getFallbackRecommendations(inputData.data || {}),
+    source: 'fallback',
+    reason: 'upstream_error',
+    errors
+  });
 }

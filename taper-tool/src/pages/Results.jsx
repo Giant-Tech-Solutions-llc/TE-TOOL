@@ -12,12 +12,21 @@ function slugify(name) {
     .replace(/^-+|-+$/g, '');
 }
 
+function summarizeError(err) {
+  if (!err) return null;
+  const where = err.where || 'gemini';
+  const model = err.model ? ` [${err.model}]` : '';
+  const status = err.status ? ` ${err.status}` : '';
+  const summary = err.summary || err.error || '';
+  return `${where}${model}${status}: ${summary}`.trim();
+}
+
 function DiagnosticBanner({ diagnostics }) {
   if (!diagnostics) return null;
-  const { textSource, imageSource, proxy } = diagnostics;
+  const { textSource, imageSource, proxy, errors } = diagnostics;
   const aiUsed = textSource && textSource.startsWith('gemini');
-  const aiImages = imageSource && imageSource.startsWith('gemini');
-  if (aiUsed && aiImages === true && imageSource === 'gemini-all') return null;
+  const aiAllImages = imageSource === 'gemini-all';
+  if (aiUsed && aiAllImages) return null;
 
   let title;
   let detail;
@@ -28,29 +37,56 @@ function DiagnosticBanner({ diagnostics }) {
     title = 'AI is off — server has no GEMINI_API_KEY.';
     detail = 'Set GEMINI_API_KEY in your Vercel project settings, then redeploy. Until then, illustrations are shown.';
   } else if (!aiUsed) {
-    title = 'Showing curated recommendations.';
-    detail = 'AI text generation is unavailable right now — the curated catalog is being used instead.';
-  } else if (!aiImages) {
-    title = 'AI text worked but image generation did not.';
-    detail = 'Check that your Gemini key has access to gemini-2.5-flash-image-preview, or check the Vercel function logs.';
-  } else {
-    title = `Some images couldn't be generated (${imageSource}).`;
-    detail = 'Curated illustrations are used where AI rendering failed.';
+    title = 'AI text generation failed — showing curated recommendations.';
+    detail = 'The Gemini text call returned an error for every model in the fallback chain. The actual upstream messages are listed below — most often this means the API key isn\'t enabled for these model IDs in Google AI Studio.';
+  } else if (!aiAllImages) {
+    title = imageSource === 'illustration'
+      ? 'AI text worked but image generation did not.'
+      : `Some images couldn't be generated (${imageSource}).`;
+    detail = 'Make sure your Gemini key has access to gemini-2.5-flash-image-preview (it needs to be enabled in your Google AI Studio account). Curated illustrations are shown where AI rendering failed.';
   }
+
+  const errorList = (errors || []).slice(0, 8).map(summarizeError).filter(Boolean);
 
   return (
     <div style={{
-      maxWidth: '720px',
+      maxWidth: '760px',
       margin: '0 auto var(--space-8)',
-      padding: 'var(--space-3) var(--space-4)',
+      padding: 'var(--space-4)',
       background: 'var(--bg-secondary)',
       border: '1px solid var(--border)',
       borderRadius: 'var(--radius-md)',
       color: 'var(--text-secondary)',
       fontSize: 'var(--text-sm)',
-      textAlign: 'center'
+      textAlign: 'left'
     }}>
-      <strong style={{ color: 'var(--text-primary)' }}>{title}</strong> {detail}
+      <div style={{ textAlign: 'center', marginBottom: errorList.length ? 'var(--space-3)' : 0 }}>
+        <strong style={{ color: 'var(--text-primary)' }}>{title}</strong> {detail}
+      </div>
+      {errorList.length > 0 && (
+        <details style={{ marginTop: 'var(--space-2)' }}>
+          <summary style={{
+            cursor: 'pointer',
+            color: 'var(--accent)',
+            fontWeight: 'var(--font-semibold)',
+            textAlign: 'center'
+          }}>
+            Show upstream errors ({errorList.length})
+          </summary>
+          <ul style={{
+            margin: 'var(--space-3) 0 0',
+            paddingLeft: 'var(--space-5)',
+            fontFamily: 'monospace',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--text-tertiary)',
+            wordBreak: 'break-word'
+          }}>
+            {errorList.map((line, idx) => (
+              <li key={idx} style={{ marginBottom: 'var(--space-1)' }}>{line}</li>
+            ))}
+          </ul>
+        </details>
+      )}
     </div>
   );
 }
