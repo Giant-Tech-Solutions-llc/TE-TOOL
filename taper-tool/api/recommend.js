@@ -55,6 +55,17 @@ async function callTextModel(model, body, apiKey) {
 }
 
 export default async function handler(req, res) {
+  // CORS â embed lives on taperempire.com, function lives on te-tool-app.vercel.app
+  const ALLOWED_ORIGINS = ['https://taperempire.com', 'https://www.taperempire.com'];
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') { res.status(204).end(); return; }
+
   if (req.method === 'GET') {
     res.status(200).json({
       ok: true,
