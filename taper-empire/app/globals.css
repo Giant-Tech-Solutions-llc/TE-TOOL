@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body { min-height: 100%; }
+
+body {
+  background: #FBF7F4;
+  color: #000;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+/* Custom selection */
+::selection { background: #7C6A58; color: #FBF7F4; }
+
+/* Scrollbar — subtle, on-brand */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #FBF7F4; }
+::-webkit-scrollbar-thumb { background: #D8D0C6; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #A39382; }
+
+/* Shimmer skeleton */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #E5DED2 0%, #FBF7F4 50%, #E5DED2 100%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid #7C6A58;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Smooth scrolling for anchor nav */
+html { scroll-behavior: smooth; }
+
+/* Prose tweaks for authority pages */
+.tt-prose h2 { font-family: var(--font-cal-sans), var(--font-inter); }
