@@ -166,7 +166,12 @@ export default function Results({ recommendations = [], diagnostics, onReset }) 
           const isAiImage = Boolean(rec.image_url);
 
           return (
-            <Card key={i} padding="lg">
+            <Card
+              key={i}
+              padding="lg"
+              className="tt-slide-up"
+              style={{ animationDelay: `${i * 110}ms` }}
+            >
               <div style={{
                 position: 'relative',
                 width: '100%',
@@ -227,13 +232,36 @@ export default function Results({ recommendations = [], diagnostics, onReset }) 
                 </div>
               </div>
 
-              <h3 style={{
-                fontSize: 'var(--text-xl)',
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
                 marginBottom: 'var(--space-3)',
-                fontWeight: 'var(--font-semibold)'
+                flexWrap: 'wrap',
               }}>
-                {rec.style_name}
-              </h3>
+                {i === 0 && (
+                  <span style={{
+                    background: 'var(--accent)',
+                    color: 'var(--bg-primary)',
+                    padding: '2px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: 'var(--text-xs)',
+                    fontWeight: 'var(--font-bold)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    flexShrink: 0,
+                  }}>
+                    Best Match
+                  </span>
+                )}
+                <h3 style={{
+                  fontSize: 'var(--text-xl)',
+                  fontWeight: 'var(--font-semibold)',
+                  margin: 0,
+                }}>
+                  {rec.style_name}
+                </h3>
+              </div>
 
               <p style={{
                 color: 'var(--text-secondary)',
