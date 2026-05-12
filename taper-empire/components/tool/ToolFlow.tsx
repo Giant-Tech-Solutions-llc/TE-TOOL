@@ -53,7 +53,7 @@ export function ToolFlow() {
         transition={{ duration: 0.4 }}
         className="text-center mb-10"
       >
-        <h1 className="font-display text-4xl sm:text-5xl font-bold text-jet-black mb-3 tracking-tight">
+        <h1 className="font-display text-4xl sm:text-5xl font-extrabold text-jet-black mb-3 tracking-tight">
           How would you like to get started?
         </h1>
         <p className="text-mocha">Upload a photo for the most accurate AI recommendations</p>

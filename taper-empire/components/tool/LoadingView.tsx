@@ -63,7 +63,7 @@ export function LoadingView({ mode }: LoadingViewProps) {
         />
       </div>
 
-      <h3 className="font-display text-3xl font-bold text-jet-black mb-3 tracking-tight">
+      <h3 className="font-display text-3xl font-extrabold text-jet-black mb-3 tracking-tight">
         Building your taper plan
       </h3>
 

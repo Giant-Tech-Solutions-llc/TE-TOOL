@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Bricolage_Grotesque } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import './globals.css'
 
@@ -7,6 +7,13 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+})
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-bricolage',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 })
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://taperempire.com'
@@ -42,6 +49,9 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
   alternates: { canonical: SITE_URL },
+  icons: {
+    icon: [{ url: '/logos/taper-empire-black.svg', type: 'image/svg+xml' }],
+  },
 }
 
 export const viewport: Viewport = {
@@ -52,7 +62,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable}`}>
+    <html lang="en" className={`${inter.variable} ${bricolage.variable}`}>
       <body className="bg-milk text-jet-black antialiased font-sans">
         {children}
         <Analytics />

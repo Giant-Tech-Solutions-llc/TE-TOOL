@@ -32,7 +32,7 @@ export function HowItWorks() {
           <p className="text-sm font-semibold tracking-widest text-accent uppercase mb-3">
             How it works
           </p>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-jet-black mb-4 tracking-tight">
+          <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-jet-black mb-4 tracking-tight">
             From photo to perfect taper in 60 seconds
           </h2>
           <p className="text-lg text-mocha max-w-2xl mx-auto">
@@ -46,7 +46,7 @@ export function HowItWorks() {
             <ScrollReveal key={s.n} delay={i * 0.1}>
               <div className="h-full p-8 bg-milk border border-border rounded-2xl hover:border-accent transition-all hover:-translate-y-1 hover:shadow-md">
                 <div className="flex items-baseline justify-between mb-6">
-                  <span className="font-display text-5xl font-bold text-oat">{s.n}</span>
+                  <span className="font-display text-5xl font-extrabold text-oat">{s.n}</span>
                   <s.icon className="w-7 h-7 text-accent" />
                 </div>
                 <h3 className="font-display text-2xl font-semibold text-jet-black mb-3">

@@ -60,7 +60,7 @@ export function InlineFeedback({ recommendations, flow }: InlineFeedbackProps) {
         className="max-w-2xl mx-auto bg-oat/40 border border-border rounded-2xl p-6 text-center"
       >
         <CheckCircle2 className="w-8 h-8 text-success mx-auto mb-3" />
-        <h3 className="font-display text-xl font-bold mb-2">Thanks — your feedback shapes the next version.</h3>
+        <h3 className="font-display text-xl font-extrabold mb-2">Thanks — your feedback shapes the next version.</h3>
         <p className="text-mocha">
           You&apos;re 1 of <strong className="text-jet-black">12,847+</strong> men this month who help us tune the recommendations.
         </p>
@@ -73,7 +73,7 @@ export function InlineFeedback({ recommendations, flow }: InlineFeedbackProps) {
       <div className="inline-flex items-center gap-2 px-3 py-1 bg-milk border border-border rounded-full text-xs font-semibold text-accent uppercase tracking-wider mb-3">
         <Heart className="w-3 h-3" fill="currentColor" /> 5 second favor
       </div>
-      <h3 className="font-display text-xl font-bold mb-2">How accurate are these matches?</h3>
+      <h3 className="font-display text-xl font-extrabold mb-2">How accurate are these matches?</h3>
       <p className="text-mocha mb-5">Your honest take is what makes Taper Empire smarter — pick one.</p>
 
       <div role="radiogroup" className="flex justify-center gap-2 mb-5 flex-wrap">

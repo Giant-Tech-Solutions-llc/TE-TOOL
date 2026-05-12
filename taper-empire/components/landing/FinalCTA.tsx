@@ -12,7 +12,7 @@ export function FinalCTA() {
 
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <ScrollReveal>
-          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight">
             Stop guessing. Start matching.
           </h2>
           <p className="text-lg sm:text-xl text-oat mb-10 max-w-xl mx-auto">

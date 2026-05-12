@@ -42,7 +42,7 @@ export function Results() {
         transition={{ duration: 0.5 }}
         className="text-center mb-12"
       >
-        <h2 className="font-display text-4xl sm:text-5xl font-bold text-jet-black mb-3 tracking-tight">
+        <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-jet-black mb-3 tracking-tight">
           Here are your perfect matches
         </h2>
         <p className="text-lg text-mocha">Based on your unique features and preferences</p>

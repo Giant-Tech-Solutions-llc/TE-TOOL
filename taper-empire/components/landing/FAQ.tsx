@@ -36,7 +36,7 @@ export function FAQ() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal className="text-center mb-12">
           <p className="text-sm font-semibold tracking-widest text-accent uppercase mb-3">FAQ</p>
-          <h2 className="font-display text-4xl sm:text-5xl font-bold text-jet-black mb-4 tracking-tight">
+          <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-jet-black mb-4 tracking-tight">
             Frequently asked questions
           </h2>
         </ScrollReveal>

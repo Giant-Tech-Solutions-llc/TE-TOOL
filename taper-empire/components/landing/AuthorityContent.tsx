@@ -33,7 +33,7 @@ export function AuthorityContent() {
         <ScrollReveal>
           <div className="bg-oat/40 border border-border rounded-3xl p-8 lg:p-12">
             <p className="text-sm font-semibold tracking-widest text-accent uppercase mb-3">Direct Answer</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-jet-black mb-4">
+            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-4">
               What is the best taper haircut?
             </h2>
             <p className="text-lg text-mocha leading-relaxed max-w-3xl mb-6">
@@ -55,7 +55,7 @@ export function AuthorityContent() {
 
         {/* Face shape matching */}
         <ScrollReveal>
-          <h2 id="face-shape" className="font-display text-3xl sm:text-4xl font-bold text-jet-black mb-3 tracking-tight">
+          <h2 id="face-shape" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
             Face shape matching system
           </h2>
           <p className="text-mocha mb-8 max-w-3xl">
@@ -89,7 +89,7 @@ export function AuthorityContent() {
 
         {/* Hair type system */}
         <ScrollReveal>
-          <h2 id="hair-type" className="font-display text-3xl sm:text-4xl font-bold text-jet-black mb-3 tracking-tight">
+          <h2 id="hair-type" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
             Hair texture recommendation system
           </h2>
           <p className="text-mocha mb-8 max-w-3xl">
@@ -123,7 +123,7 @@ export function AuthorityContent() {
 
         {/* Comparisons */}
         <ScrollReveal>
-          <h2 id="comparisons" className="font-display text-3xl sm:text-4xl font-bold text-jet-black mb-3 tracking-tight">
+          <h2 id="comparisons" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
             Structured comparison blocks
           </h2>
           <p className="text-mocha mb-8 max-w-3xl">
@@ -156,7 +156,7 @@ export function AuthorityContent() {
 
         {/* Maintenance system */}
         <ScrollReveal>
-          <h2 id="maintenance" className="font-display text-3xl sm:text-4xl font-bold text-jet-black mb-3 tracking-tight">
+          <h2 id="maintenance" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
             Maintenance & styling system
           </h2>
           <p className="text-mocha mb-6 max-w-3xl">

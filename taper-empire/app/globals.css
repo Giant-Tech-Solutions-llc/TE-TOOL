@@ -44,5 +44,11 @@ body {
 /* Smooth scrolling for anchor nav */
 html { scroll-behavior: smooth; }
 
+/* Display headings — Bricolage Grotesque ExtraBold */
+.font-display {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 /* Prose tweaks for authority pages */
-.tt-prose h2 { font-family: var(--font-cal-sans), var(--font-inter); }
+.tt-prose h2 { font-family: var(--font-bricolage), var(--font-inter); font-weight: 800; }
