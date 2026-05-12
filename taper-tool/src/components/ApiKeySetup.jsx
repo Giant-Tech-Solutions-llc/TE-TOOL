@@ -231,11 +231,17 @@ function KeyDialog({ open, onClose, hasKey }) {
   );
 }
 
+const isLocalDev =
+  typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 export function ApiKeyBanner() {
   const apiKey = useApiKeyState();
   const proxy = useProxyKeyState();
   const [open, setOpen] = useState(false);
 
+  // Never show to real users — this is a dev-only tool.
+  if (!isLocalDev) return null;
   // Server proxy already has a key — visitors don't need their own. Stay silent.
   if (proxy.checked && proxy.hasKey) return null;
   // Local override exists — also silent.
@@ -299,6 +305,8 @@ export default function ApiKeyButton() {
   const [open, setOpen] = useState(false);
   const hasKey = Boolean(apiKey);
 
+  // Only useful during local development — hide on production entirely.
+  if (!isLocalDev) return null;
   // Production deployment with server-side key: hide the button.
   if (proxy.checked && proxy.hasKey && !hasKey) return null;
 

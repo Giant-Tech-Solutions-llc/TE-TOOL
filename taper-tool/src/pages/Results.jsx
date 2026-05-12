@@ -103,23 +103,13 @@ function DiagnosticBanner({ diagnostics }) {
 export default function Results({ recommendations = [], diagnostics, onReset }) {
   const [expandedCard, setExpandedCard] = useState(null);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
-  const [softStop, setSoftStop] = useState(false);
 
   useEffect(() => {
     setFeedbackGiven(hasGivenFeedback());
   }, []);
 
   const flow = diagnostics && diagnostics.proxy ? diagnostics.proxy : 'unknown';
-
-  const handleReset = () => {
-    if (!feedbackGiven && !softStop) {
-      setSoftStop(true);
-      const el = document.getElementById('tt-feedback');
-      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-    onReset();
-  };
+  const handleReset = () => onReset();
 
   return (
     <div
@@ -362,19 +352,6 @@ export default function Results({ recommendations = [], diagnostics, onReset }) 
           onSubmitted={() => setFeedbackGiven(true)}
         />
       </div>
-
-      {softStop && !feedbackGiven && (
-        <p style={{
-          textAlign: 'center',
-          color: 'var(--accent)',
-          fontSize: 'var(--text-sm)',
-          marginTop: 'calc(-1 * var(--space-8))',
-          marginBottom: 'var(--space-6)',
-          fontWeight: 'var(--font-semibold)'
-        }}>
-          One quick tap above and we'll get out of your way ↑
-        </p>
-      )}
 
       <div style={{ textAlign: 'center' }}>
         <Button onClick={handleReset}>Start Over</Button>
