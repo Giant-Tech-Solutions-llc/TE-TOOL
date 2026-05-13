@@ -50,5 +50,33 @@ html { scroll-behavior: smooth; }
   letter-spacing: -0.02em;
 }
 
+/* Editorial serif for italic accents — used as "&italic" inflection */
+.font-serif {
+  font-family: 'Tiempos Headline', 'IvyOra Display', Georgia, 'Times New Roman', serif;
+  font-feature-settings: "kern", "liga", "calt";
+}
+
+/* OpenType — proper small caps where supported */
+.smallcaps {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em;
+}
+
+/* Editorial body — Inter with looser leading */
+.editorial-body {
+  font-family: var(--font-inter);
+  line-height: 1.75;
+}
+
 /* Prose tweaks for authority pages */
 .tt-prose h2 { font-family: var(--font-bricolage), var(--font-inter); font-weight: 800; }
+
+/* Subtle ink texture for big black surfaces */
+.ink-surface {
+  background-color: #000;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 4px 4px, 7px 7px;
+  background-position: 0 0, 2px 2px;
+}

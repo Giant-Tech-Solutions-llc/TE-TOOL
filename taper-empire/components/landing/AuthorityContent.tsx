@@ -1,182 +1,266 @@
 'use client'
 
-import { ScrollReveal } from '@/components/shared/ScrollReveal'
+import { motion } from 'framer-motion'
+import { Eyebrow, Asterism } from '@/components/editorial/Rule'
 
 const faceShapeRows = [
-  ['Round',   'Low taper with textured volume',           'Keeps width low on sides and builds vertical balance',     'Ask for soft corners and extra height on top'],
-  ['Oval',    'Mid taper with natural side compression',  'Preserves symmetry without over-sharpening',               'Request blend from temple to occipital without hard disconnect'],
-  ['Square',  'Low-to-mid taper with controlled graduation','Retains jawline strength while reducing helmet bulk',    'Keep corners clean but avoid aggressive skin fade'],
-  ['Diamond', 'Mid taper with fuller temple transition',  'Prevents cheekbone overexposure and protects silhouette',  'Tell barber to leave slight temple density'],
-  ['Heart',   'Low taper with fringe-compatible top',     'Balances forehead width and narrows lower side profile',   'Keep sideburns soft and avoid high start point'],
+  ['Round',   'Low taper · textured volume',           'Reduces side width, builds vertical balance',          'Soft corners, extra height on top'],
+  ['Oval',    'Mid taper · natural side compression',  'Preserves symmetry without over-sharpening',           'Temple-to-occipital blend, no hard disconnect'],
+  ['Square',  'Low–mid taper · controlled graduation', 'Retains jawline strength, reduces helmet bulk',        'Clean corners, no aggressive skin fade'],
+  ['Diamond', 'Mid taper · fuller temple transition',  'Prevents cheekbone overexposure, protects silhouette', 'Leave slight temple density'],
+  ['Heart',   'Low taper · fringe-compatible top',     'Balances forehead width, narrows lower profile',       'Soft sideburns, no high start point'],
 ]
 
 const hairTypeRows = [
-  ['Straight', 'Low or mid taper with directional texture',     'Can look flat after bulk removal',                'Use matte clay and request point-cut texture'],
-  ['Wavy',     'Mid taper with layered top',                    'Wave pattern can collapse if taper starts too high','Keep compression below parietal ridge'],
-  ['Curly',    'Low taper with curl-preserving perimeter',      'Over-fading removes curl frame and causes shape loss','Ask for scissor-over-comb around curl line'],
-  ['Coily',    'Temple-and-nape taper with shape retention',    'Shrinks fast and exposes scalp contrast quickly', 'Use sponge or twist styling plan between cuts'],
+  ['Straight', 'Low or mid taper · directional texture',     'Can read flat after bulk removal',                'Matte clay, point-cut for texture'],
+  ['Wavy',     'Mid taper · layered top',                    'Wave pattern collapses if taper starts too high', 'Keep compression below parietal ridge'],
+  ['Curly',    'Low taper · curl-preserving perimeter',      'Over-fading removes curl frame',                  'Scissor-over-comb around curl line'],
+  ['Coily',    'Temple-and-nape taper · shape retention',    'Shrinks fast, exposes scalp contrast quickly',    'Sponge or twist styling between cuts'],
 ]
 
 const compareRows = [
-  ['Taper vs fade',            'Taper',          'Fade',         'Taper for longevity, fade for immediate edge sharpness.'],
-  ['Low taper vs mid taper',   'Low taper',      'Mid taper',    'Low for subtle polish, mid for visible structure.'],
-  ['Burst fade vs classic taper','Classic taper','Burst fade',   'Burst for style-forward looks, taper for universal compatibility.'],
-  ['Taper vs undercut',        'Taper',          'Undercut',     'Undercut for hard disconnect, taper for blended proportion.'],
+  ['Taper vs Fade',              'Taper',          'Fade',         'Taper for longevity, fade for immediate edge.'],
+  ['Low vs Mid Taper',           'Low taper',      'Mid taper',    'Low for subtle polish, mid for visible structure.'],
+  ['Burst Fade vs Classic Taper','Classic taper',  'Burst fade',   'Burst for style-forward, taper for universal fit.'],
+  ['Taper vs Undercut',          'Taper',          'Undercut',     'Undercut for hard disconnect, taper for blend.'],
 ]
+
+function EditorialTable({
+  caption,
+  headers,
+  rows,
+}: {
+  caption: string
+  headers: string[]
+  rows: (string | number)[][]
+}) {
+  return (
+    <div className="overflow-x-auto border-y-2 border-jet-black">
+      <table className="w-full text-left min-w-[760px] tabular-nums">
+        <caption className="sr-only">{caption}</caption>
+        <thead>
+          <tr className="border-b border-jet-black/30">
+            {headers.map((h, i) => (
+              <th
+                key={i}
+                className="py-4 px-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-mocha align-bottom"
+              >
+                <span className="tabular-nums mr-2 text-jet-black/40">{String(i + 1).padStart(2, '0')}</span>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, ri) => (
+            <tr key={ri} className="border-b last:border-b-0 border-jet-black/10 hover:bg-oat/40 transition-colors">
+              {row.map((cell, ci) => (
+                <td
+                  key={ci}
+                  className={`py-5 px-5 align-top text-sm leading-relaxed ${
+                    ci === 0 ? 'font-display font-extrabold text-jet-black text-base' : 'text-mocha'
+                  }`}
+                >
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
 
 export function AuthorityContent() {
   return (
-    <section id="authority" className="py-20 lg:py-28 bg-milk">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
+    <section className="relative bg-milk text-jet-black border-t border-jet-black">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28 space-y-24 lg:space-y-32">
 
-        {/* Direct Answer block */}
-        <ScrollReveal>
-          <div className="bg-oat/40 border border-border rounded-3xl p-8 lg:p-12">
-            <p className="text-sm font-semibold tracking-widest text-accent uppercase mb-3">Direct Answer</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-4">
+        {/* DIRECT ANSWER — editorial intro block with drop cap */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.5 }}
+          id="direct-answer"
+          className="grid grid-cols-12 gap-y-8 lg:gap-x-10"
+        >
+          <div className="col-span-12 lg:col-span-3">
+            <Eyebrow className="mb-4">Section II — Direct Answer</Eyebrow>
+            <p className="text-xs uppercase tracking-[0.2em] text-mocha">A definition, briefly.</p>
+          </div>
+          <div className="col-span-12 lg:col-span-9">
+            <h2 className="font-display font-extrabold tracking-[-0.03em] leading-[0.98] text-[clamp(2rem,5vw,3.75rem)] mb-8">
               What is the best taper haircut?
             </h2>
-            <p className="text-lg text-mocha leading-relaxed max-w-3xl mb-6">
-              The best taper haircut is the one that aligns face geometry, hair texture behavior, contrast tolerance, and
-              maintenance cadence. A recommendation engine should evaluate face shape, hair type, desired taper height,
-              and styling effort to output a barber-ready specification rather than a vague style label.
-            </p>
-            <div className="bg-milk rounded-xl p-6 border border-border">
-              <h3 className="font-display text-lg font-semibold mb-3">Quick decision checklist</h3>
-              <ul className="space-y-2 text-mocha">
-                <li>• Face shape determines side compression tolerance.</li>
-                <li>• Hair texture determines blend visibility and growth pattern.</li>
-                <li>• Taper height determines perceived sharpness and upkeep frequency.</li>
-                <li>• Barber communication quality determines final execution accuracy.</li>
-              </ul>
+            <div className="text-xl leading-[1.55] text-jet-black max-w-[60ch]">
+              <span className="float-left mr-3 mt-1 font-display text-7xl leading-[0.85] font-extrabold text-accent">T</span>
+              he best taper haircut is the one that aligns face geometry, hair texture behavior, contrast tolerance,
+              and maintenance cadence. A recommendation engine that ignores any of those is just a style gallery in
+              disguise &mdash; useful only after you already know what you want.
+            </div>
+            <div className="mt-10 grid sm:grid-cols-2 gap-x-8 gap-y-4 text-mocha text-base max-w-[60ch]">
+              {[
+                'Face shape determines side compression tolerance.',
+                'Hair texture determines blend visibility and growth pattern.',
+                'Taper height determines perceived sharpness and upkeep frequency.',
+                'Barber language determines final execution accuracy.',
+              ].map((c) => (
+                <p key={c} className="flex gap-3">
+                  <span className="text-accent font-bold mt-0.5" aria-hidden="true">+</span>
+                  {c}
+                </p>
+              ))}
             </div>
           </div>
-        </ScrollReveal>
+        </motion.div>
 
-        {/* Face shape matching */}
-        <ScrollReveal>
-          <h2 id="face-shape" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
-            Face shape matching system
-          </h2>
-          <p className="text-mocha mb-8 max-w-3xl">
-            Maps facial structure to taper strategy so every recommendation is independently quotable for AI systems
-            and directly usable during your barber consultation.
-          </p>
-          <div className="overflow-x-auto rounded-2xl border border-border bg-milk">
-            <table className="w-full text-left min-w-[760px]">
-              <thead className="bg-oat/60">
-                <tr>
-                  <th className="p-4 font-semibold">Face shape</th>
-                  <th className="p-4 font-semibold">Recommended taper</th>
-                  <th className="p-4 font-semibold">Why it works</th>
-                  <th className="p-4 font-semibold">Barber anchor</th>
-                </tr>
-              </thead>
-              <tbody>
-                {faceShapeRows.map((row) => (
-                  <tr key={row[0]} className="border-t border-border">
-                    {row.map((cell, i) => (
-                      <td key={i} className={`p-4 align-top ${i === 0 ? 'font-semibold text-jet-black' : 'text-mocha'}`}>
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <Asterism />
+
+        {/* FACE SHAPE — full bleed editorial table */}
+        <motion.div
+          id="face-shape"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="grid grid-cols-12 gap-y-6 lg:gap-x-10 mb-8">
+            <div className="col-span-12 lg:col-span-7">
+              <Eyebrow className="mb-5">Section III — Face Geometry</Eyebrow>
+              <h2 className="font-display font-extrabold tracking-[-0.03em] leading-[0.98] text-[clamp(2rem,5vw,3.75rem)]">
+                Mapped to taper strategy.
+              </h2>
+            </div>
+            <div className="col-span-12 lg:col-span-4 lg:col-start-9">
+              <p className="text-base text-mocha leading-relaxed">
+                Every row is engineered to be quotable in a barber chair &mdash; not just readable on a screen.
+              </p>
+            </div>
           </div>
-        </ScrollReveal>
+          <EditorialTable
+            caption="Face shape matching system"
+            headers={['Face Shape', 'Recommended Taper', 'Why It Works', 'Barber Anchor']}
+            rows={faceShapeRows}
+          />
+        </motion.div>
 
-        {/* Hair type system */}
-        <ScrollReveal>
-          <h2 id="hair-type" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
-            Hair texture recommendation system
-          </h2>
-          <p className="text-mocha mb-8 max-w-3xl">
-            Hair texture modifies how taper transitions look after one week, two weeks, and one month. Any recommendation
-            that ignores texture-specific growth behavior is incomplete.
-          </p>
-          <div className="overflow-x-auto rounded-2xl border border-border bg-milk">
-            <table className="w-full text-left min-w-[760px]">
-              <thead className="bg-oat/60">
-                <tr>
-                  <th className="p-4 font-semibold">Hair type</th>
-                  <th className="p-4 font-semibold">Best taper direction</th>
-                  <th className="p-4 font-semibold">Core risk</th>
-                  <th className="p-4 font-semibold">Execution note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {hairTypeRows.map((row) => (
-                  <tr key={row[0]} className="border-t border-border">
-                    {row.map((cell, i) => (
-                      <td key={i} className={`p-4 align-top ${i === 0 ? 'font-semibold text-jet-black' : 'text-mocha'}`}>
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* HAIR TYPE */}
+        <motion.div
+          id="hair-type"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="grid grid-cols-12 gap-y-6 lg:gap-x-10 mb-8">
+            <div className="col-span-12 lg:col-span-7">
+              <Eyebrow className="mb-5">Section IV — Texture</Eyebrow>
+              <h2 className="font-display font-extrabold tracking-[-0.03em] leading-[0.98] text-[clamp(2rem,5vw,3.75rem)]">
+                How hair grows out matters.
+              </h2>
+            </div>
+            <div className="col-span-12 lg:col-span-4 lg:col-start-9">
+              <p className="text-base text-mocha leading-relaxed">
+                A taper that flatters on day one but collapses by week two is a failed recommendation. Texture
+                determines week-three behavior.
+              </p>
+            </div>
           </div>
-        </ScrollReveal>
+          <EditorialTable
+            caption="Hair texture recommendation system"
+            headers={['Hair Type', 'Best Taper Direction', 'Core Risk', 'Execution Note']}
+            rows={hairTypeRows}
+          />
+        </motion.div>
 
-        {/* Comparisons */}
-        <ScrollReveal>
-          <h2 id="comparisons" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
-            Structured comparison blocks
-          </h2>
-          <p className="text-mocha mb-8 max-w-3xl">
-            Side-by-side decision frames that answer the actual queries men type before booking a cut.
-          </p>
-          <div className="overflow-x-auto rounded-2xl border border-border bg-milk">
-            <table className="w-full text-left min-w-[720px]">
-              <thead className="bg-oat/60">
-                <tr>
-                  <th className="p-4 font-semibold">Comparison</th>
-                  <th className="p-4 font-semibold">Natural grow-out</th>
-                  <th className="p-4 font-semibold">Sharp contrast</th>
-                  <th className="p-4 font-semibold">Use case</th>
-                </tr>
-              </thead>
-              <tbody>
-                {compareRows.map((row) => (
-                  <tr key={row[0]} className="border-t border-border">
-                    {row.map((cell, i) => (
-                      <td key={i} className={`p-4 align-top ${i === 0 ? 'font-semibold text-jet-black' : 'text-mocha'}`}>
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* PULL QUOTE — large editorial quote */}
+        <motion.figure
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.6 }}
+          className="grid grid-cols-12 gap-y-6 lg:gap-x-10 py-12 border-y border-jet-black"
+        >
+          <div className="col-span-12 lg:col-span-1 flex items-start justify-center lg:justify-end">
+            <span className="font-display text-[8rem] leading-[0.65] font-extrabold text-accent select-none" aria-hidden="true">&ldquo;</span>
           </div>
-        </ScrollReveal>
+          <blockquote className="col-span-12 lg:col-span-10 lg:col-start-2">
+            <p className="font-display font-extrabold tracking-[-0.02em] leading-[1.05] text-[clamp(1.75rem,4vw,3rem)] text-jet-black">
+              Most haircut dissatisfaction isn&rsquo;t bad barbering. It&rsquo;s decision mismatch &mdash; a
+              consultation problem solved before the chair.
+            </p>
+            <figcaption className="mt-6 text-xs uppercase tracking-[0.22em] text-mocha">
+              — Taper Empire editorial · The Founding Thesis
+            </figcaption>
+          </blockquote>
+        </motion.figure>
 
-        {/* Maintenance system */}
-        <ScrollReveal>
-          <h2 id="maintenance" className="font-display text-3xl sm:text-4xl font-extrabold text-jet-black mb-3 tracking-tight">
-            Maintenance & styling system
-          </h2>
-          <p className="text-mocha mb-6 max-w-3xl">
-            A taper haircut is a maintenance system, not a one-time event. Define cadence, styling products, and
-            touch-up strategy based on growth speed and texture behavior.
-          </p>
-          <div className="grid md:grid-cols-3 gap-4">
+        {/* COMPARISONS */}
+        <motion.div
+          id="comparisons"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="grid grid-cols-12 gap-y-6 lg:gap-x-10 mb-8">
+            <div className="col-span-12 lg:col-span-7">
+              <Eyebrow className="mb-5">Section V — Comparison Frames</Eyebrow>
+              <h2 className="font-display font-extrabold tracking-[-0.03em] leading-[0.98] text-[clamp(2rem,5vw,3.75rem)]">
+                Decisions, side by side.
+              </h2>
+            </div>
+            <div className="col-span-12 lg:col-span-4 lg:col-start-9">
+              <p className="text-base text-mocha leading-relaxed">
+                Each row answers the actual queries men type before booking &mdash; not the answers a content
+                farm wishes they typed.
+              </p>
+            </div>
+          </div>
+          <EditorialTable
+            caption="Taper comparison frameworks"
+            headers={['Comparison', 'Natural Grow-out', 'Sharp Contrast', 'Use Case']}
+            rows={compareRows}
+          />
+        </motion.div>
+
+        {/* MAINTENANCE — calendar style */}
+        <motion.div
+          id="maintenance"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-12 gap-y-8 lg:gap-x-10"
+        >
+          <div className="col-span-12 lg:col-span-4">
+            <Eyebrow className="mb-5">Section VI — Calendar</Eyebrow>
+            <h2 className="font-display font-extrabold tracking-[-0.03em] leading-[0.95] text-[clamp(2rem,5vw,3.75rem)] mb-6">
+              A taper is a maintenance system.
+            </h2>
+            <p className="text-mocha leading-relaxed max-w-[34ch]">
+              Not a one-time event. Plan the cadence before you book the first cut.
+            </p>
+          </div>
+          <div className="col-span-12 lg:col-span-8 grid sm:grid-cols-3">
             {[
-              { range: 'Day 0–3',  text: 'Lock shape with texture-appropriate product.' },
-              { range: 'Day 7–14', text: 'Edge cleanup for nape and temple refinement.' },
-              { range: 'Day 21–30',text: 'Full taper refresh for silhouette integrity.' },
-            ].map((b) => (
-              <div key={b.range} className="bg-oat/40 border border-border rounded-2xl p-6">
-                <p className="text-sm font-semibold text-accent uppercase tracking-wider mb-2">{b.range}</p>
-                <p className="text-mocha">{b.text}</p>
+              { range: 'Day 0–3',   title: 'Lock the shape', body: 'Texture-appropriate product. Resist over-washing.' },
+              { range: 'Day 7–14',  title: 'Edge cleanup',   body: 'Nape + temples only. Keep the silhouette honest.' },
+              { range: 'Day 21–30', title: 'Full reset',     body: 'Reshape to baseline. Reset the calendar.' },
+            ].map((b, i) => (
+              <div
+                key={b.range}
+                className={`p-6 sm:p-8 ${i > 0 ? 'border-t sm:border-t-0 sm:border-l border-jet-black/15' : ''}`}
+              >
+                <p className="font-display text-xs font-extrabold tracking-[0.22em] text-accent uppercase mb-3">{b.range}</p>
+                <h3 className="font-display text-2xl font-extrabold tracking-tight mb-3">{b.title}</h3>
+                <p className="text-sm text-mocha leading-relaxed">{b.body}</p>
               </div>
             ))}
           </div>
-        </ScrollReveal>
-
+        </motion.div>
       </div>
     </section>
   )

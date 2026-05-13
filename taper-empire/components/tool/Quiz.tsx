@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Check } from 'lucide-react'
 import type { QuizData } from '@/types'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 
 interface Option { value: string; label: string; desc: string }
 interface Question { key: keyof QuizData; label: string; hint: string; options: Option[] }

@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, X } from 'lucide-react'
 import Image from 'next/image'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { prepareUploadPhoto, type PreparedPhoto } from '@/lib/image'
 
 interface PhotoUploadProps {

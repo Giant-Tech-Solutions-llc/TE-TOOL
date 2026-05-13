@@ -1,62 +1,92 @@
 'use client'
 
-import { Camera, Cpu, Scissors } from 'lucide-react'
-import { ScrollReveal } from '@/components/shared/ScrollReveal'
+import { Eyebrow, ChapterNumber, Asterism } from '@/components/editorial/Rule'
+import { motion } from 'framer-motion'
 
 const steps = [
   {
-    icon: Camera,
     n: '01',
-    title: 'Upload or Quiz',
-    desc: 'Drop a clear headshot or answer 5 quick questions about your face, hair, and lifestyle.',
+    title: 'Submit your inputs',
+    lede: 'A clear headshot, or 5 questions about face, hair, lifestyle, and upkeep.',
+    body:
+      'The engine accepts either modality. A photo is the gold standard — it lets the AI read face geometry directly. The quiz path exists for privacy-conscious users; results converge within a few percentage points.',
   },
   {
-    icon: Cpu,
     n: '02',
-    title: 'AI Analysis',
-    desc: 'Gemini analyzes face shape, hair texture, and your preferences to rank 40+ taper styles.',
+    title: 'The engine scores 40 styles',
+    lede: 'Face shape, hair texture, lifestyle, age, and maintenance tolerance feed four ranking lenses.',
+    body:
+      'Geometric fit, growth pattern compatibility, formality alignment, and maintenance cadence each produce a sub-score. The composite ranking is normalized to a 0–99 match percentage that&rsquo;s honest about its uncertainty.',
   },
   {
-    icon: Scissors,
     n: '03',
-    title: 'Barber-Ready Plan',
-    desc: 'Get 3 ranked matches with on-face previews, guard sizes, and maintenance plans.',
+    title: 'You receive a barber-ready plan',
+    lede: 'Three ranked matches with on-face previews, guard sizes, and a four-week maintenance calendar.',
+    body:
+      'Each recommendation includes a verbatim script you can read aloud to your barber, with guard progressions, blend heights, neckline preference, and a maintenance frequency that matches your hair texture&rsquo;s growth pattern.',
   },
 ]
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-20 lg:py-32 bg-oat/40">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal className="text-center mb-16">
-          <p className="text-sm font-semibold tracking-widest text-accent uppercase mb-3">
-            How it works
-          </p>
-          <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-jet-black mb-4 tracking-tight">
-            From photo to perfect taper in 60 seconds
-          </h2>
-          <p className="text-lg text-mocha max-w-2xl mx-auto">
-            Three steps. Zero guesswork. The whole flow is built around decision intelligence,
-            not generic style galleries.
-          </p>
-        </ScrollReveal>
+    <section id="how-it-works" className="relative bg-milk text-jet-black border-t border-jet-black">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-32">
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        {/* Section masthead */}
+        <div className="relative grid grid-cols-12 gap-y-8 lg:gap-x-10 mb-16 lg:mb-24">
+          <div className="col-span-12 lg:col-span-7">
+            <Eyebrow className="mb-6">Section I — The Method</Eyebrow>
+            <h2 className="font-display font-extrabold tracking-[-0.04em] leading-[0.95] text-[clamp(2.5rem,6vw,5.5rem)]">
+              Three steps.
+              <br />
+              Zero guesswork.
+            </h2>
+          </div>
+          <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pl-10 lg:border-l lg:border-jet-black/15">
+            <p className="text-lg text-mocha leading-relaxed">
+              The method below is engineered to remove every avoidable failure mode of a barbershop visit:
+              vague language, trend mismatch, and texture-blindness. Read it through &mdash; or skim the
+              numbered headings.
+            </p>
+          </div>
+        </div>
+
+        {/* Steps */}
+        <div className="relative">
           {steps.map((s, i) => (
-            <ScrollReveal key={s.n} delay={i * 0.1}>
-              <div className="h-full p-8 bg-milk border border-border rounded-2xl hover:border-accent transition-all hover:-translate-y-1 hover:shadow-md">
-                <div className="flex items-baseline justify-between mb-6">
-                  <span className="font-display text-5xl font-extrabold text-oat">{s.n}</span>
-                  <s.icon className="w-7 h-7 text-accent" />
-                </div>
-                <h3 className="font-display text-2xl font-semibold text-jet-black mb-3">
+            <motion.article
+              key={s.n}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.5, delay: i * 0.05 }}
+              className="relative grid grid-cols-12 gap-y-6 lg:gap-x-10 py-12 lg:py-16 border-t border-jet-black/15 first:border-t-0 group"
+            >
+              {/* Giant outline number floating in left gutter */}
+              <div className="absolute -left-2 -top-4 lg:-top-6 select-none pointer-events-none">
+                <ChapterNumber n={s.n} className="!text-jet-black/[0.045] !text-[8rem] sm:!text-[12rem]" />
+              </div>
+
+              <div className="relative col-span-12 lg:col-span-4 lg:col-start-1">
+                <p className="font-display text-sm font-extrabold tracking-[0.2em] text-accent uppercase mb-3">
+                  Step {s.n}
+                </p>
+                <h3 className="font-display font-extrabold tracking-[-0.02em] text-[2rem] sm:text-[2.5rem] leading-[1.05] text-jet-black">
                   {s.title}
                 </h3>
-                <p className="text-mocha leading-relaxed">{s.desc}</p>
               </div>
-            </ScrollReveal>
+
+              <div className="relative col-span-12 lg:col-span-7 lg:col-start-6">
+                <p className="text-xl sm:text-2xl font-display font-medium text-jet-black leading-snug mb-6 max-w-[40ch]">
+                  {s.lede}
+                </p>
+                <p className="text-base text-mocha leading-[1.7] max-w-[60ch]">{s.body}</p>
+              </div>
+            </motion.article>
           ))}
         </div>
+
+        <Asterism className="mt-16" />
       </div>
     </section>
   )
