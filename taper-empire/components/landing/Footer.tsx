@@ -3,159 +3,112 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Twitter, Facebook, Instagram, Youtube } from 'lucide-react'
 
-const guides = [
-  { href: '/low-taper-guide',           label: 'Low Taper Guide' },
-  { href: '/mid-taper-guide',           label: 'Mid Taper Guide' },
-  { href: '/high-taper-guide',          label: 'High Taper Guide' },
-  { href: '/taper-vs-fade',             label: 'Taper vs Fade' },
-  { href: '/barber-guide-for-tapers',   label: 'Barber Guide' },
+const primaryLinks = [
+  { href: '/tool',                  label: 'Get My Match' },
+  { href: '#how-it-works',          label: 'Method' },
+  { href: '#face-shape',            label: 'Face Shapes' },
+  { href: '#hair-type',             label: 'Hair Textures' },
+  { href: '#comparisons',           label: 'Compare' },
+  { href: '#faq',                   label: 'FAQ' },
 ]
 
-const matches = [
-  { href: '/best-taper-for-round-face', label: 'Best for Round Face' },
-  { href: '/best-taper-for-oval-face',  label: 'Best for Oval Face' },
-  { href: '/best-taper-for-square-face',label: 'Best for Square Face' },
-  { href: '/best-taper-for-curly-hair', label: 'Best for Curly Hair' },
-  { href: '/best-taper-for-coily-hair', label: 'Best for Coily Hair' },
-]
-
-const pages = [
-  { href: '/tool',    label: 'Get My Taper Match' },
-  { href: '/about',   label: 'About' },
-  { href: '/contact', label: 'Contact' },
+const legalLinks = [
   { href: '/privacy', label: 'Privacy' },
   { href: '/terms',   label: 'Terms' },
-]
-
-const socials = [
-  { href: 'https://twitter.com/taperempire',  label: 'Twitter',   Icon: Twitter },
-  { href: 'https://facebook.com/taperempire', label: 'Facebook',  Icon: Facebook },
-  { href: 'https://instagram.com/taperempire',label: 'Instagram', Icon: Instagram },
-  { href: 'https://youtube.com/@taperempire', label: 'YouTube',   Icon: Youtube },
+  { href: '/contact', label: 'Contact' },
 ]
 
 export function Footer() {
   return (
-    <footer className="bg-jet-black text-milk relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-10">
+    <footer className="bg-jet-black text-milk">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
 
-        {/* Top grid: brand + 3 link columns + socials column */}
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-10 md:gap-8 pb-12 border-b border-mocha/40">
+        {/* Editorial wordmark band */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.8 }}
+          className="border-b border-milk/15 py-24 lg:py-32"
+        >
+          <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-taupe mb-6">
+            Vol. 01 — Edition I
+          </p>
+          <p className="font-display font-extrabold tracking-[-0.025em] leading-[0.95] text-[clamp(2.25rem,9vw,8rem)] max-w-[18ch]">
+            The grooming
+            <br />
+            intelligence
+            <br />
+            <span className="italic font-medium text-taupe">layer.</span>
+          </p>
+        </motion.div>
 
-          {/* Brand block */}
-          <div className="col-span-2 md:col-span-4">
-            <Link href="/" aria-label="Taper Empire — Home" className="inline-block mb-5">
+        {/* Nav + brand */}
+        <div className="grid grid-cols-12 gap-10 py-16 lg:py-20 border-b border-milk/15">
+
+          <div className="col-span-12 md:col-span-5">
+            <Link href="/" aria-label="Taper Empire — Home" className="inline-block mb-6">
               <Image
                 src="/logos/taper-empire-white.svg"
                 alt="Taper Empire"
-                width={220}
-                height={34}
+                width={240}
+                height={36}
                 className="h-8 w-auto"
               />
             </Link>
-            <p className="text-sm text-taupe leading-relaxed max-w-xs">
-              Decision intelligence for men&rsquo;s taper haircuts — AI-matched recommendations
-              with on-face previews and barber-ready instructions.
+            <p className="text-sm text-taupe leading-[1.7] max-w-md">
+              A grooming intelligence platform for modern men. Face-optimized taper
+              recommendations with barber-ready instructions and maintenance plans.
             </p>
           </div>
 
-          {/* Guides */}
-          <div className="col-span-1 md:col-span-2">
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-milk mb-5">Guides</h4>
-            <ul className="space-y-3 text-sm">
-              {guides.map((l) => (
+          <div className="col-span-6 md:col-span-4 md:col-start-7">
+            <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-taupe mb-5">
+              Sections
+            </p>
+            <ul className="space-y-3 text-sm font-medium">
+              {primaryLinks.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-taupe hover:text-milk transition-colors">{l.label}</Link>
+                  <Link
+                    href={l.href}
+                    className="text-milk hover:text-accent transition-colors inline-flex items-baseline gap-2"
+                  >
+                    <span aria-hidden="true" className="text-taupe">—</span>
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Matches */}
-          <div className="col-span-1 md:col-span-2">
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-milk mb-5">By Face & Hair</h4>
-            <ul className="space-y-3 text-sm">
-              {matches.map((l) => (
+          <div className="col-span-6 md:col-span-3">
+            <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-taupe mb-5">
+              Practical
+            </p>
+            <ul className="space-y-3 text-sm font-medium">
+              {legalLinks.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-taupe hover:text-milk transition-colors">{l.label}</Link>
+                  <Link
+                    href={l.href}
+                    className="text-milk hover:text-accent transition-colors inline-flex items-baseline gap-2"
+                  >
+                    <span aria-hidden="true" className="text-taupe">—</span>
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Pages */}
-          <div className="col-span-1 md:col-span-2">
-            <h4 className="text-xs font-semibold uppercase tracking-widest text-milk mb-5">Pages</h4>
-            <ul className="space-y-3 text-sm">
-              {pages.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-taupe hover:text-milk transition-colors">{l.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Socials */}
-          <div className="col-span-1 md:col-span-2 flex md:justify-end">
-            <div className="flex md:flex-col gap-3">
-              {socials.map(({ href, label, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="w-10 h-10 rounded-lg bg-charcoal hover:bg-mocha text-milk flex items-center justify-center transition-colors"
-                >
-                  <Icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Bottom row: copy + tagline */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-8 text-xs text-taupe">
-          <p>© {new Date().getFullYear()} Taper Empire. All rights reserved.</p>
-          <p>Built for the barbershop · Powered by AI</p>
+        {/* Bottom band */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-10 text-[11px] tracking-[0.16em] uppercase text-taupe">
+          <p>© {new Date().getFullYear()} Taper Empire — All rights reserved</p>
+          <p>Currently free during beta</p>
         </div>
       </div>
-
-      {/* Marquee strip */}
-      <MarqueeStrip />
     </footer>
-  )
-}
-
-function MarqueeStrip() {
-  // A massive low-contrast brand wordmark scrolling horizontally
-  const phrases = ['Sharp Lines', 'Clean Tapers', 'Decision Intelligence', 'For Every Face']
-  const block = (
-    <div className="flex items-center gap-12 px-6 whitespace-nowrap">
-      {phrases.map((p) => (
-        <span key={p} className="inline-flex items-center gap-12">
-          <span className="font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold text-mocha/40 tracking-tight">
-            {p}
-          </span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-mocha/40 shrink-0">
-            <path d="M5 19L19 5M19 19V5H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
-      ))}
-    </div>
-  )
-  return (
-    <div className="relative overflow-hidden border-t border-mocha/40 py-6">
-      <motion.div
-        animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-        className="flex"
-      >
-        {block}
-        {block}
-      </motion.div>
-    </div>
   )
 }

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Upload, MessageSquare } from 'lucide-react'
 import { PhotoUpload } from './PhotoUpload'
 import { Quiz } from './Quiz'
 import { LoadingView } from './LoadingView'
@@ -22,10 +21,7 @@ export function ToolFlow() {
     submit(input)
     try {
       const r = await getRecommendations(input)
-      if (r.validationError) {
-        validation(r.validationError.message)
-        return
-      }
+      if (r.validationError) { validation(r.validationError.message); return }
       success(r.recommendations, {
         proxy: r.source === 'gemini' ? 'ok' : 'server-no-key',
         textSource: r.source,
@@ -46,79 +42,141 @@ export function ToolFlow() {
   if (step === 'results') return <Results />
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="text-center mb-10"
-      >
-        <h1 className="font-display text-4xl sm:text-5xl font-extrabold text-jet-black mb-3 tracking-tight">
-          How would you like to get started?
-        </h1>
-        <p className="text-mocha">Upload a photo for the most accurate AI recommendations</p>
-      </motion.div>
+    <div className="bg-milk text-jet-black">
+      <div className="max-w-[1200px] mx-auto px-6 lg:px-10 pt-16 lg:pt-24 pb-24 lg:pb-32">
 
-      {/* Mode selector */}
-      <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-4 items-stretch mb-10">
-        <button
-          type="button"
-          onClick={() => setTab('photo')}
-          className={`relative p-5 rounded-2xl border-2 transition-colors text-center flex flex-col items-center gap-2
-            ${tab === 'photo' ? 'border-accent bg-oat/40' : 'border-border bg-milk hover:border-accent'}`}
-        >
-          <span className="absolute top-2 right-2 bg-accent text-milk px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider">
-            Best
-          </span>
-          <Upload className={`w-7 h-7 ${tab === 'photo' ? 'text-accent' : 'text-mocha'}`} />
-          <span className="font-semibold text-jet-black">Upload Photo</span>
-          <span className="text-sm text-mocha">AI reads your face shape</span>
-        </button>
-
-        <div className="hidden sm:flex items-center text-taupe font-semibold">OR</div>
-
-        <button
-          type="button"
-          onClick={() => setTab('quiz')}
-          className={`p-5 rounded-2xl border-2 transition-colors text-center flex flex-col items-center gap-2
-            ${tab === 'quiz' ? 'border-accent bg-oat/40' : 'border-border bg-milk hover:border-accent'}`}
-        >
-          <MessageSquare className={`w-7 h-7 ${tab === 'quiz' ? 'text-accent' : 'text-mocha'}`} />
-          <span className="font-semibold text-jet-black">Quick Quiz</span>
-          <span className="text-sm text-mocha">5 questions, ~1 minute</span>
-        </button>
-      </div>
-
-      {validationError && (
-        <div role="alert" className="bg-oat/40 border border-error rounded-xl p-4 mb-6 text-jet-black">
-          <strong className="text-error">Heads up: </strong>
-          {validationError}
+        {/* Editorial intro */}
+        <div className="grid grid-cols-12 gap-y-8 lg:gap-x-10 mb-14 lg:mb-20">
+          <div className="col-span-12 lg:col-span-8">
+            <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-5 flex items-center gap-3">
+              <span aria-hidden="true" className="block h-px w-8 bg-jet-black" />
+              Phase I — Capture
+            </p>
+            <h1 className="font-display font-extrabold tracking-[-0.03em] leading-[0.95] text-[clamp(2.25rem,5.5vw,4.5rem)]">
+              Begin the analysis.
+            </h1>
+          </div>
+          <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pt-2">
+            <p className="text-sm text-mocha leading-[1.7]">
+              Two paths, same destination — a structured read of your face geometry, hair texture,
+              and maintenance reality.
+            </p>
+          </div>
         </div>
-      )}
 
-      <AnimatePresence mode="wait">
-        {tab === 'photo' ? (
-          <motion.div
-            key="photo"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
+        {/* Mode selector — editorial tabs */}
+        <div className="border-t-2 border-jet-black flex" role="tablist" aria-label="Capture method">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'photo'}
+            onClick={() => setTab('photo')}
+            className={`flex-1 py-5 lg:py-6 px-4 text-left transition-colors border-r border-jet-black/15 group ${
+              tab === 'photo' ? 'bg-milk' : 'bg-milk hover:bg-oat/40'
+            }`}
           >
-            <PhotoUpload onAnalyze={handlePhoto} />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="quiz"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.25 }}
+            <div className="flex items-baseline gap-4">
+              <span className={`text-[10px] font-semibold tracking-[0.32em] uppercase ${
+                tab === 'photo' ? 'text-jet-black' : 'text-mocha'
+              }`}>
+                I
+              </span>
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <span className={`font-display font-extrabold tracking-tight text-xl lg:text-2xl ${
+                    tab === 'photo' ? 'text-jet-black' : 'text-mocha group-hover:text-jet-black'
+                  } transition-colors`}>
+                    Upload Photo
+                  </span>
+                  <span className="text-[9px] font-semibold tracking-[0.22em] uppercase bg-jet-black text-milk px-2 py-0.5">
+                    Recommended
+                  </span>
+                </div>
+                <p className={`text-sm ${tab === 'photo' ? 'text-mocha' : 'text-mocha/70'}`}>
+                  Photo-based facial structure read
+                </p>
+              </div>
+            </div>
+            {tab === 'photo' && (
+              <motion.div
+                layoutId="tab-indicator"
+                className="h-0.5 bg-jet-black mt-5 -mb-[1px]"
+                transition={{ duration: 0.3 }}
+              />
+            )}
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'quiz'}
+            onClick={() => setTab('quiz')}
+            className={`flex-1 py-5 lg:py-6 px-4 text-left transition-colors group ${
+              tab === 'quiz' ? 'bg-milk' : 'bg-milk hover:bg-oat/40'
+            }`}
           >
-            <Quiz onComplete={handleQuiz} />
-          </motion.div>
+            <div className="flex items-baseline gap-4">
+              <span className={`text-[10px] font-semibold tracking-[0.32em] uppercase ${
+                tab === 'quiz' ? 'text-jet-black' : 'text-mocha'
+              }`}>
+                II
+              </span>
+              <div className="flex-1">
+                <span className={`font-display font-extrabold tracking-tight text-xl lg:text-2xl block mb-1 ${
+                  tab === 'quiz' ? 'text-jet-black' : 'text-mocha group-hover:text-jet-black'
+                } transition-colors`}>
+                  Quick Quiz
+                </span>
+                <p className={`text-sm ${tab === 'quiz' ? 'text-mocha' : 'text-mocha/70'}`}>
+                  Five short questions, ~1 minute
+                </p>
+              </div>
+            </div>
+            {tab === 'quiz' && (
+              <motion.div
+                layoutId="tab-indicator"
+                className="h-0.5 bg-jet-black mt-5 -mb-[1px]"
+                transition={{ duration: 0.3 }}
+              />
+            )}
+          </button>
+        </div>
+
+        <div className="border-b-2 border-jet-black mb-10 lg:mb-12" aria-hidden="true" />
+
+        {validationError && (
+          <div role="alert" className="border-y border-error bg-oat/40 px-6 py-5 mb-8">
+            <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-error mb-2">
+              Heads up
+            </p>
+            <p className="text-sm text-jet-black leading-relaxed">{validationError}</p>
+          </div>
         )}
-      </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          {tab === 'photo' ? (
+            <motion.div
+              key="photo"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <PhotoUpload onAnalyze={handlePhoto} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="quiz"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <Quiz onComplete={handleQuiz} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

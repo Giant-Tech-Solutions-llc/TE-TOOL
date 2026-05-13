@@ -1,92 +1,86 @@
 'use client'
 
-import { Eyebrow, ChapterNumber, Asterism } from '@/components/editorial/Rule'
 import { motion } from 'framer-motion'
+import { ScrollReveal } from '@/components/shared/ScrollReveal'
 
 const steps = [
   {
-    n: '01',
-    title: 'Submit your inputs',
-    lede: 'A clear headshot, or 5 questions about face, hair, lifestyle, and upkeep.',
-    body:
-      'The engine accepts either modality. A photo is the gold standard — it lets the AI read face geometry directly. The quiz path exists for privacy-conscious users; results converge within a few percentage points.',
+    num: 'I',
+    label: 'Capture',
+    title: 'Photo or quiz.',
+    body: 'A clear front-facing image — or five short questions. Either path returns the same structured analysis: face geometry, texture behavior, and maintenance cadence.',
   },
   {
-    n: '02',
-    title: 'The engine scores 40 styles',
-    lede: 'Face shape, hair texture, lifestyle, age, and maintenance tolerance feed four ranking lenses.',
-    body:
-      'Geometric fit, growth pattern compatibility, formality alignment, and maintenance cadence each produce a sub-score. The composite ranking is normalized to a 0–99 match percentage that&rsquo;s honest about its uncertainty.',
+    num: 'II',
+    label: 'Analysis',
+    title: 'Structural read.',
+    body: 'We score taper styles against your face shape, hair texture, and lifestyle constraints. The model evaluates compression tolerance, blend visibility, and grow-out behavior.',
   },
   {
-    n: '03',
-    title: 'You receive a barber-ready plan',
-    lede: 'Three ranked matches with on-face previews, guard sizes, and a four-week maintenance calendar.',
-    body:
-      'Each recommendation includes a verbatim script you can read aloud to your barber, with guard progressions, blend heights, neckline preference, and a maintenance frequency that matches your hair texture&rsquo;s growth pattern.',
+    num: 'III',
+    label: 'Brief',
+    title: 'Barber-ready brief.',
+    body: 'Three ranked matches with compatibility scores, the exact guard progression for your barber, and a 30-day maintenance plan calibrated to your hair growth.',
   },
 ]
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative bg-milk text-jet-black border-t border-jet-black">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-32">
+    <section id="how-it-works" className="bg-milk text-jet-black border-t border-jet-black/15">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
 
-        {/* Section masthead */}
-        <div className="relative grid grid-cols-12 gap-y-8 lg:gap-x-10 mb-16 lg:mb-24">
-          <div className="col-span-12 lg:col-span-7">
-            <Eyebrow className="mb-6">Section I — The Method</Eyebrow>
-            <h2 className="font-display font-extrabold tracking-[-0.04em] leading-[0.95] text-[clamp(2.5rem,6vw,5.5rem)]">
-              Three steps.
-              <br />
-              Zero guesswork.
-            </h2>
+        <ScrollReveal>
+          <div className="grid grid-cols-12 gap-6 lg:gap-10 mb-20 lg:mb-28">
+            <div className="col-span-12 md:col-span-5">
+              <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-6">
+                Section I — Method
+              </p>
+              <h2 className="font-display font-extrabold tracking-[-0.025em] leading-[0.95] text-[clamp(2rem,5.5vw,4.5rem)]">
+                From your face to a
+                <br />
+                <span className="italic font-medium text-mocha">cut that holds.</span>
+              </h2>
+            </div>
+            <div className="col-span-12 md:col-span-6 md:col-start-7 md:pt-3">
+              <p className="text-base lg:text-lg text-mocha leading-[1.7] max-w-xl">
+                Most haircut decisions are made from trend photos and crossed fingers. We
+                replace that with a structured read of what your face will actually carry
+                between visits — and what your barber needs to hear at the chair.
+              </p>
+            </div>
           </div>
-          <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pl-10 lg:border-l lg:border-jet-black/15">
-            <p className="text-lg text-mocha leading-relaxed">
-              The method below is engineered to remove every avoidable failure mode of a barbershop visit:
-              vague language, trend mismatch, and texture-blindness. Read it through &mdash; or skim the
-              numbered headings.
-            </p>
-          </div>
-        </div>
+        </ScrollReveal>
 
-        {/* Steps */}
-        <div className="relative">
+        <div className="border-t border-jet-black/15">
           {steps.map((s, i) => (
-            <motion.article
-              key={s.n}
-              initial={{ opacity: 0, y: 20 }}
+            <motion.div
+              key={s.num}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.5, delay: i * 0.05 }}
-              className="relative grid grid-cols-12 gap-y-6 lg:gap-x-10 py-12 lg:py-16 border-t border-jet-black/15 first:border-t-0 group"
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.6, delay: i * 0.08, ease: [0.2, 0.8, 0.2, 1] }}
+              className="grid grid-cols-12 gap-6 lg:gap-10 py-12 lg:py-16 border-b border-jet-black/15"
             >
-              {/* Giant outline number floating in left gutter */}
-              <div className="absolute -left-2 -top-4 lg:-top-6 select-none pointer-events-none">
-                <ChapterNumber n={s.n} className="!text-jet-black/[0.045] !text-[8rem] sm:!text-[12rem]" />
+              <div className="col-span-12 md:col-span-2 flex items-baseline gap-3">
+                <span className="font-display text-5xl lg:text-6xl font-extrabold text-mocha tracking-tighter leading-none">
+                  {s.num}
+                </span>
               </div>
-
-              <div className="relative col-span-12 lg:col-span-4 lg:col-start-1">
-                <p className="font-display text-sm font-extrabold tracking-[0.2em] text-accent uppercase mb-3">
-                  Step {s.n}
+              <div className="col-span-12 md:col-span-4">
+                <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-3">
+                  {s.label}
                 </p>
-                <h3 className="font-display font-extrabold tracking-[-0.02em] text-[2rem] sm:text-[2.5rem] leading-[1.05] text-jet-black">
+                <h3 className="font-display font-extrabold tracking-[-0.02em] text-2xl lg:text-3xl leading-[1.05]">
                   {s.title}
                 </h3>
               </div>
-
-              <div className="relative col-span-12 lg:col-span-7 lg:col-start-6">
-                <p className="text-xl sm:text-2xl font-display font-medium text-jet-black leading-snug mb-6 max-w-[40ch]">
-                  {s.lede}
-                </p>
-                <p className="text-base text-mocha leading-[1.7] max-w-[60ch]">{s.body}</p>
+              <div className="col-span-12 md:col-span-5 md:col-start-8">
+                <p className="text-base text-mocha leading-[1.7]">{s.body}</p>
               </div>
-            </motion.article>
+            </motion.div>
           ))}
         </div>
 
-        <Asterism className="mt-16" />
       </div>
     </section>
   )

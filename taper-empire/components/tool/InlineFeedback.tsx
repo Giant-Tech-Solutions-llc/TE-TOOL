@@ -2,26 +2,24 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, Send, CheckCircle2 } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { submitFeedback, hasGivenFeedback, markFeedbackGiven } from '@/lib/api-client'
 import type { Recommendation } from '@/types'
 
-const RATINGS = [
-  { value: 1, emoji: '😞', label: 'Way off' },
-  { value: 2, emoji: '😕', label: 'Meh' },
-  { value: 3, emoji: '🙂', label: 'Decent' },
-  { value: 4, emoji: '😊', label: 'Great' },
-  { value: 5, emoji: '🤩', label: 'Spot on' },
-]
+const OPTIONS = [
+  { value: 5, label: 'Very accurate',     desc: 'Spot on — I would book this cut.' },
+  { value: 4, label: 'Decent match',      desc: 'Mostly right, with a few tweaks.' },
+  { value: 2, label: 'Not my style',      desc: 'Wrong direction for me.' },
+  { value: 1, label: 'Needs improvement', desc: 'Missed the brief entirely.' },
+] as const
 
-interface InlineFeedbackProps {
+interface Props {
   recommendations: Recommendation[]
   flow: string
 }
 
-export function InlineFeedback({ recommendations, flow }: InlineFeedbackProps) {
+export function InlineFeedback({ recommendations, flow }: Props) {
   const [rating, setRating] = useState<number | null>(null)
-  const [hover, setHover] = useState<number | null>(null)
   const [comment, setComment] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -30,7 +28,7 @@ export function InlineFeedback({ recommendations, flow }: InlineFeedbackProps) {
   useEffect(() => { if (hasGivenFeedback()) setSubmitted(true) }, [])
   useEffect(() => { if (rating !== null) ref.current?.focus({ preventScroll: true }) }, [rating])
 
-  const handleRate = async (value: number) => {
+  const handleSelect = async (value: number) => {
     setRating(value)
     markFeedbackGiven()
     try {
@@ -57,81 +55,112 @@ export function InlineFeedback({ recommendations, flow }: InlineFeedbackProps) {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-2xl mx-auto bg-oat/40 border border-border rounded-2xl p-6 text-center"
+        className="border-y-2 border-jet-black py-10"
       >
-        <CheckCircle2 className="w-8 h-8 text-success mx-auto mb-3" />
-        <h3 className="font-display text-xl font-extrabold mb-2">Thanks — your feedback shapes the next version.</h3>
-        <p className="text-mocha">
-          You&apos;re 1 of <strong className="text-jet-black">12,847+</strong> men this month who help us tune the recommendations.
-        </p>
+        <div className="grid grid-cols-12 gap-y-6 lg:gap-x-10">
+          <div className="col-span-12 lg:col-span-5">
+            <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-3 flex items-center gap-3">
+              <span aria-hidden="true" className="block h-px w-8 bg-jet-black" />
+              Recorded
+            </p>
+            <h3 className="font-display font-extrabold tracking-[-0.02em] leading-tight text-2xl lg:text-3xl">
+              Filed — thank you.
+            </h3>
+          </div>
+          <div className="col-span-12 lg:col-span-7 lg:pt-4">
+            <p className="text-base text-mocha leading-[1.7] max-w-prose">
+              Every response tunes the next iteration. The recommendation engine improves a little
+              every time someone like you tells us where it missed.
+            </p>
+          </div>
+        </div>
       </motion.div>
     )
   }
 
   return (
-    <section aria-label="Feedback" className="max-w-2xl mx-auto bg-oat/40 border border-border rounded-2xl p-6 text-center">
-      <div className="inline-flex items-center gap-2 px-3 py-1 bg-milk border border-border rounded-full text-xs font-semibold text-accent uppercase tracking-wider mb-3">
-        <Heart className="w-3 h-3" fill="currentColor" /> 5 second favor
-      </div>
-      <h3 className="font-display text-xl font-extrabold mb-2">How accurate are these matches?</h3>
-      <p className="text-mocha mb-5">Your honest take is what makes Taper Empire smarter — pick one.</p>
+    <section aria-label="Feedback" className="border-y-2 border-jet-black py-10 lg:py-12">
+      <div className="grid grid-cols-12 gap-y-8 lg:gap-x-10">
 
-      <div role="radiogroup" className="flex justify-center gap-2 mb-5 flex-wrap">
-        {RATINGS.map((opt) => {
-          const active = (hover ?? rating) === opt.value
-          const chosen = rating === opt.value
-          return (
-            <motion.button
-              key={opt.value}
-              type="button"
-              role="radio"
-              aria-checked={chosen}
-              aria-label={opt.label}
-              whileHover={{ y: -2, scale: 1.05 }}
-              onMouseEnter={() => setHover(opt.value)}
-              onMouseLeave={() => setHover(null)}
-              onFocus={() => setHover(opt.value)}
-              onBlur={() => setHover(null)}
-              onClick={() => handleRate(opt.value)}
-              className={`min-w-[60px] px-3 py-2 border-2 rounded-xl transition-colors ${
-                chosen ? 'bg-accent border-accent text-milk' : active ? 'bg-milk border-border' : 'bg-transparent border-border'
-              }`}
-            >
-              <div className="text-2xl leading-none">{opt.emoji}</div>
-              <div className={`text-xs font-semibold mt-1 ${chosen ? 'text-milk' : 'text-mocha'}`}>{opt.label}</div>
-            </motion.button>
-          )
-        })}
-      </div>
+        <div className="col-span-12 lg:col-span-5">
+          <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-3 flex items-center gap-3">
+            <span aria-hidden="true" className="block h-px w-8 bg-jet-black" />
+            Editorial Feedback
+          </p>
+          <h3 className="font-display font-extrabold tracking-[-0.025em] leading-[0.95] text-[clamp(1.875rem,3.5vw,2.75rem)] max-w-[16ch]">
+            Did this recommendation feel accurate?
+          </h3>
+          <p className="mt-5 text-sm text-mocha leading-[1.7] max-w-md">
+            One tap is enough. Your read is what tunes the next generation of recommendations.
+          </p>
+        </div>
 
-      {rating !== null && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-left">
-          <label htmlFor="feedback-comment" className="block text-sm font-semibold mb-2">
-            One thing we could do better?{' '}
-            <span className="text-taupe font-normal">(optional, but really helps)</span>
-          </label>
-          <textarea
-            id="feedback-comment"
-            ref={ref}
-            value={comment}
-            onChange={(e) => setComment(e.target.value.slice(0, 2000))}
-            placeholder={rating <= 2 ? 'What missed the mark? Be brutally honest.' : 'What stood out? Anything you wish we showed you?'}
-            rows={3}
-            className="w-full p-3 bg-milk text-jet-black border border-border rounded-xl resize-y outline-none focus:border-accent transition-colors min-h-[88px]"
-          />
-          <div className="flex justify-between items-center mt-3 gap-2 flex-wrap">
-            <span className="text-xs text-taupe">{comment.length}/2000</span>
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="bg-accent hover:bg-accent-hover text-milk px-6 py-3 rounded-xl text-base font-semibold inline-flex items-center gap-2 disabled:opacity-70"
+        <div className="col-span-12 lg:col-span-7">
+          <ul className="border-t border-jet-black/15">
+            {OPTIONS.map((opt) => {
+              const selected = rating === opt.value
+              return (
+                <li key={opt.value} className="border-b border-jet-black/15">
+                  <button
+                    type="button"
+                    onClick={() => handleSelect(opt.value)}
+                    className="w-full text-left py-4 lg:py-5 flex items-center gap-4 lg:gap-6 group transition-colors"
+                  >
+                    <span className={`w-5 h-5 border-2 flex-shrink-0 grid place-items-center transition-colors ${
+                      selected ? 'border-jet-black bg-jet-black text-milk' : 'border-jet-black/30 group-hover:border-jet-black'
+                    }`}>
+                      {selected && <Check className="w-3 h-3" strokeWidth={3} />}
+                    </span>
+                    <span className="flex-1 grid sm:grid-cols-[14rem_1fr] gap-1 sm:gap-6 items-baseline">
+                      <span className={`font-display font-extrabold tracking-[-0.01em] text-lg lg:text-xl ${
+                        selected ? 'text-jet-black' : 'text-jet-black group-hover:text-accent transition-colors'
+                      }`}>
+                        {opt.label}
+                      </span>
+                      <span className="text-sm text-mocha">{opt.desc}</span>
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+
+          {rating !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6"
             >
-              <Send className="w-4 h-4" /> {submitting ? 'Sending…' : comment.trim() ? 'Send feedback' : 'Done'}
-            </button>
-          </div>
-        </motion.div>
-      )}
+              <label htmlFor="feedback-comment" className="block text-[10px] font-semibold tracking-[0.28em] uppercase text-mocha mb-3">
+                Optional — What felt off about the recommendation?
+              </label>
+              <textarea
+                id="feedback-comment"
+                ref={ref}
+                value={comment}
+                onChange={(e) => setComment(e.target.value.slice(0, 2000))}
+                placeholder="Texture didn't match, style felt off, maintenance too aggressive…"
+                rows={3}
+                className="w-full p-4 bg-milk text-jet-black border border-jet-black/30 focus:border-jet-black resize-y outline-none text-sm transition-colors min-h-[96px]"
+              />
+              <div className="flex justify-between items-center mt-4 gap-2 flex-wrap">
+                <span className="text-[10px] tracking-[0.22em] uppercase text-mocha tabular-nums">
+                  {comment.length} / 2000
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="inline-flex items-center gap-3 bg-jet-black text-milk px-6 h-11 text-xs font-semibold tracking-[0.18em] uppercase hover:bg-charcoal disabled:opacity-60 transition-colors"
+                >
+                  <span>{submitting ? 'Submitting' : comment.trim() ? 'Submit feedback' : 'Done'}</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </div>
     </section>
   )
 }

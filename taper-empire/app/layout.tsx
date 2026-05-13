@@ -21,11 +21,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://taperempire.com'
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Taper Empire — AI-Powered Taper Haircut Recommendations',
+    default: 'Taper Empire — Grooming Intelligence for Modern Men',
     template: '%s · Taper Empire',
   },
   description:
-    'Find the best taper haircut for your face shape, hair texture, and lifestyle. AI-powered recommendations with on-face previews, barber-ready instructions, and maintenance plans.',
+    'Find the taper that actually fits your face. A grooming intelligence platform that reads your face shape, hair texture, and maintenance tolerance — and returns barber-ready taper recommendations.',
   keywords: [
     'taper haircut', 'low taper', 'mid taper', 'high taper', 'fade vs taper',
     'haircut for face shape', 'AI haircut recommendation', 'barber tool',
@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: SITE_URL,
     siteName: 'Taper Empire',
-    title: 'Taper Empire — AI-Powered Taper Haircut Recommendations',
-    description: 'Find the best taper haircut for your face, hair texture, and lifestyle in 60 seconds.',
+    title: 'Taper Empire — Grooming Intelligence for Modern Men',
+    description: 'Find the taper that actually fits your face. Barber-ready recommendations in 60 seconds.',
     images: [{ url: '/og-image.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Taper Empire — AI-Powered Taper Recommendations',
-    description: 'Find the best taper haircut for your face & hair in 60 seconds.',
+    title: 'Taper Empire — Grooming Intelligence for Modern Men',
+    description: 'Find the taper that actually fits your face. Barber-ready recommendations.',
     images: ['/og-image.png'],
   },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
