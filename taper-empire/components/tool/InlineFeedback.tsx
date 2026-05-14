@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { submitFeedback, hasGivenFeedback, markFeedbackGiven } from '@/lib/api-client'
 import type { Recommendation } from '@/types'
+import { Button } from '@/components/ui/button'
 
 const OPTIONS = [
   { value: 5, label: 'Extremely accurate', desc: 'I would book this cut today.' },
@@ -144,15 +145,17 @@ export function InlineFeedback({ recommendations, flow }: Props) {
                 <span className="text-[10px] tracking-[0.32em] uppercase text-mute tabular-nums">
                   {comment.length} / 2000
                 </span>
-                <button
-                  type="button"
+                <Button
+                  variant="cream"
+                  size="md"
+                  shape="pill"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="inline-flex items-center gap-3 bg-soft text-ink px-7 h-12 text-[11px] font-semibold tracking-[0.24em] uppercase hover:bg-gold hover:text-soft disabled:opacity-60 transition-colors"
+                  loading={submitting}
                 >
-                  <span>{submitting ? 'Submitting' : comment.trim() ? 'Submit feedback' : 'Done'}</span>
-                  <span aria-hidden="true">→</span>
-                </button>
+                  {submitting ? 'Submitting' : comment.trim() ? 'Submit feedback' : 'Done'}
+                  {!submitting && <span aria-hidden="true">→</span>}
+                </Button>
               </div>
             </motion.div>
           )}

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { CinematicPortrait } from './CinematicPortrait'
+import { Button } from '@/components/ui/button'
 
 const REVEAL = { duration: 1.1, ease: [0.16, 1, 0.3, 1] as any }
 
@@ -55,20 +56,18 @@ export function Hero() {
               transition={{ ...REVEAL, delay: 0.55 }}
               className="mt-12 flex flex-wrap items-center gap-5"
             >
-              <Link
-                href="/tool"
-                className="group inline-flex items-center gap-4 bg-soft text-ink px-9 h-14 text-[11px] font-semibold tracking-[0.24em] uppercase hover:bg-gold hover:text-soft transition-colors"
-              >
-                <span>Begin the analysis</span>
-                <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
-              </Link>
-              <Link
-                href="#how-it-works"
-                className="text-[11px] font-medium tracking-[0.24em] uppercase text-soft/70 hover:text-soft transition-colors flex items-center gap-3"
-              >
-                <span aria-hidden="true" className="block h-px w-6 bg-soft/40" />
-                See the method
-              </Link>
+              <Button asChild variant="cream" size="lg" shape="pill">
+                <Link href="/tool">
+                  Begin the analysis
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="lg" shape="pill">
+                <Link href="#how-it-works">
+                  <span aria-hidden="true" className="block h-px w-6 bg-soft/40" />
+                  See the method
+                </Link>
+              </Button>
             </motion.div>
 
             <motion.p

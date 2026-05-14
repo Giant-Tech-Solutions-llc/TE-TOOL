@@ -126,10 +126,11 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
                   {photo.downscaled && <span className="text-mute"> · optimized</span>}
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button variant="cream" size="lg" onClick={() => onAnalyze(photo)}>
-                    Begin the analysis →
+                  <Button variant="cream" size="lg" shape="pill" onClick={() => onAnalyze(photo)}>
+                    Begin the analysis
+                    <span aria-hidden="true">→</span>
                   </Button>
-                  <Button variant="ghost" size="lg" onClick={() => setPhoto(null)}>
+                  <Button variant="outline" size="lg" shape="pill" onClick={() => setPhoto(null)}>
                     Different photo
                   </Button>
                 </div>

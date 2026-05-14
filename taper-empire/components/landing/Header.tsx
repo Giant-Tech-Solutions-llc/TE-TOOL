@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -43,13 +44,12 @@ export function Header() {
             <Link href="#faq"          className="hover:text-soft transition-colors">FAQ</Link>
           </nav>
 
-          <Link
-            href="/tool"
-            className="group inline-flex items-center gap-2.5 bg-soft text-ink px-5 py-2.5 text-[11px] font-semibold tracking-[0.22em] uppercase hover:bg-gold hover:text-soft transition-colors"
-          >
-            <span>Begin</span>
-            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
-          </Link>
+          <Button asChild variant="cream" size="sm" shape="pill">
+            <Link href="/tool">
+              Begin
+              <span aria-hidden="true">→</span>
+            </Link>
+          </Button>
         </div>
       </div>
     </header>

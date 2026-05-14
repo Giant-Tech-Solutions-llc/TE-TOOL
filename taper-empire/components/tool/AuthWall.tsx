@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { X } from 'lucide-react'
 import type { Recommendation } from '@/types'
+import { Button } from '@/components/ui/button'
 
 interface AuthWallProps {
   open: boolean
@@ -119,31 +120,31 @@ export function AuthWall({
                 compatibility scores, face-shape analysis, and barber-ready references.
               </p>
 
-              {/* OAuth — oversized luxury */}
-              <button
-                type="button"
+              {/* OAuth — oversized luxury, soft tactile pill */}
+              <Button
+                variant="cream"
+                size="xl"
+                shape="pill"
                 onClick={onContinueWithGoogle}
-                className="group w-full bg-soft text-ink h-16 px-6 flex items-center justify-between hover:bg-gold hover:text-soft transition-colors mb-3"
+                className="w-full !justify-between !px-7 mb-3"
               >
                 <span className="flex items-center gap-4">
                   <GoogleMark />
-                  <span className="text-sm font-semibold tracking-[0.18em] uppercase">
-                    Continue with Google
-                  </span>
+                  <span>Continue with Google</span>
                 </span>
-                <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
-              </button>
+                <span aria-hidden="true">→</span>
+              </Button>
 
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="xl"
+                shape="pill"
                 onClick={onContinueWithEmail}
-                className="group w-full border border-line text-soft h-16 px-6 flex items-center justify-between hover:border-soft transition-colors"
+                className="w-full !justify-between !px-7"
               >
-                <span className="text-sm font-semibold tracking-[0.18em] uppercase">
-                  Continue with email
-                </span>
-                <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
-              </button>
+                <span>Continue with email</span>
+                <span aria-hidden="true">→</span>
+              </Button>
 
               <p className="mt-10 text-[10px] tracking-[0.32em] uppercase text-mute leading-relaxed">
                 No card · No spam · Used only for your grooming profile

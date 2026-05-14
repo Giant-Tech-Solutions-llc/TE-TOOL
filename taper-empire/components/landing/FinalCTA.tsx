@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
 
 export function FinalCTA() {
   return (
@@ -58,18 +59,13 @@ export function FinalCTA() {
                 maintenance reality. Sixty seconds, three matches, zero noise.
               </p>
 
-              <div className="col-span-12 lg:col-span-7 lg:col-start-6 flex flex-col sm:flex-row items-stretch sm:items-end gap-5 lg:justify-end">
-                <Link
-                  href="/tool"
-                  className="group inline-flex items-center gap-4 bg-soft text-ink pl-9 pr-3 py-3 hover:bg-gold hover:text-soft transition-colors"
-                >
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.24em]">
+              <div className="col-span-12 lg:col-span-7 lg:col-start-6 flex flex-col sm:flex-row items-stretch sm:items-end gap-4 lg:justify-end">
+                <Button asChild variant="cream" size="xl" shape="pill">
+                  <Link href="/tool">
                     Begin the analysis
-                  </span>
-                  <span className="grid place-items-center w-12 h-12 bg-ink text-soft group-hover:bg-soft group-hover:text-ink transition-colors">
-                    <span aria-hidden="true" className="text-lg">→</span>
-                  </span>
-                </Link>
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </Button>
               </div>
             </div>
           </motion.div>
