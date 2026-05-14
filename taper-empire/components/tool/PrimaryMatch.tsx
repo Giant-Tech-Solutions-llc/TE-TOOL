@@ -38,7 +38,7 @@ export function PrimaryMatch({ rec, imageLoading }: Props) {
       <div className="grid grid-cols-12 gap-0 items-stretch">
 
         {/* LEFT — large cinematic image */}
-        <div className="col-span-12 lg:col-span-7 relative aspect-[4/5] lg:aspect-[5/6] bg-surface overflow-hidden group">
+        <div className="col-span-12 lg:col-span-7 relative aspect-[4/5] lg:aspect-[5/6] bg-surface overflow-hidden group lg:rounded-l-3xl">
           {imageLoading && !rec.image_url ? (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
@@ -68,7 +68,7 @@ export function PrimaryMatch({ rec, imageLoading }: Props) {
                 className="absolute inset-0 pointer-events-none"
                 style={{ background: 'linear-gradient(180deg, transparent 60%, rgba(10,10,10,0.6) 100%)' }}
               />
-              <div className="absolute top-5 right-5 w-10 h-10 bg-ink/70 backdrop-blur-sm border border-line grid place-items-center text-soft opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-5 right-5 w-11 h-11 rounded-full bg-ink/70 backdrop-blur-md border border-soft/15 grid place-items-center text-soft opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105">
                 <Maximize2 className="w-4 h-4" />
               </div>
             </button>
@@ -79,7 +79,7 @@ export function PrimaryMatch({ rec, imageLoading }: Props) {
           )}
 
           {/* Floating chip */}
-          <div className="absolute top-5 left-5 bg-gold text-ink text-[10px] font-semibold tracking-[0.32em] uppercase px-3 py-1.5 z-10">
+          <div className="absolute top-5 left-5 bg-gold text-ink text-[10px] font-semibold tracking-[0.32em] uppercase px-3 py-1.5 rounded-full z-10 shadow-[0_4px_14px_rgba(0,0,0,0.5)]">
             Primary Match
           </div>
 
@@ -93,7 +93,7 @@ export function PrimaryMatch({ rec, imageLoading }: Props) {
         </div>
 
         {/* RIGHT — analysis panel */}
-        <div className="col-span-12 lg:col-span-5 p-8 lg:p-12 xl:p-14 flex flex-col bg-ink">
+        <div className="col-span-12 lg:col-span-5 p-8 lg:p-12 xl:p-14 flex flex-col bg-ink lg:rounded-r-3xl">
 
           <p className="text-[10px] font-medium tracking-[0.4em] uppercase text-gold mb-5 flex items-center gap-4">
             <span aria-hidden="true" className="block h-px w-12 bg-gold/70" />
@@ -114,7 +114,7 @@ export function PrimaryMatch({ rec, imageLoading }: Props) {
               {labels.map((l) => (
                 <span
                   key={l}
-                  className="text-[9px] font-medium tracking-[0.28em] uppercase border border-line text-soft/80 px-3 py-1.5"
+                  className="text-[9px] font-medium tracking-[0.28em] uppercase border border-line text-soft/80 px-3 py-1.5 rounded-full"
                 >
                   {l}
                 </span>
@@ -173,7 +173,7 @@ export function PrimaryMatch({ rec, imageLoading }: Props) {
               type="button"
               aria-label="Close"
               onClick={() => setLightbox(false)}
-              className="absolute top-6 right-6 w-12 h-12 bg-surface border border-line text-soft grid place-items-center hover:bg-gold hover:text-ink hover:border-gold transition-colors"
+              className="absolute top-6 right-6 w-12 h-12 rounded-full bg-surface border border-line text-soft grid place-items-center hover:bg-gold hover:text-ink hover:border-gold hover:scale-105 transition-all duration-300"
             >
               <X className="w-5 h-5" />
             </button>

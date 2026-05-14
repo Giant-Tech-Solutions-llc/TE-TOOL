@@ -96,7 +96,7 @@ export function AuthWall({
                   type="button"
                   aria-label="Close"
                   onClick={onClose}
-                  className="absolute top-6 right-6 w-10 h-10 grid place-items-center text-mute hover:text-soft transition-colors"
+                  className="absolute top-6 right-6 w-11 h-11 rounded-full bg-surface2/60 border border-line grid place-items-center text-mute hover:text-soft hover:bg-surface2 hover:scale-110 transition-all duration-300"
                 >
                   <X className="w-4 h-4" />
                 </button>

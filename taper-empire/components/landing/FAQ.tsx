@@ -49,16 +49,16 @@ export function FAQ() {
             </p>
           </div>
 
-          <div className="col-span-12 lg:col-span-8 border-t border-line">
+          <div className="col-span-12 lg:col-span-8 rounded-3xl border border-line bg-surface/20 overflow-hidden">
             {items.map((it, i) => {
               const isOpen = open === i
               return (
-                <article key={it.q} className="border-b border-line">
+                <article key={it.q} className={`${i < items.length - 1 ? 'border-b border-line' : ''} ${isOpen ? 'bg-surface/40' : 'hover:bg-surface/30'} transition-colors duration-500`}>
                   <button
                     type="button"
                     onClick={() => setOpen(isOpen ? null : i)}
                     aria-expanded={isOpen}
-                    className="w-full text-left py-8 flex items-start gap-6 group"
+                    className="w-full text-left py-7 px-6 lg:px-8 flex items-start gap-6 group"
                   >
                     <span className="font-display tabular-nums text-gold text-xs tracking-[0.32em] mt-2 w-12 flex-shrink-0">
                       Q.{String(i + 1).padStart(2, '0')}
@@ -66,7 +66,11 @@ export function FAQ() {
                     <span className="flex-1 font-display font-extrabold tracking-[-0.015em] text-xl sm:text-2xl leading-tight text-soft group-hover:text-gold transition-colors">
                       {it.q}
                     </span>
-                    <span className="mt-2 flex-shrink-0 grid place-items-center w-9 h-9 border border-line text-soft/70 group-hover:border-gold group-hover:text-gold transition-colors">
+                    <span className={`mt-2 flex-shrink-0 grid place-items-center w-9 h-9 rounded-full border transition-all duration-300 ${
+                      isOpen
+                        ? 'border-gold bg-gold/10 text-gold rotate-[180deg]'
+                        : 'border-line text-soft/70 group-hover:border-gold group-hover:text-gold group-hover:scale-110'
+                    }`}>
                       {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     </span>
                   </button>
@@ -79,7 +83,7 @@ export function FAQ() {
                         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                         className="overflow-hidden"
                       >
-                        <div className="flex items-start gap-6 pb-8">
+                        <div className="flex items-start gap-6 pb-8 px-6 lg:px-8">
                           <span className="font-display tabular-nums text-gold text-xs tracking-[0.32em] w-12 flex-shrink-0">
                             A.
                           </span>

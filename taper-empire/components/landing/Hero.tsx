@@ -98,14 +98,17 @@ export function Hero() {
           transition={{ ...REVEAL, delay: 0.9 }}
           className="mt-24 lg:mt-32 pt-10 border-t border-line"
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 lg:gap-4">
             {[
               ['12,847', 'Profiles matched'],
               ['94%',    'Average compatibility'],
               ['~58s',   'To barber-ready brief'],
               ['40+',    'Taper styles indexed'],
             ].map(([metric, label]) => (
-              <div key={label as string} className="flex flex-col gap-2">
+              <div
+                key={label as string}
+                className="flex flex-col gap-2 rounded-2xl border border-line bg-surface/30 p-5 lg:p-6 hover:border-soft/15 hover:bg-surface/60 hover:-translate-y-0.5 transition-all duration-500"
+              >
                 <span className="font-display text-3xl lg:text-4xl font-extrabold text-soft tracking-tight tabular-nums">
                   {metric}
                 </span>

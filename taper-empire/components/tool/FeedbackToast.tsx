@@ -70,7 +70,7 @@ export function FeedbackToast({ recommendations, flow }: Props) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed bottom-6 right-6 z-50 w-[340px] max-w-[calc(100vw-3rem)] bg-surface border border-line shadow-[0_12px_32px_rgba(0,0,0,0.5)] overflow-hidden"
+          className="fixed bottom-6 right-6 z-50 w-[340px] max-w-[calc(100vw-3rem)] bg-surface border border-line rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.5)] overflow-hidden"
         >
           {!done ? (
             <>
@@ -112,7 +112,7 @@ export function FeedbackToast({ recommendations, flow }: Props) {
             </>
           ) : (
             <div className="px-5 py-7 text-center">
-              <div className="w-8 h-8 mx-auto mb-3 grid place-items-center bg-gold text-ink">
+              <div className="w-9 h-9 mx-auto mb-3 grid place-items-center bg-gold text-ink rounded-full">
                 <Check className="w-4 h-4" strokeWidth={2.5} />
               </div>
               <p className="text-sm font-semibold text-soft">Recorded — thank you.</p>

@@ -34,7 +34,7 @@ function LuxuryTable({
   caption: string
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto rounded-3xl border border-line bg-surface/30">
       <table className="w-full text-left min-w-[820px] border-collapse">
         <caption className="sr-only">{caption}</caption>
         <thead>
@@ -228,11 +228,11 @@ export function AuthorityContent() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 border-y border-line">
+          <div className="grid grid-cols-1 lg:grid-cols-3 border border-line rounded-3xl overflow-hidden bg-surface/30">
             {maintenanceWindows.map((w, i) => (
               <div
                 key={w.range}
-                className={`py-10 lg:py-14 px-6 lg:px-10 ${
+                className={`py-10 lg:py-14 px-6 lg:px-10 hover:bg-surface2/60 transition-colors duration-300 ${
                   i > 0 ? 'lg:border-l border-line border-t lg:border-t-0' : ''
                 }`}
               >

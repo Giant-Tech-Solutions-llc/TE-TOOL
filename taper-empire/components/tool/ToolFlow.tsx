@@ -67,7 +67,7 @@ export function ToolFlow() {
         </div>
 
         {/* Mode selector — tonal tabs */}
-        <div className="grid grid-cols-2 gap-1 mb-12 lg:mb-16" role="tablist" aria-label="Capture method">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-10 lg:mb-14 p-1 rounded-2xl bg-surface/30 border border-line" role="tablist" aria-label="Capture method">
           <TabButton
             active={tab === 'photo'}
             num="I"
@@ -86,7 +86,7 @@ export function ToolFlow() {
         </div>
 
         {validationError && (
-          <div role="alert" className="border-l-2 border-error bg-surface/60 px-6 py-5 mb-10">
+          <div role="alert" className="border-l-2 border-error bg-surface/60 px-6 py-5 mb-10 rounded-r-2xl">
             <p className="text-[10px] font-medium tracking-[0.32em] uppercase text-error mb-2">Heads up</p>
             <p className="text-sm text-soft leading-relaxed">{validationError}</p>
           </div>
@@ -131,34 +131,32 @@ function TabButton({
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`relative text-left p-6 lg:p-7 transition-colors ${
-        active ? 'bg-surface2' : 'bg-surface/40 hover:bg-surface'
+      className={`relative text-left p-5 lg:p-7 rounded-xl transition-all duration-300 ease-out ${
+        active
+          ? 'bg-surface2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_4px_18px_rgba(0,0,0,0.35)]'
+          : 'bg-transparent hover:bg-surface/60'
       }`}
     >
       <div className="flex items-baseline gap-5">
-        <span className={`text-[10px] font-medium tracking-[0.4em] uppercase ${active ? 'text-gold' : 'text-mute'}`}>
+        <span className={`text-[10px] font-medium tracking-[0.4em] uppercase transition-colors ${active ? 'text-gold' : 'text-mute'}`}>
           {num}
         </span>
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <span className={`font-display font-extrabold tracking-[-0.015em] text-xl lg:text-2xl ${
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
+            <span className={`font-display font-extrabold tracking-[-0.015em] text-xl lg:text-2xl transition-colors ${
               active ? 'text-soft' : 'text-soft/80'
             }`}>
               {title}
             </span>
             {badge && (
-              <span className="text-[9px] font-medium tracking-[0.32em] uppercase bg-gold text-ink px-2 py-0.5">
+              <span className="text-[9px] font-medium tracking-[0.32em] uppercase bg-gold text-ink px-2.5 py-0.5 rounded-full">
                 {badge}
               </span>
             )}
           </div>
-          <p className={`text-sm ${active ? 'text-mute' : 'text-mute/70'}`}>{sub}</p>
+          <p className={`text-sm transition-colors ${active ? 'text-mute' : 'text-mute/70'}`}>{sub}</p>
         </div>
       </div>
-      <span
-        aria-hidden="true"
-        className={`absolute left-0 right-0 bottom-0 h-px transition-colors ${active ? 'bg-gold' : 'bg-line'}`}
-      />
     </button>
   )
 }

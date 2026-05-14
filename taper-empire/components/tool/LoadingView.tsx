@@ -142,7 +142,7 @@ export function LoadingView({ mode }: LoadingViewProps) {
 
 function FaceLandmarks() {
   return (
-    <div className="relative aspect-[4/5] bg-surface overflow-hidden grain">
+    <div className="relative aspect-[4/5] bg-surface overflow-hidden grain rounded-3xl">
       {/* Tonal base */}
       <div
         aria-hidden="true"
@@ -217,10 +217,10 @@ function FaceLandmarks() {
 
 function Bracket({ pos }: { pos: 'tl' | 'tr' | 'bl' | 'br' }) {
   const map = {
-    tl: 'top-4 left-4 border-t border-l',
-    tr: 'top-4 right-4 border-t border-r',
-    bl: 'bottom-4 left-4 border-b border-l',
-    br: 'bottom-4 right-4 border-b border-r',
+    tl: 'top-4 left-4 border-t border-l rounded-tl-xl',
+    tr: 'top-4 right-4 border-t border-r rounded-tr-xl',
+    bl: 'bottom-4 left-4 border-b border-l rounded-bl-xl',
+    br: 'bottom-4 right-4 border-b border-r rounded-br-xl',
   }
   return <div className={`absolute w-6 h-6 border-gold/60 ${map[pos]}`} aria-hidden="true" />
 }

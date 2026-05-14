@@ -49,8 +49,8 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className={`relative bg-surface/60 p-16 lg:p-24 cursor-pointer transition-colors ${
-              isDragActive ? 'bg-surface2' : 'hover:bg-surface'
+            className={`relative bg-surface/60 p-12 sm:p-16 lg:p-24 cursor-pointer transition-all duration-300 rounded-3xl border border-line ${
+              isDragActive ? 'bg-surface2 border-gold/60 scale-[1.005]' : 'hover:bg-surface hover:border-soft/20'
             }`}
           >
             <input {...getInputProps()} />
@@ -89,11 +89,11 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="bg-surface/60 p-8 lg:p-10"
+            className="bg-surface/60 p-6 sm:p-8 lg:p-10 rounded-3xl border border-line"
           >
             <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start">
               <div className="col-span-12 sm:col-span-5">
-                <div className="relative aspect-square max-w-[320px] mx-auto sm:mx-0 ring-1 ring-line">
+                <div className="relative aspect-square max-w-[320px] mx-auto sm:mx-0 rounded-2xl overflow-hidden ring-1 ring-line">
                   <Image
                     src={photo.dataUrl}
                     alt="Your upload"
@@ -106,7 +106,7 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
                     type="button"
                     onClick={() => { setPhoto(null); setError(null) }}
                     aria-label="Remove photo"
-                    className="absolute top-3 right-3 w-9 h-9 bg-ink/80 backdrop-blur-sm border border-line grid place-items-center text-soft hover:bg-soft hover:text-ink hover:border-soft transition-colors"
+                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-ink/80 backdrop-blur-sm border border-line grid place-items-center text-soft hover:bg-soft hover:text-ink hover:border-soft transition-all duration-300 hover:scale-105"
                   >
                     <X className="w-4 h-4" strokeWidth={1.75} />
                   </button>
@@ -148,10 +148,10 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
 
 function Bracket({ pos }: { pos: 'tl' | 'tr' | 'bl' | 'br' }) {
   const map = {
-    tl: 'top-4 left-4 border-t border-l',
-    tr: 'top-4 right-4 border-t border-r',
-    bl: 'bottom-4 left-4 border-b border-l',
-    br: 'bottom-4 right-4 border-b border-r',
+    tl: 'top-4 left-4 border-t border-l rounded-tl-xl',
+    tr: 'top-4 right-4 border-t border-r rounded-tr-xl',
+    bl: 'bottom-4 left-4 border-b border-l rounded-bl-xl',
+    br: 'bottom-4 right-4 border-b border-r rounded-br-xl',
   }
   return <div className={`absolute w-6 h-6 border-gold/60 ${map[pos]}`} aria-hidden="true" />
 }

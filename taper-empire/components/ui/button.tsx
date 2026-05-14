@@ -21,10 +21,15 @@ const buttonVariants = cva(
   [
     'group/btn relative inline-flex items-center justify-center gap-3 whitespace-nowrap',
     'font-semibold uppercase tracking-[0.20em] select-none',
-    'transition-[filter,transform,box-shadow,border-color,background-color] duration-300 ease-out',
+    'transition-[filter,transform,box-shadow,border-color,background-color] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)]',
     'disabled:pointer-events-none disabled:opacity-40',
     '[&_svg]:size-4 [&_svg]:shrink-0',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink',
+    // Arrow translate on hover when there's a trailing arrow span
+    '[&_[aria-hidden="true"]:last-child]:transition-transform [&_[aria-hidden="true"]:last-child]:duration-300',
+    'hover:[&_[aria-hidden="true"]:last-child]:translate-x-1',
+    // Subtle lift on hover
+    'hover:-translate-y-px',
   ].join(' '),
   {
     variants: {

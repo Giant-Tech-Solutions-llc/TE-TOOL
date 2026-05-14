@@ -104,8 +104,8 @@ export function InlineFeedback({ recommendations, flow }: Props) {
                     onClick={() => handleSelect(opt.value)}
                     className="w-full text-left py-5 lg:py-6 flex items-center gap-5 lg:gap-7 group transition-colors"
                   >
-                    <span className={`w-5 h-5 border flex-shrink-0 grid place-items-center transition-colors ${
-                      selected ? 'border-gold bg-gold text-ink' : 'border-soft/30 group-hover:border-gold'
+                    <span className={`w-5 h-5 border rounded-full flex-shrink-0 grid place-items-center transition-all duration-300 ${
+                      selected ? 'border-gold bg-gold text-ink scale-110' : 'border-soft/30 group-hover:border-gold group-hover:scale-105'
                     }`}>
                       {selected && <Check className="w-3 h-3" strokeWidth={3} />}
                     </span>
@@ -139,7 +139,7 @@ export function InlineFeedback({ recommendations, flow }: Props) {
                 onChange={(e) => setComment(e.target.value.slice(0, 2000))}
                 placeholder="Texture mismatch, style felt off, maintenance too aggressive…"
                 rows={3}
-                className="w-full p-4 bg-surface text-soft border border-line focus:border-gold resize-y outline-none text-sm transition-colors min-h-[112px]"
+                className="w-full p-4 bg-surface text-soft border border-line rounded-2xl focus:border-gold resize-y outline-none text-sm transition-colors min-h-[112px]"
               />
               <div className="flex justify-between items-center mt-5 gap-2 flex-wrap">
                 <span className="text-[10px] tracking-[0.32em] uppercase text-mute tabular-nums">

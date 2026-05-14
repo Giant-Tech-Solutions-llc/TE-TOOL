@@ -52,7 +52,7 @@ export function HowItWorks() {
           </div>
         </ScrollReveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-x-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-x-10">
           {sequence.map((s, i) => (
             <motion.article
               key={s.num}
@@ -60,10 +60,10 @@ export function HowItWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.9, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-              className="relative"
+              className="relative rounded-3xl border border-line bg-surface/30 p-8 lg:p-10 hover:bg-surface/60 hover:border-soft/15 transition-all duration-500 group/card"
             >
               {/* Oversized chapter number */}
-              <span className="block font-display font-extrabold leading-none tracking-[-0.04em] text-[clamp(5rem,9vw,8rem)] text-gold/15 mb-6">
+              <span className="block font-display font-extrabold leading-none tracking-[-0.04em] text-[clamp(5rem,9vw,8rem)] text-gold/15 mb-6 group-hover/card:text-gold/25 transition-colors duration-500">
                 {s.num}
               </span>
 

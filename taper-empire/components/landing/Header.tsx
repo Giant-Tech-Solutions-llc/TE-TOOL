@@ -36,12 +36,22 @@ export function Header() {
             />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-9 text-[11px] font-medium tracking-[0.22em] uppercase text-soft/70">
-            <Link href="#how-it-works" className="hover:text-soft transition-colors">Method</Link>
-            <Link href="#face-shape"   className="hover:text-soft transition-colors">Face</Link>
-            <Link href="#hair-type"    className="hover:text-soft transition-colors">Hair</Link>
-            <Link href="#maintenance"  className="hover:text-soft transition-colors">Maintenance</Link>
-            <Link href="#faq"          className="hover:text-soft transition-colors">FAQ</Link>
+          <nav className="hidden md:flex items-center gap-1 text-[11px] font-medium tracking-[0.22em] uppercase text-soft/70">
+            {[
+              ['#how-it-works', 'Method'],
+              ['#face-shape',   'Face'],
+              ['#hair-type',    'Hair'],
+              ['#maintenance',  'Maintenance'],
+              ['#faq',          'FAQ'],
+            ].map(([href, label]) => (
+              <Link
+                key={href}
+                href={href}
+                className="px-4 py-2 rounded-full hover:text-soft hover:bg-soft/[0.06] transition-all duration-300"
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
 
           <Button asChild variant="cream" size="sm" shape="pill">

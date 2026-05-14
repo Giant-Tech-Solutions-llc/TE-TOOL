@@ -154,14 +154,14 @@ export function Quiz({ onComplete }: QuizProps) {
                   whileTap={{ scale: advancing ? 1 : 0.98 }}
                   transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                   onClick={() => handleAnswer(opt.value)}
-                  className={`relative text-left p-6 transition-colors ${
+                  className={`relative text-left p-6 rounded-2xl border transition-all duration-300 ${
                     isSel
-                      ? 'bg-surface2 text-soft'
-                      : 'bg-surface/60 hover:bg-surface2 text-soft'
+                      ? 'bg-surface2 text-soft border-gold/60 shadow-[0_8px_24px_rgba(0,0,0,0.4)]'
+                      : 'bg-surface/60 hover:bg-surface2 text-soft border-line hover:border-soft/30 hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)]'
                   }`}
                 >
-                  <div className={`absolute top-4 right-4 w-5 h-5 border transition-colors ${
-                    isSel ? 'bg-gold border-gold text-ink' : 'border-line group-hover:border-soft/60'
+                  <div className={`absolute top-4 right-4 w-5 h-5 border rounded-full transition-colors ${
+                    isSel ? 'bg-gold border-gold text-ink' : 'border-line'
                   } grid place-items-center`}>
                     {isSel && <Check className="w-3 h-3" strokeWidth={3} />}
                   </div>
@@ -169,12 +169,6 @@ export function Quiz({ onComplete }: QuizProps) {
                     {opt.label}
                   </p>
                   <p className="text-xs text-mute leading-relaxed">{opt.desc}</p>
-                  <span
-                    aria-hidden="true"
-                    className={`absolute left-0 bottom-0 right-0 h-px transition-colors ${
-                      isSel ? 'bg-gold' : 'bg-line'
-                    }`}
-                  />
                 </motion.button>
               )
             })}
