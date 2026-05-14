@@ -8,9 +8,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { prepareUploadPhoto, type PreparedPhoto } from '@/lib/image'
 
-interface PhotoUploadProps {
-  onAnalyze: (photo: PreparedPhoto) => void
-}
+interface PhotoUploadProps { onAnalyze: (photo: PreparedPhoto) => void }
 
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024
 
@@ -47,40 +45,41 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
           <motion.div
             key="dropzone"
             {...getRootProps() as any}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className={`relative border bg-milk p-14 lg:p-20 cursor-pointer transition-colors ${
-              isDragActive ? 'border-jet-black bg-oat/40' : 'border-jet-black/30 hover:border-jet-black hover:bg-oat/20'
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className={`relative bg-surface/60 p-16 lg:p-24 cursor-pointer transition-colors ${
+              isDragActive ? 'bg-surface2' : 'hover:bg-surface'
             }`}
           >
             <input {...getInputProps()} />
 
-            {/* Corner brackets — editorial framing */}
             <Bracket pos="tl" />
             <Bracket pos="tr" />
             <Bracket pos="bl" />
             <Bracket pos="br" />
 
             <div className="text-center">
-              <Upload className="w-10 h-10 mx-auto mb-6 text-jet-black" strokeWidth={1.5} />
-              <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-3">
+              <Upload className="w-12 h-12 mx-auto mb-8 text-gold" strokeWidth={1.25} />
+              <p className="text-[10px] font-medium tracking-[0.4em] uppercase text-gold mb-5 flex items-center justify-center gap-4">
+                <span aria-hidden="true" className="block h-px w-12 bg-gold/70" />
                 Phase I — Capture
               </p>
-              <h3 className="font-display font-extrabold tracking-[-0.02em] leading-tight text-2xl lg:text-3xl mb-4 max-w-[20ch] mx-auto">
-                {isDragActive ? 'Drop your photo here' : 'Upload your photo'}
+              <h3 className="font-display font-extrabold tracking-[-0.025em] leading-[0.95] text-3xl lg:text-5xl mb-6 max-w-[20ch] mx-auto">
+                {isDragActive ? 'Drop your photo here.' : 'Upload your photo.'}
               </h3>
-              <p className="text-mocha max-w-md mx-auto leading-[1.7] mb-6">
-                We read your facial structure, hair texture, and grooming compatibility to return the
-                taper styles most likely to suit you.
+              <p className="text-soft/65 max-w-md mx-auto leading-[1.75] mb-8">
+                We read your facial structure, hair texture, and grooming compatibility to
+                return the taper styles most likely to suit you.
               </p>
-              <p className="text-xs tracking-[0.18em] uppercase text-mocha">
+              <p className="text-[10px] tracking-[0.32em] uppercase text-mute">
                 JPG · PNG · WebP &nbsp;·&nbsp; up to 10 MB
               </p>
-              {error && <p className="text-error text-sm mt-4">{error}</p>}
+              {error && <p className="text-error text-sm mt-5">{error}</p>}
             </div>
 
-            <p className="absolute bottom-4 left-0 right-0 text-center text-[10px] tracking-[0.22em] uppercase text-mocha">
+            <p className="absolute bottom-6 left-0 right-0 text-center text-[10px] tracking-[0.32em] uppercase text-mute">
               Never stored &nbsp;·&nbsp; Processed securely &nbsp;·&nbsp; Deleted after analysis
             </p>
           </motion.div>
@@ -90,11 +89,11 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="bg-milk border border-jet-black/30 p-6 lg:p-8"
+            className="bg-surface/60 p-8 lg:p-10"
           >
-            <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start">
               <div className="col-span-12 sm:col-span-5">
-                <div className="relative aspect-square max-w-[300px] mx-auto sm:mx-0">
+                <div className="relative aspect-square max-w-[320px] mx-auto sm:mx-0 ring-1 ring-line">
                   <Image
                     src={photo.dataUrl}
                     alt="Your upload"
@@ -107,34 +106,34 @@ export function PhotoUpload({ onAnalyze }: PhotoUploadProps) {
                     type="button"
                     onClick={() => { setPhoto(null); setError(null) }}
                     aria-label="Remove photo"
-                    className="absolute top-2 right-2 w-9 h-9 bg-milk border border-jet-black/30 grid place-items-center hover:bg-jet-black hover:text-milk transition-colors"
+                    className="absolute top-3 right-3 w-9 h-9 bg-ink/80 backdrop-blur-sm border border-line grid place-items-center text-soft hover:bg-soft hover:text-ink hover:border-soft transition-colors"
                   >
                     <X className="w-4 h-4" strokeWidth={1.75} />
                   </button>
                 </div>
               </div>
               <div className="col-span-12 sm:col-span-7">
-                <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-3">
+                <p className="text-[10px] font-medium tracking-[0.4em] uppercase text-gold mb-4">
                   Image received
                 </p>
-                <h3 className="font-display font-extrabold tracking-[-0.02em] text-2xl lg:text-3xl mb-3 leading-tight">
+                <h3 className="font-display font-extrabold tracking-[-0.025em] text-3xl lg:text-4xl mb-4 leading-tight">
                   Ready to analyze.
                 </h3>
-                <p className="text-sm text-mocha mb-6">
-                  <span className="font-semibold text-jet-black">{originalName}</span>
-                  <span className="mx-2 text-jet-black/30">·</span>
+                <p className="text-sm text-soft/65 mb-8">
+                  <span className="font-semibold text-soft">{originalName}</span>
+                  <span className="mx-2 text-mute">·</span>
                   {(photo.size / 1024).toFixed(0)} KB
-                  {photo.downscaled && <span className="text-mocha"> · optimized</span>}
+                  {photo.downscaled && <span className="text-mute"> · optimized</span>}
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button variant="ink" size="lg" onClick={() => onAnalyze(photo)}>
-                    Begin Analysis →
+                  <Button variant="cream" size="lg" onClick={() => onAnalyze(photo)}>
+                    Begin the analysis →
                   </Button>
                   <Button variant="ghost" size="lg" onClick={() => setPhoto(null)}>
                     Different photo
                   </Button>
                 </div>
-                <p className="mt-6 text-[10px] tracking-[0.22em] uppercase text-mocha">
+                <p className="mt-8 text-[10px] tracking-[0.32em] uppercase text-mute">
                   Never stored &nbsp;·&nbsp; Deleted after analysis
                 </p>
               </div>
@@ -153,5 +152,5 @@ function Bracket({ pos }: { pos: 'tl' | 'tr' | 'bl' | 'br' }) {
     bl: 'bottom-4 left-4 border-b border-l',
     br: 'bottom-4 right-4 border-b border-r',
   }
-  return <div className={`absolute w-5 h-5 border-jet-black ${map[pos]}`} aria-hidden="true" />
+  return <div className={`absolute w-6 h-6 border-gold/60 ${map[pos]}`} aria-hidden="true" />
 }

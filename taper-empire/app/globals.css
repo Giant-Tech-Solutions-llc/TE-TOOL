@@ -3,14 +3,27 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
+  --color-ink: #0A0A0A;
+  --color-surface: #111111;
+  --color-surface-2: #151515;
+  --color-surface-3: #1A1A1A;
+  --color-soft: #F5F3EF;
+  --color-mute: #A8A39A;
+  --color-line: #262422;
+  --color-gold: #8F7A58;
 }
 
 html, body { min-height: 100%; }
 
+html {
+  background: var(--color-ink);
+  scroll-behavior: smooth;
+}
+
 body {
-  background: #FBF7F4;
-  color: #000;
+  background: var(--color-ink);
+  color: var(--color-soft);
   font-feature-settings: "ss01", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -18,65 +31,74 @@ body {
 
 * { box-sizing: border-box; }
 
-/* Custom selection */
-::selection { background: #7C6A58; color: #FBF7F4; }
+::selection { background: var(--color-gold); color: var(--color-ink); }
 
-/* Scrollbar — subtle, on-brand */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #FBF7F4; }
-::-webkit-scrollbar-thumb { background: #D8D0C6; border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: #A39382; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-ink); }
+::-webkit-scrollbar-thumb { background: var(--color-line); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-gold); }
 
-/* Shimmer skeleton */
-.skeleton-shimmer {
-  background: linear-gradient(90deg, #E5DED2 0%, #FBF7F4 50%, #E5DED2 100%);
-  background-size: 1000px 100%;
-  animation: shimmer 2s linear infinite;
-}
-
-/* Focus ring */
 :focus-visible {
-  outline: 2px solid #7C6A58;
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 1.5px solid var(--color-gold);
+  outline-offset: 3px;
 }
 
-/* Smooth scrolling for anchor nav */
-html { scroll-behavior: smooth; }
+/* ── Film grain — barely visible tactile noise layer ────────────────────── */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.16 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.55;
+  mix-blend-mode: overlay;
+}
+.grain > * { position: relative; z-index: 2; }
 
-/* Display headings — Bricolage Grotesque ExtraBold */
+/* Variant for content blocks that don't want overlay blending */
+.grain-soft::before {
+  opacity: 0.35;
+  mix-blend-mode: soft-light;
+}
+
+/* ── Cinematic vignette overlay ─────────────────────────────────────────── */
+.vignette {
+  position: relative;
+}
+.vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 90% 70% at 50% 35%, transparent 0%, rgba(0,0,0,0.55) 100%);
+  z-index: 1;
+}
+
+/* ── Marquee for moving typography strip ───────────────────────────────── */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Display heading weight reset (Bricolage ExtraBold) ────────────────── */
 .font-display {
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  font-feature-settings: 'ss01', 'ss02';
 }
 
-/* Editorial serif for italic accents — used as "&italic" inflection */
-.font-serif {
-  font-family: 'Tiempos Headline', 'IvyOra Display', Georgia, 'Times New Roman', serif;
-  font-feature-settings: "kern", "liga", "calt";
-}
+/* Editorial reset for tabular numerics */
+.tabular-nums { font-variant-numeric: tabular-nums; }
 
-/* OpenType — proper small caps where supported */
-.smallcaps {
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.1em;
-}
-
-/* Editorial body — Inter with looser leading */
-.editorial-body {
-  font-family: var(--font-inter);
-  line-height: 1.75;
-}
-
-/* Prose tweaks for authority pages */
-.tt-prose h2 { font-family: var(--font-bricolage), var(--font-inter); font-weight: 800; }
-
-/* Subtle ink texture for big black surfaces */
-.ink-surface {
-  background-color: #000;
-  background-image:
-    radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 4px 4px, 7px 7px;
-  background-position: 0 0, 2px 2px;
-}
+/* Prevent layout shift from scrollbar swap on long scroll */
+html { scrollbar-gutter: stable both-edges; }

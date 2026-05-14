@@ -14,14 +14,14 @@ const buttonVariants = cva(
         ink: 'bg-jet-black text-milk hover:bg-charcoal active:translate-y-px',
         // Solid mocha accent
         mocha: 'bg-accent text-milk hover:bg-accent-hover active:translate-y-px',
-        // Editorial outlined button
-        outline: 'border border-jet-black bg-transparent text-jet-black hover:bg-jet-black hover:text-milk',
+        // Editorial outlined button — works on dark surfaces
+        outline: 'border border-soft/30 bg-transparent text-soft hover:bg-soft hover:text-ink hover:border-soft',
         // Inverted — for dark surfaces
         cream: 'bg-milk text-jet-black hover:bg-oat active:translate-y-px',
         // Subtle ghost
-        ghost: 'text-mocha hover:bg-oat/50 hover:text-jet-black',
+        ghost: 'text-mute hover:bg-surface2 hover:text-soft',
         // Editorial link
-        link: 'text-jet-black underline underline-offset-[6px] decoration-[1.5px] hover:decoration-accent hover:text-accent normal-case tracking-normal',
+        link: 'text-soft underline underline-offset-[6px] decoration-[1.5px] hover:decoration-gold hover:text-gold normal-case tracking-normal',
       },
       size: {
         sm: 'h-9 px-4 text-xs',

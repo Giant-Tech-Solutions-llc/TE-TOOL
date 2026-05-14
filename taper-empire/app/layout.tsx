@@ -60,7 +60,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#FBF7F4',
+  themeColor: '#0A0A0A',
   width: 'device-width',
   initialScale: 1,
 }
@@ -68,7 +68,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${bricolage.variable}`}>
-      <body className="bg-milk text-jet-black antialiased font-sans">
+      <body className="bg-ink text-soft antialiased font-sans">
         {children}
         <Analytics />
       </body>

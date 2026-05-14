@@ -16,15 +16,17 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-40 bg-milk transition-shadow ${
-        scrolled ? 'shadow-[0_1px_0_0_rgba(0,0,0,0.08)]' : ''
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? 'bg-ink/85 backdrop-blur-xl backdrop-saturate-150 border-b border-line'
+          : 'bg-transparent'
       }`}
     >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
+      <div className="max-w-[1480px] mx-auto px-6 lg:px-10">
         <div className="flex items-center justify-between h-20">
           <Link href="/" aria-label="Taper Empire — Home" className="flex items-center">
             <Image
-              src="/logos/taper-empire-black.svg"
+              src="/logos/taper-empire-white.svg"
               alt="Taper Empire"
               width={200}
               height={32}
@@ -33,20 +35,20 @@ export function Header() {
             />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-10 text-sm font-semibold tracking-[0.14em] uppercase">
-            <Link href="#how-it-works" className="hover:text-accent transition-colors">Method</Link>
-            <Link href="#face-shape"   className="hover:text-accent transition-colors">Face</Link>
-            <Link href="#hair-type"    className="hover:text-accent transition-colors">Hair</Link>
-            <Link href="#comparisons"  className="hover:text-accent transition-colors">Compare</Link>
-            <Link href="#faq"          className="hover:text-accent transition-colors">FAQ</Link>
+          <nav className="hidden md:flex items-center gap-9 text-[11px] font-medium tracking-[0.22em] uppercase text-soft/70">
+            <Link href="#how-it-works" className="hover:text-soft transition-colors">Method</Link>
+            <Link href="#face-shape"   className="hover:text-soft transition-colors">Face</Link>
+            <Link href="#hair-type"    className="hover:text-soft transition-colors">Hair</Link>
+            <Link href="#maintenance"  className="hover:text-soft transition-colors">Maintenance</Link>
+            <Link href="#faq"          className="hover:text-soft transition-colors">FAQ</Link>
           </nav>
 
           <Link
             href="/tool"
-            className="inline-flex items-center gap-2 bg-jet-black text-milk px-5 py-2.5 text-xs font-semibold tracking-[0.18em] uppercase hover:bg-charcoal transition-colors"
+            className="group inline-flex items-center gap-2.5 bg-soft text-ink px-5 py-2.5 text-[11px] font-semibold tracking-[0.22em] uppercase hover:bg-gold hover:text-soft transition-colors"
           >
             <span>Begin</span>
-            <span aria-hidden="true">→</span>
+            <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
           </Link>
         </div>
       </div>

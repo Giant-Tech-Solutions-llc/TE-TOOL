@@ -2,81 +2,71 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { CinematicPortrait } from './CinematicPortrait'
+
+const REVEAL = { duration: 1.1, ease: [0.16, 1, 0.3, 1] as any }
 
 export function Hero() {
   return (
-    <section className="relative bg-milk text-jet-black">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-16 lg:pt-24 pb-24 lg:pb-32">
+    <section className="relative bg-ink text-soft overflow-hidden grain">
+      <div className="relative pt-32 lg:pt-40 pb-16 lg:pb-24 max-w-[1480px] mx-auto px-6 lg:px-10">
 
-        {/* Eyebrow row — editorial masthead */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-          className="grid grid-cols-12 items-baseline gap-6 pb-12 border-b border-jet-black/15"
-        >
-          <div className="col-span-12 md:col-span-7 lg:col-span-8 flex items-baseline gap-4">
-            <span className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha">
-              Vol. 01
-            </span>
-            <span className="h-px w-8 bg-jet-black/30" aria-hidden="true" />
-            <span className="text-[10px] font-semibold tracking-[0.28em] uppercase text-jet-black">
-              AI Grooming Intelligence
-            </span>
-          </div>
-          <div className="col-span-12 md:col-span-5 lg:col-span-4 flex md:justify-end gap-6 text-[10px] font-semibold tracking-[0.22em] uppercase text-mocha">
-            <span>For Modern Men</span>
-            <span aria-hidden="true">/</span>
-            <span>Edition I</span>
-          </div>
-        </motion.div>
+        <div className="grid grid-cols-12 gap-x-8 lg:gap-x-12 items-end">
 
-        {/* Headline + meta column */}
-        <div className="grid grid-cols-12 gap-6 lg:gap-10 pt-14 lg:pt-20">
-
-          {/* Headline */}
-          <div className="col-span-12 lg:col-span-9">
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
+          {/* LEFT — typography */}
+          <div className="col-span-12 lg:col-span-7 xl:col-span-7 relative z-10">
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.05, ease: [0.2, 0.8, 0.2, 1] }}
-              className="font-display font-extrabold tracking-[-0.035em] leading-[0.92] text-[clamp(2.5rem,8.4vw,8.5rem)]"
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-[10px] font-medium tracking-[0.4em] uppercase text-mute mb-10 flex items-center gap-4"
+            >
+              <span aria-hidden="true" className="block h-px w-12 bg-gold/70" />
+              <span>Vol. 01 — Grooming Intelligence</span>
+            </motion.p>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...REVEAL, delay: 0.15 }}
+              className="font-display font-extrabold leading-[0.88] tracking-[-0.045em] text-[clamp(2.75rem,8.6vw,9.5rem)]"
             >
               Find the taper
               <br />
-              that actually fits
+              that actually
               <br />
-              <span className="italic font-medium text-mocha">your face.</span>
+              <span className="italic font-medium text-mute">fits your face.</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
-              className="mt-10 max-w-2xl text-lg lg:text-xl text-mocha leading-[1.55]"
+              transition={{ ...REVEAL, delay: 0.4 }}
+              className="mt-10 max-w-xl text-base lg:text-lg text-soft/65 leading-[1.65]"
             >
-              Grooming intelligence that reads your face shape, hair texture, and maintenance
-              tolerance — then returns the taper styles most likely to suit you. Barber-ready
-              instructions included.
+              A grooming intelligence platform that reads facial structure, hair texture, and
+              maintenance tolerance — then returns the taper styles most likely to suit you.
+              Barber-ready, in under a minute.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-              className="mt-12 flex flex-wrap items-center gap-6"
+              transition={{ ...REVEAL, delay: 0.55 }}
+              className="mt-12 flex flex-wrap items-center gap-5"
             >
               <Link
                 href="/tool"
-                className="inline-flex items-center gap-3 bg-jet-black text-milk px-8 h-14 text-sm font-semibold tracking-[0.18em] uppercase hover:bg-charcoal transition-colors"
+                className="group inline-flex items-center gap-4 bg-soft text-ink px-9 h-14 text-[11px] font-semibold tracking-[0.24em] uppercase hover:bg-gold hover:text-soft transition-colors"
               >
-                <span>Get My Taper Match</span>
-                <span aria-hidden="true">→</span>
+                <span>Begin the analysis</span>
+                <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">→</span>
               </Link>
               <Link
                 href="#how-it-works"
-                className="text-sm font-semibold tracking-[0.14em] uppercase text-jet-black underline underline-offset-[6px] decoration-[1.5px] decoration-jet-black/30 hover:decoration-accent hover:text-accent transition-colors"
+                className="text-[11px] font-medium tracking-[0.24em] uppercase text-soft/70 hover:text-soft transition-colors flex items-center gap-3"
               >
+                <span aria-hidden="true" className="block h-px w-6 bg-soft/40" />
                 See the method
               </Link>
             </motion.div>
@@ -84,66 +74,66 @@ export function Hero() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="mt-6 text-xs tracking-[0.16em] uppercase text-mocha"
+              transition={{ duration: 1, delay: 0.85 }}
+              className="mt-10 text-[10px] tracking-[0.32em] uppercase text-mute"
             >
               Currently free during beta &nbsp;·&nbsp; No card &nbsp;·&nbsp; ~60s
             </motion.p>
           </div>
 
-          {/* Right meta column */}
-          <motion.aside
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
-            className="col-span-12 lg:col-span-3 lg:pt-3"
+          {/* RIGHT — cinematic portrait */}
+          <motion.div
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+            className="hidden lg:block col-span-5 xl:col-span-5 relative"
           >
-            <div className="lg:sticky lg:top-32">
-              <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-5">
-                The Index
-              </p>
-              <ul className="space-y-3 text-sm font-medium">
-                {[
-                  ['I',   'Face Structure'],
-                  ['II',  'Hair Texture'],
-                  ['III', 'Maintenance'],
-                  ['IV',  'Barber Brief'],
-                ].map(([num, label]) => (
-                  <li key={num} className="flex items-baseline gap-4 border-b border-jet-black/10 pb-3">
-                    <span className="text-[10px] tracking-[0.22em] uppercase text-mocha w-8">{num}</span>
-                    <span className="font-display text-base font-extrabold tracking-tight">{label}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-8 text-xs text-mocha leading-relaxed max-w-[24ch]">
-                A four-part read on the cut you should actually walk into the barbershop asking for.
-              </p>
-            </div>
-          </motion.aside>
-
+            <CinematicPortrait />
+          </motion.div>
         </div>
+
+        {/* AUTHORITY STRIP — trust metrics */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...REVEAL, delay: 0.9 }}
+          className="mt-24 lg:mt-32 pt-10 border-t border-line"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
+            {[
+              ['12,847', 'Profiles matched'],
+              ['94%',    'Average compatibility'],
+              ['~58s',   'To barber-ready brief'],
+              ['40+',    'Taper styles indexed'],
+            ].map(([metric, label]) => (
+              <div key={label as string} className="flex flex-col gap-2">
+                <span className="font-display text-3xl lg:text-4xl font-extrabold text-soft tracking-tight tabular-nums">
+                  {metric}
+                </span>
+                <span className="text-[10px] font-medium tracking-[0.28em] uppercase text-mute">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
 
-      {/* Hairline pillar quote — editorial breath */}
-      <div className="border-t border-jet-black/15 bg-milk">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-32">
-          <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-8">
-            Editorial Note
-          </p>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-            className="font-display font-extrabold tracking-[-0.025em] leading-[0.95] text-[clamp(2rem,6.5vw,6rem)] max-w-[18ch]"
-          >
-            The right taper for the right man.
-          </motion.p>
-          <p className="mt-10 max-w-xl text-base lg:text-lg text-mocha leading-[1.6]">
-            Most haircut tools throw a gallery at you and call it a recommendation. We start
-            from your face, then back into a cut your barber can actually execute on the
-            first try.
-          </p>
+      {/* Moving editorial wordmark strip — bottom of hero */}
+      <div className="relative border-t border-line overflow-hidden py-10 mt-8">
+        <div className="marquee-track gap-16 text-soft/[0.06]">
+          {Array.from({ length: 2 }).map((_, dup) => (
+            <div key={dup} className="flex items-center gap-16 px-8 whitespace-nowrap">
+              {['Cinematic Editorial Intelligence', 'For Modern Men', 'Face Optimized', 'Volume 01'].map((p, i) => (
+                <span key={`${dup}-${i}`} className="flex items-center gap-16">
+                  <span className="font-display font-extrabold tracking-[-0.04em] text-[clamp(3rem,8vw,7rem)] leading-none">
+                    {p}
+                  </span>
+                  <span aria-hidden="true" className="text-gold/40 text-4xl">✦</span>
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </section>

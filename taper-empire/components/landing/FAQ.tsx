@@ -20,7 +20,7 @@ const items = [
   },
   {
     q: 'What should I tell my barber for a low taper?',
-    a: 'Three things: starting height, guard progression, and neckline preference. Our tool generates the verbatim script — including the exact phrasing that prevents the "make it short on the sides" misinterpretation.',
+    a: 'Three things: starting height, guard progression, and neckline preference. The platform generates the verbatim script — including the exact phrasing that prevents the "make it short on the sides" misinterpretation.',
   },
   {
     q: 'Is the photo upload private?',
@@ -32,47 +32,41 @@ export function FAQ() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section id="faq" className="relative bg-milk text-jet-black border-t border-jet-black">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 py-20 lg:py-28">
-        <div className="grid grid-cols-12 gap-y-10 lg:gap-x-10">
+    <section id="faq" className="relative bg-ink text-soft border-t border-line">
+      <div className="max-w-[1480px] mx-auto px-6 lg:px-10 py-24 lg:py-32">
+        <div className="grid grid-cols-12 gap-y-12 lg:gap-x-12">
 
-          {/* Left meta column */}
           <div className="col-span-12 lg:col-span-4">
-            <Eyebrow className="mb-5">Section VII — Correspondence</Eyebrow>
-            <h2 className="font-display font-extrabold tracking-[-0.03em] leading-[0.95] text-[clamp(2.25rem,5vw,4rem)] mb-6">
-              Frequently
+            <Eyebrow className="mb-6">Chapter VII — Correspondence</Eyebrow>
+            <h2 className="font-display font-extrabold tracking-[-0.035em] leading-[0.95] text-[clamp(2.25rem,5vw,4.5rem)] mb-8">
+              Asked.
               <br />
-              asked.
-              <br />
-              Honestly
-              <br />
-              answered.
+              <span className="italic font-medium text-mute">Answered.</span>
             </h2>
-            <p className="text-base text-mocha leading-relaxed max-w-[36ch]">
-              No marketing-team copy. No SEO-stuffed throat-clearing. Straight answers, written the way a
-              barbershop owner would say them.
+            <p className="text-base text-soft/65 leading-[1.75] max-w-[36ch]">
+              No marketing copy. No SEO-stuffed throat-clearing. Straight answers, written the
+              way a barbershop owner would say them.
             </p>
           </div>
 
-          {/* Right Q&A list */}
-          <div className="col-span-12 lg:col-span-8 border-t border-jet-black">
+          <div className="col-span-12 lg:col-span-8 border-t border-line">
             {items.map((it, i) => {
               const isOpen = open === i
               return (
-                <article key={it.q} className="border-b border-jet-black/15">
+                <article key={it.q} className="border-b border-line">
                   <button
                     type="button"
                     onClick={() => setOpen(isOpen ? null : i)}
                     aria-expanded={isOpen}
-                    className="w-full text-left py-7 flex items-start gap-6 group"
+                    className="w-full text-left py-8 flex items-start gap-6 group"
                   >
-                    <span className="font-display font-extrabold tabular-nums text-mocha text-sm tracking-[0.15em] mt-1.5 w-10 flex-shrink-0">
-                      Q. {String(i + 1).padStart(2, '0')}
+                    <span className="font-display tabular-nums text-gold text-xs tracking-[0.32em] mt-2 w-12 flex-shrink-0">
+                      Q.{String(i + 1).padStart(2, '0')}
                     </span>
-                    <span className="flex-1 font-display font-extrabold tracking-[-0.01em] text-xl sm:text-2xl leading-tight text-jet-black group-hover:text-accent transition-colors">
+                    <span className="flex-1 font-display font-extrabold tracking-[-0.015em] text-xl sm:text-2xl leading-tight text-soft group-hover:text-gold transition-colors">
                       {it.q}
                     </span>
-                    <span className="mt-1.5 flex-shrink-0 grid place-items-center w-8 h-8 border border-jet-black/30 group-hover:border-jet-black group-hover:bg-jet-black group-hover:text-milk transition-colors">
+                    <span className="mt-2 flex-shrink-0 grid place-items-center w-9 h-9 border border-line text-soft/70 group-hover:border-gold group-hover:text-gold transition-colors">
                       {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     </span>
                   </button>
@@ -82,14 +76,14 @@ export function FAQ() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                         className="overflow-hidden"
                       >
-                        <div className="flex items-start gap-6 pb-7 pl-0">
-                          <span className="font-display font-extrabold tabular-nums text-accent text-sm tracking-[0.15em] w-10 flex-shrink-0">
+                        <div className="flex items-start gap-6 pb-8">
+                          <span className="font-display tabular-nums text-gold text-xs tracking-[0.32em] w-12 flex-shrink-0">
                             A.
                           </span>
-                          <p className="flex-1 text-base text-mocha leading-[1.75] max-w-[60ch]">{it.a}</p>
+                          <p className="flex-1 text-base text-soft/65 leading-[1.85] max-w-[60ch]">{it.a}</p>
                         </div>
                       </motion.div>
                     )}

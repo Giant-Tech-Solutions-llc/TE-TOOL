@@ -7,18 +7,15 @@ import { submitFeedback, hasGivenFeedback, markFeedbackGiven } from '@/lib/api-c
 import type { Recommendation } from '@/types'
 
 const OPTIONS = [
-  { value: 5, label: 'Very accurate' },
-  { value: 4, label: 'Decent match' },
-  { value: 2, label: 'Not my style' },
-  { value: 1, label: 'Needs improvement' },
+  { value: 5, label: 'Extremely accurate' },
+  { value: 4, label: 'Mostly accurate' },
+  { value: 2, label: 'Partially accurate' },
+  { value: 1, label: 'Not a fit' },
 ] as const
 
 const AUTO_DISMISS_MS = 9000
 
-interface Props {
-  recommendations: Recommendation[]
-  flow: string
-}
+interface Props { recommendations: Recommendation[]; flow: string }
 
 export function FeedbackToast({ recommendations, flow }: Props) {
   const [open, setOpen] = useState(false)
@@ -37,10 +34,7 @@ export function FeedbackToast({ recommendations, flow }: Props) {
       }
     }
     const grace = setTimeout(() => document.addEventListener('mouseleave', onLeave), 2000)
-    return () => {
-      clearTimeout(grace)
-      document.removeEventListener('mouseleave', onLeave)
-    }
+    return () => { clearTimeout(grace); document.removeEventListener('mouseleave', onLeave) }
   }, [])
 
   useEffect(() => {
@@ -50,10 +44,7 @@ export function FeedbackToast({ recommendations, flow }: Props) {
       const elapsed = Date.now() - start
       const pct = Math.max(0, 100 - (elapsed / AUTO_DISMISS_MS) * 100)
       setProgress(pct)
-      if (pct <= 0) {
-        if (tickRef.current) clearInterval(tickRef.current)
-        setOpen(false)
-      }
+      if (pct <= 0) { if (tickRef.current) clearInterval(tickRef.current); setOpen(false) }
     }, 80)
     return () => { if (tickRef.current) clearInterval(tickRef.current) }
   }, [open, done])
@@ -67,7 +58,7 @@ export function FeedbackToast({ recommendations, flow }: Props) {
         rating: value, flow,
         recommendations: recommendations.map((r) => ({ style_name: r.style_name, match_score: r.match_score })),
       })
-    } catch { /* noop */ }
+    } catch {}
     setTimeout(() => setOpen(false), 1800)
   }
 
@@ -78,56 +69,53 @@ export function FeedbackToast({ recommendations, flow }: Props) {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
-          transition={{ duration: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-          className="fixed bottom-6 right-6 z-50 w-[320px] max-w-[calc(100vw-3rem)] bg-milk border border-jet-black shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden"
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed bottom-6 right-6 z-50 w-[340px] max-w-[calc(100vw-3rem)] bg-surface border border-line shadow-[0_12px_32px_rgba(0,0,0,0.5)] overflow-hidden"
         >
           {!done ? (
             <>
-              <div className="flex items-start justify-between px-5 pt-4 pb-3 border-b border-jet-black/15">
+              <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-line">
                 <div>
-                  <p className="text-[9px] font-semibold tracking-[0.32em] uppercase text-mocha mb-1">
+                  <p className="text-[9px] font-medium tracking-[0.4em] uppercase text-gold mb-2">
                     Before you go
                   </p>
-                  <p className="text-sm font-semibold text-jet-black leading-snug">
-                    Did the matches feel accurate?
+                  <p className="text-sm font-semibold text-soft leading-snug">
+                    Did this feel accurate?
                   </p>
                 </div>
                 <button
                   type="button"
                   aria-label="Dismiss"
                   onClick={() => setOpen(false)}
-                  className="w-6 h-6 grid place-items-center text-mocha hover:text-jet-black transition-colors flex-shrink-0"
+                  className="w-6 h-6 grid place-items-center text-mute hover:text-soft transition-colors flex-shrink-0"
                 >
                   <X className="w-4 h-4" strokeWidth={1.75} />
                 </button>
               </div>
               <ul>
                 {OPTIONS.map((opt) => (
-                  <li key={opt.value} className="border-b border-jet-black/10 last:border-b-0">
+                  <li key={opt.value} className="border-b border-line last:border-b-0">
                     <button
                       type="button"
                       onClick={() => handleSelect(opt.value)}
-                      className="w-full text-left px-5 py-2.5 text-xs font-semibold tracking-[0.12em] uppercase text-jet-black hover:bg-oat/60 hover:text-accent transition-colors flex items-center justify-between"
+                      className="w-full text-left px-5 py-3 text-xs font-medium tracking-[0.18em] uppercase text-soft/80 hover:bg-surface2 hover:text-gold transition-colors flex items-center justify-between"
                     >
                       <span>{opt.label}</span>
-                      <span aria-hidden="true" className="text-mocha">→</span>
+                      <span aria-hidden="true" className="text-mute">→</span>
                     </button>
                   </li>
                 ))}
               </ul>
-              <div className="h-0.5 bg-oat overflow-hidden">
-                <div
-                  className="h-full bg-jet-black"
-                  style={{ width: `${progress}%`, transition: 'width 80ms linear' }}
-                />
+              <div className="h-px bg-line overflow-hidden">
+                <div className="h-full bg-gold" style={{ width: `${progress}%`, transition: 'width 80ms linear' }} />
               </div>
             </>
           ) : (
-            <div className="px-5 py-6 text-center">
-              <div className="w-8 h-8 mx-auto mb-3 grid place-items-center bg-jet-black text-milk">
+            <div className="px-5 py-7 text-center">
+              <div className="w-8 h-8 mx-auto mb-3 grid place-items-center bg-gold text-ink">
                 <Check className="w-4 h-4" strokeWidth={2.5} />
               </div>
-              <p className="text-sm font-semibold text-jet-black">Recorded — thank you.</p>
+              <p className="text-sm font-semibold text-soft">Recorded — thank you.</p>
             </div>
           )}
         </motion.div>

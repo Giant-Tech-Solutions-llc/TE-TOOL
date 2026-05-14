@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STATES = [
-  { label: 'Analyzing facial structure',         tag: 'STRUCTURE' },
-  { label: 'Evaluating taper compatibility',     tag: 'COMPATIBILITY' },
-  { label: 'Scoring hairstyle balance',          tag: 'BALANCE' },
-  { label: 'Generating barber-ready references', tag: 'REFERENCES' },
-  { label: 'Finalizing your grooming profile',   tag: 'PROFILE' },
+  { label: 'Mapping facial proportions',     tag: 'PROPORTIONS' },
+  { label: 'Evaluating taper geometry',      tag: 'GEOMETRY' },
+  { label: 'Measuring silhouette balance',   tag: 'SILHOUETTE' },
+  { label: 'Calculating maintenance profile',tag: 'MAINTENANCE' },
+  { label: 'Finalizing style compatibility', tag: 'COMPATIBILITY' },
 ] as const
 
 interface LoadingViewProps { mode: 'photo' | 'quiz' }
@@ -17,10 +17,8 @@ export function LoadingView({ mode }: LoadingViewProps) {
   const [stateIdx, setStateIdx] = useState(0)
   const [progress, setProgress] = useState(2)
 
-  // Long fake-progress curve (max 92% — auth wall can claim 8% later)
   useEffect(() => {
-    const DURATION = 38000
-    const MAX = 92
+    const DURATION = 38000, MAX = 92
     const start = Date.now()
     const tick = setInterval(() => {
       const t = Math.min((Date.now() - start) / DURATION, 1)
@@ -31,82 +29,72 @@ export function LoadingView({ mode }: LoadingViewProps) {
     return () => clearInterval(tick)
   }, [])
 
-  // Cycle state messages
   useEffect(() => {
-    const cycle = setInterval(() => {
-      setStateIdx((p) => (p + 1) % STATES.length)
-    }, 3400)
+    const cycle = setInterval(() => setStateIdx((p) => (p + 1) % STATES.length), 3600)
     return () => clearInterval(cycle)
   }, [])
 
   return (
-    <div className="bg-milk text-jet-black min-h-[80vh]">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 pt-16 pb-24 lg:pt-24">
+    <div className="relative bg-ink text-soft min-h-screen pt-32 lg:pt-40 pb-24 grain-soft">
+      <div className="relative max-w-[1480px] mx-auto px-6 lg:px-10">
 
-        {/* Editorial header */}
-        <div className="grid grid-cols-12 gap-y-8 lg:gap-x-10 mb-12 lg:mb-20">
+        <div className="grid grid-cols-12 gap-y-10 lg:gap-x-12 mb-16 lg:mb-24">
           <div className="col-span-12 lg:col-span-7">
-            <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-5 flex items-center gap-3">
-              <span aria-hidden="true" className="block h-px w-8 bg-jet-black" />
+            <p className="text-[10px] font-medium tracking-[0.4em] uppercase text-gold mb-6 flex items-center gap-4">
+              <span aria-hidden="true" className="block h-px w-12 bg-gold/70" />
               Phase II — Analysis in Progress
             </p>
-            <h2 className="font-display font-extrabold tracking-[-0.03em] leading-[0.95] text-[clamp(2.5rem,6.5vw,5.5rem)]">
+            <h2 className="font-display font-extrabold tracking-[-0.04em] leading-[0.92] text-[clamp(2.5rem,7vw,6rem)]">
               Building your
               <br />
-              <span className="italic font-medium text-mocha">taper plan.</span>
+              <span className="italic font-medium text-mute">grooming profile.</span>
             </h2>
           </div>
-          <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pt-6">
-            <p className="text-xs tracking-[0.18em] uppercase text-mocha mb-2">Source</p>
-            <p className="font-display text-xl font-extrabold tracking-tight">
+          <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pt-3">
+            <p className="text-[10px] tracking-[0.32em] uppercase text-mute mb-3">Source</p>
+            <p className="font-display text-xl lg:text-2xl font-extrabold tracking-tight">
               {mode === 'photo' ? 'Image analysis' : 'Structured profile'}
             </p>
           </div>
         </div>
 
-        {/* Two-column body */}
-        <div className="grid grid-cols-12 gap-10 lg:gap-12 border-t border-jet-black/15 pt-12 lg:pt-16">
+        <div className="grid grid-cols-12 gap-y-12 lg:gap-x-12 border-t border-line pt-12 lg:pt-16">
 
-          {/* Face mapping aesthetic */}
-          <div className="col-span-12 lg:col-span-5">
-            <FaceMappingFrame />
+          <div className="col-span-12 lg:col-span-6">
+            <FaceLandmarks />
           </div>
 
-          {/* Live state list */}
-          <div className="col-span-12 lg:col-span-7">
-            <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha mb-6">
-              Active processes
+          <div className="col-span-12 lg:col-span-6">
+            <p className="text-[10px] font-medium tracking-[0.32em] uppercase text-gold mb-8">
+              Live processes
             </p>
 
-            <ul className="space-y-0 border-t border-jet-black/15">
+            <ul className="border-t border-line">
               {STATES.map((s, i) => {
                 const active = i === stateIdx
-                const done = i < stateIdx || (stateIdx === STATES.length - 1 && i === stateIdx && progress >= 88)
+                const done = i < stateIdx
                 return (
-                  <li
-                    key={s.tag}
-                    className="flex items-center gap-5 lg:gap-8 py-5 border-b border-jet-black/15"
-                  >
-                    <span className="text-[10px] font-semibold tracking-[0.22em] uppercase tabular-nums text-mocha w-10 flex-shrink-0">
+                  <li key={s.tag} className="flex items-center gap-6 py-5 border-b border-line">
+                    <span className="text-[10px] font-medium tracking-[0.32em] uppercase tabular-nums text-mute w-12 flex-shrink-0">
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <span
-                      className={`flex-1 font-display font-extrabold tracking-[-0.01em] text-lg lg:text-xl leading-snug transition-colors ${
-                        active ? 'text-jet-black' : done ? 'text-mocha line-through decoration-[1px] decoration-mocha/40' : 'text-mocha/40'
+                      className={`flex-1 font-display font-extrabold tracking-[-0.015em] text-lg lg:text-xl leading-snug transition-colors ${
+                        active ? 'text-soft' : done ? 'text-soft/40 line-through decoration-soft/20' : 'text-soft/30'
                       }`}
                     >
                       {s.label}
                     </span>
-                    <span className="flex-shrink-0">
+                    <span className="flex-shrink-0 w-16 text-right">
                       {active && (
                         <motion.span
                           animate={{ opacity: [0.3, 1, 0.3] }}
-                          transition={{ duration: 1.2, repeat: Infinity }}
-                          className="block w-2 h-2 bg-accent"
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                          className="inline-block w-2 h-2 bg-gold"
                         />
                       )}
                       {done && (
-                        <span className="text-[10px] font-semibold tracking-[0.22em] uppercase text-mocha">Done</span>
+                        <span className="text-[10px] font-medium tracking-[0.32em] uppercase text-mute">Done</span>
                       )}
                     </span>
                   </li>
@@ -114,20 +102,19 @@ export function LoadingView({ mode }: LoadingViewProps) {
               })}
             </ul>
 
-            {/* Progress meter */}
-            <div className="mt-12">
-              <div className="flex items-baseline justify-between mb-4">
-                <p className="text-[10px] font-semibold tracking-[0.32em] uppercase text-mocha">Progress</p>
-                <p className="font-display font-extrabold tabular-nums tracking-tight text-3xl lg:text-4xl">
-                  {progress}<span className="text-mocha text-lg">%</span>
+            <div className="mt-14">
+              <div className="flex items-baseline justify-between mb-5">
+                <p className="text-[10px] font-medium tracking-[0.32em] uppercase text-mute">Progress</p>
+                <p className="font-display font-extrabold tabular-nums tracking-[-0.025em] text-4xl lg:text-5xl">
+                  {progress}<span className="text-mute text-xl">%</span>
                 </p>
               </div>
-              <div className="h-px bg-jet-black/15 relative overflow-hidden">
+              <div className="h-px bg-line relative">
                 <motion.div
                   animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                  className="absolute inset-y-0 left-0 bg-jet-black"
-                  style={{ height: '2px' }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute inset-y-0 left-0 bg-gold"
+                  style={{ height: '1px' }}
                 />
               </div>
               <AnimatePresence mode="wait">
@@ -136,77 +123,93 @@ export function LoadingView({ mode }: LoadingViewProps) {
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.25 }}
-                  className="mt-4 text-sm text-mocha"
+                  transition={{ duration: 0.3 }}
+                  className="mt-5 text-sm text-soft/70"
                 >
                   {STATES[stateIdx].label}…
                 </motion.p>
               </AnimatePresence>
-              <p className="mt-3 text-xs tracking-[0.18em] uppercase text-mocha">
+              <p className="mt-3 text-[10px] tracking-[0.32em] uppercase text-mute">
                 Typical duration · 20–40s
               </p>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   )
 }
 
-/* Face mapping frame — animated geometric overlay */
-function FaceMappingFrame() {
+function FaceLandmarks() {
   return (
-    <div className="relative aspect-[4/5] bg-oat/40 border border-jet-black/15 overflow-hidden">
-      {/* Corner brackets */}
-      <Bracket pos="tl" />
-      <Bracket pos="tr" />
-      <Bracket pos="bl" />
-      <Bracket pos="br" />
+    <div className="relative aspect-[4/5] bg-surface overflow-hidden grain">
+      {/* Tonal base */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{ background: 'radial-gradient(ellipse 70% 60% at 60% 30%, #232017 0%, #14110E 50%, #0A0A0A 100%)' }}
+      />
 
-      {/* Crosshair center */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      {/* Corner brackets */}
+      <Bracket pos="tl" /><Bracket pos="tr" /><Bracket pos="bl" /><Bracket pos="br" />
+
+      {/* Face structural overlay */}
+      <div className="absolute inset-0 flex items-center justify-center">
         <svg
           viewBox="0 0 200 250"
-          className="w-3/4 h-3/4 text-jet-black/40"
+          className="w-3/4 h-3/4 text-gold/70"
           fill="none"
           stroke="currentColor"
-          strokeWidth="0.5"
+          strokeWidth="0.4"
           aria-hidden="true"
         >
-          {/* Stylized face oval */}
           <ellipse cx="100" cy="120" rx="60" ry="78" />
-          {/* Vertical center */}
           <line x1="100" y1="40" x2="100" y2="200" strokeDasharray="2 3" />
-          {/* Horizontal symmetry */}
           <line x1="36" y1="120" x2="164" y2="120" strokeDasharray="2 3" />
           {/* Eye markers */}
-          <circle cx="78" cy="105" r="1.5" fill="currentColor" />
-          <circle cx="122" cy="105" r="1.5" fill="currentColor" />
+          <circle cx="78" cy="105" r="2" fill="currentColor">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="122" cy="105" r="2" fill="currentColor">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" begin="0.4s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="100" cy="135" r="1.5" fill="currentColor">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" begin="0.8s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="100" cy="160" r="1.5" fill="currentColor">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" begin="1.2s" repeatCount="indefinite" />
+          </circle>
           {/* Hairline arc */}
           <path d="M40 80 Q100 50 160 80" />
           {/* Jaw arc */}
           <path d="M50 165 Q100 200 150 165" />
+          {/* Brow line */}
+          <path d="M60 95 Q100 88 140 95" />
         </svg>
       </div>
 
-      {/* Scan line */}
+      {/* Scanning beam */}
       <motion.div
+        aria-hidden="true"
         animate={{ y: ['0%', '100%', '0%'] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent"
-        style={{ top: 0 }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute inset-x-0 h-32 pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(180deg, transparent 0%, rgba(143,122,88,0.20) 50%, transparent 100%)',
+        }}
       />
 
       {/* Meta labels */}
-      <div className="absolute top-4 left-4 text-[9px] font-semibold tracking-[0.22em] uppercase text-mocha">
+      <div className="absolute top-5 left-5 text-[9px] font-medium tracking-[0.32em] uppercase text-soft/70">
         Face Structure Index™
       </div>
-      <div className="absolute bottom-4 left-4 text-[9px] font-semibold tracking-[0.22em] uppercase text-mocha">
-        Sample · No image stored
-      </div>
-      <div className="absolute top-4 right-4 text-[9px] font-semibold tracking-[0.22em] uppercase text-mocha">
+      <div className="absolute top-5 right-5 text-[9px] font-medium tracking-[0.32em] uppercase text-gold">
         Live
+      </div>
+      <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3 text-[9px] font-medium tracking-[0.32em] uppercase">
+        <span className="text-mute">Geometry · Live trace</span>
+        <span className="text-soft/70">No image stored</span>
       </div>
     </div>
   )
@@ -214,10 +217,10 @@ function FaceMappingFrame() {
 
 function Bracket({ pos }: { pos: 'tl' | 'tr' | 'bl' | 'br' }) {
   const map = {
-    tl: 'top-3 left-3 border-t border-l',
-    tr: 'top-3 right-3 border-t border-r',
-    bl: 'bottom-3 left-3 border-b border-l',
-    br: 'bottom-3 right-3 border-b border-r',
+    tl: 'top-4 left-4 border-t border-l',
+    tr: 'top-4 right-4 border-t border-r',
+    bl: 'bottom-4 left-4 border-b border-l',
+    br: 'bottom-4 right-4 border-b border-r',
   }
-  return <div className={`absolute w-5 h-5 border-jet-black ${map[pos]}`} aria-hidden="true" />
+  return <div className={`absolute w-6 h-6 border-gold/60 ${map[pos]}`} aria-hidden="true" />
 }

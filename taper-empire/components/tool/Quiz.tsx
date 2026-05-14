@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Check } from 'lucide-react'
+import { Check } from 'lucide-react'
 import type { QuizData } from '@/types'
 import { Button } from '@/components/ui/button'
 
@@ -67,13 +67,9 @@ const questions: Question[] = [
   },
 ]
 
-const initialQuiz: QuizData = {
-  faceShape: null, hairType: null, lifestyle: null, age: null, maintenance: null,
-}
+const initialQuiz: QuizData = { faceShape: null, hairType: null, lifestyle: null, age: null, maintenance: null }
 
-interface QuizProps {
-  onComplete: (data: QuizData) => void
-}
+interface QuizProps { onComplete: (data: QuizData) => void }
 
 export function Quiz({ onComplete }: QuizProps) {
   const [step, setStep] = useState(0)
@@ -107,17 +103,17 @@ export function Quiz({ onComplete }: QuizProps) {
 
   return (
     <div>
-      {/* Dot-pill progress */}
-      <div className="flex justify-center items-center gap-2 mb-8">
+      {/* Editorial step progress */}
+      <div className="flex justify-center items-center gap-3 mb-12">
         {questions.map((_, i) => {
           const done = i < step
           const active = i === step
           return (
             <motion.div
               key={i}
-              animate={{ width: active ? 28 : done ? 16 : 6 }}
-              transition={{ duration: 0.3 }}
-              className={`h-1.5 rounded-full ${done || active ? 'bg-accent' : 'bg-border'}`}
+              animate={{ width: active ? 36 : done ? 18 : 6 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className={`h-px ${done || active ? 'bg-gold' : 'bg-line'}`}
             />
           )
         })}
@@ -126,23 +122,23 @@ export function Quiz({ onComplete }: QuizProps) {
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
-          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="text-center mb-8">
-            <p className="text-xs font-semibold tracking-widest text-taupe uppercase mb-2">
-              Question {step + 1} of {questions.length}
+          <div className="text-center mb-12">
+            <p className="text-[10px] font-medium tracking-[0.32em] uppercase text-gold mb-4">
+              Question {String(step + 1).padStart(2, '0')} / {String(questions.length).padStart(2, '0')}
             </p>
-            <h3 className="font-display text-2xl sm:text-3xl font-semibold text-jet-black mb-2 tracking-tight">
+            <h3 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-soft mb-4 tracking-[-0.025em] leading-[1.05]">
               {q.label}
             </h3>
-            <p className="text-sm text-mocha">{q.hint}</p>
+            <p className="text-sm text-mute max-w-md mx-auto">{q.hint}</p>
           </div>
 
           <div
-            className={`grid gap-3 max-w-3xl mx-auto
+            className={`grid gap-3 max-w-4xl mx-auto
               ${q.options.length === 3 ? 'sm:grid-cols-3' : ''}
               ${q.options.length === 4 ? 'sm:grid-cols-2 lg:grid-cols-4' : ''}
               ${q.options.length === 5 ? 'sm:grid-cols-3 lg:grid-cols-5' : ''}
@@ -154,30 +150,40 @@ export function Quiz({ onComplete }: QuizProps) {
                 <motion.button
                   key={opt.value}
                   type="button"
-                  whileHover={{ scale: advancing ? 1 : 1.02 }}
+                  whileHover={{ y: advancing ? 0 : -3 }}
                   whileTap={{ scale: advancing ? 1 : 0.98 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                   onClick={() => handleAnswer(opt.value)}
-                  className={`relative text-center p-4 border-2 rounded-xl transition-colors
-                    ${isSel ? 'border-accent bg-oat/50' : 'border-border bg-milk hover:border-accent'}`}
+                  className={`relative text-left p-6 transition-colors ${
+                    isSel
+                      ? 'bg-surface2 text-soft'
+                      : 'bg-surface/60 hover:bg-surface2 text-soft'
+                  }`}
                 >
-                  {isSel && (
-                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-                      <Check className="w-3 h-3 text-milk" strokeWidth={3} />
-                    </div>
-                  )}
-                  <p className="font-semibold text-jet-black text-sm mb-1 pr-4">{opt.label}</p>
-                  <p className={`text-xs leading-relaxed ${isSel ? 'text-mocha' : 'text-taupe'}`}>
-                    {opt.desc}
+                  <div className={`absolute top-4 right-4 w-5 h-5 border transition-colors ${
+                    isSel ? 'bg-gold border-gold text-ink' : 'border-line group-hover:border-soft/60'
+                  } grid place-items-center`}>
+                    {isSel && <Check className="w-3 h-3" strokeWidth={3} />}
+                  </div>
+                  <p className="font-display font-extrabold text-lg tracking-tight mb-2 pr-8">
+                    {opt.label}
                   </p>
+                  <p className="text-xs text-mute leading-relaxed">{opt.desc}</p>
+                  <span
+                    aria-hidden="true"
+                    className={`absolute left-0 bottom-0 right-0 h-px transition-colors ${
+                      isSel ? 'bg-gold' : 'bg-line'
+                    }`}
+                  />
                 </motion.button>
               )
             })}
           </div>
 
           {step > 0 && (
-            <div className="text-center mt-8">
-              <Button variant="ghost" size="sm" onClick={handleBack} icon={<ArrowLeft className="w-4 h-4" />}>
-                Back
+            <div className="text-center mt-12">
+              <Button variant="ghost" size="sm" onClick={handleBack}>
+                ← Back
               </Button>
             </div>
           )}
