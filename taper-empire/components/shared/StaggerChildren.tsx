@@ -2,20 +2,28 @@
 
 import { motion } from 'framer-motion'
 import { ReactNode } from 'react'
+import { staggerParent, staggerChild } from '@/lib/motion'
 
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+interface StaggerProps {
+  children: ReactNode
+  className?: string
+  /** Delay between each child reveal in seconds. Default 0.1. */
+  stagger?: number
+  /** Delay before the first child reveal. Default 0.05. */
+  delayChildren?: number
 }
 
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
-}
-
-export function StaggerContainer({ children, className }: { children: ReactNode; className?: string }) {
+export function StaggerContainer({
+  children, className, stagger = 0.1, delayChildren = 0.05,
+}: StaggerProps) {
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className={className}>
+    <motion.div
+      variants={staggerParent(stagger, delayChildren)}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-80px' }}
+      className={className}
+    >
       {children}
     </motion.div>
   )
@@ -23,7 +31,7 @@ export function StaggerContainer({ children, className }: { children: ReactNode;
 
 export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <motion.div variants={item} className={className}>
+    <motion.div variants={staggerChild} className={className}>
       {children}
     </motion.div>
   )
