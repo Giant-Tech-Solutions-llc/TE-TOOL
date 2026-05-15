@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CinematicPortrait } from './CinematicPortrait'
 import { easeLux } from '@/lib/motion'
 
 /**
@@ -44,8 +44,35 @@ export function HeroIntelligenceModule() {
   return (
     <div className="relative aspect-[4/5] w-full overflow-hidden rounded-hero bg-ink ring-1 ring-[rgba(255,255,255,0.06)] shadow-luxury">
 
-      {/* Base portrait — always present */}
-      <CinematicPortrait />
+      {/* Base portrait — real subject, always present */}
+      <div className="absolute inset-0">
+        <Image
+          src="/hero/subject.webp"
+          alt="Subject for facial structure analysis"
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 40vw"
+          placeholder="blur"
+          blurDataURL="/hero/subject-blur.webp"
+          className="object-cover object-top"
+        />
+        {/* Cinematic vignette + tonal floor — preserves the editorial feel */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 92% 78% at 50% 38%, transparent 0%, rgba(0,0,0,0.55) 100%)',
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.7) 100%)',
+          }}
+        />
+      </div>
 
       {/* Layer A — Stage II: face landmarks + jaw/hairline arcs */}
       <motion.div
@@ -169,9 +196,9 @@ function FaceLandmarksLayer({ active }: { active: boolean }) {
       className="absolute inset-x-0 bottom-0 mx-auto h-[96%] w-auto text-gold"
       aria-hidden="true"
     >
-      {/* Connecting hairline arcs */}
+      {/* Hairline arc — top of head, mapped to real subject coordinates */}
       <motion.path
-        d="M138 220 Q230 122 322 220"
+        d="M168 163 Q230 88 293 163"
         fill="none"
         stroke="currentColor"
         strokeWidth="0.6"
@@ -180,8 +207,9 @@ function FaceLandmarksLayer({ active }: { active: boolean }) {
         animate={{ pathLength: active ? 1 : 0, opacity: active ? 0.9 : 0 }}
         transition={{ duration: 1, ease: easeLux }}
       />
+      {/* Jaw arc — bottom contour through chin */}
       <motion.path
-        d="M150 380 Q230 432 310 380"
+        d="M143 388 Q230 470 317 388"
         fill="none"
         stroke="currentColor"
         strokeWidth="0.6"
@@ -191,16 +219,16 @@ function FaceLandmarksLayer({ active }: { active: boolean }) {
         transition={{ duration: 1, ease: easeLux, delay: 0.15 }}
       />
 
-      {/* Landmark dots — staggered fade */}
+      {/* Landmark dots — repositioned to align with the real subject */}
       {[
-        [200, 258, 0.05], [260, 258, 0.1],   // eyes
-        [230, 196, 0.15],                     // hairline center
-        [138, 268, 0.20], [322, 268, 0.25],   // temples
-        [230, 268, 0.30], [230, 305, 0.35],   // nose bridge
-        [212, 360, 0.40], [248, 360, 0.45],   // upper lip
-        [165, 392, 0.50], [295, 392, 0.55],   // jaw corners
-        [230, 432, 0.60],                     // chin
-        [200, 248, 0.65], [260, 248, 0.70],   // brows
+        [192, 219, 0.05], [268, 219, 0.10],   // eyes
+        [230, 88,  0.15],                      // hairline center
+        [168, 163, 0.18], [293, 163, 0.22],    // temples
+        [230, 244, 0.28], [230, 306, 0.33],    // nose bridge top + tip
+        [205, 406, 0.40], [255, 406, 0.45],    // mouth corners
+        [143, 388, 0.50], [317, 388, 0.55],    // jaw corners
+        [230, 456, 0.60],                      // chin
+        [186, 200, 0.65], [273, 200, 0.70],    // brows
       ].map(([x, y, d], i) => (
         <motion.circle
           key={i}
@@ -229,9 +257,9 @@ function GeometryLayer({ active }: { active: boolean }) {
         className="absolute inset-x-0 bottom-0 mx-auto h-[96%] w-auto text-gold"
         aria-hidden="true"
       >
-        {/* Vertical symmetry axis */}
+        {/* Vertical symmetry axis — through real subject's nose */}
         <motion.line
-          x1="230" y1="120" x2="230" y2="450"
+          x1="230" y1="88" x2="230" y2="470"
           stroke="currentColor"
           strokeWidth="0.5"
           strokeDasharray="3 5"
@@ -240,9 +268,9 @@ function GeometryLayer({ active }: { active: boolean }) {
           transition={{ duration: 0.9, ease: easeLux }}
         />
 
-        {/* Horizontal eye line */}
+        {/* Horizontal eye line — runs across at real eye y=219 */}
         <motion.line
-          x1="120" y1="258" x2="340" y2="258"
+          x1="130" y1="219" x2="330" y2="219"
           stroke="currentColor"
           strokeWidth="0.5"
           strokeDasharray="3 5"
@@ -251,9 +279,9 @@ function GeometryLayer({ active }: { active: boolean }) {
           transition={{ duration: 0.9, delay: 0.15, ease: easeLux }}
         />
 
-        {/* Jaw angle arc */}
+        {/* Jaw angle arc — at the left jaw corner */}
         <motion.path
-          d="M168 392 Q170 415 200 425"
+          d="M143 388 Q170 420 200 440"
           fill="none"
           stroke="currentColor"
           strokeWidth="0.8"
@@ -262,15 +290,15 @@ function GeometryLayer({ active }: { active: boolean }) {
           transition={{ duration: 0.9, delay: 0.3, ease: easeLux }}
         />
 
-        {/* Width gauge brackets */}
+        {/* Width gauge — spans across the cheekbone level */}
         <motion.g
           initial={{ opacity: 0 }}
           animate={{ opacity: active ? 0.9 : 0 }}
           transition={{ duration: 0.6, delay: 0.5, ease: easeLux }}
         >
-          <line x1="138" y1="278" x2="138" y2="298" stroke="currentColor" strokeWidth="0.6" />
-          <line x1="322" y1="278" x2="322" y2="298" stroke="currentColor" strokeWidth="0.6" />
-          <line x1="138" y1="288" x2="322" y2="288" stroke="currentColor" strokeWidth="0.4" />
+          <line x1="143" y1="290" x2="143" y2="310" stroke="currentColor" strokeWidth="0.6" />
+          <line x1="317" y1="290" x2="317" y2="310" stroke="currentColor" strokeWidth="0.6" />
+          <line x1="143" y1="300" x2="317" y2="300" stroke="currentColor" strokeWidth="0.4" />
         </motion.g>
       </svg>
 
