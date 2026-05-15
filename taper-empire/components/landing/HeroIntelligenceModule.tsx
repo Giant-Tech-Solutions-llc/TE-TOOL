@@ -44,32 +44,28 @@ export function HeroIntelligenceModule() {
   return (
     <div className="relative aspect-[4/5] w-full overflow-hidden rounded-hero bg-ink ring-1 ring-[rgba(255,255,255,0.06)] shadow-luxury">
 
-      {/* Base portrait — real subject, always present */}
+      {/* Base portrait — real subject, always present.
+          Source is 1200px at q94; next/image generates a sharp srcset
+          spanning device sizes for retina-crisp delivery. */}
       <div className="absolute inset-0">
         <Image
           src="/hero/subject.webp"
           alt="Subject for facial structure analysis"
           fill
           priority
-          sizes="(max-width: 1024px) 100vw, 40vw"
+          quality={95}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 600px"
           placeholder="blur"
           blurDataURL="/hero/subject-blur.webp"
           className="object-cover object-top"
         />
-        {/* Cinematic vignette + tonal floor — preserves the editorial feel */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(ellipse 92% 78% at 50% 38%, transparent 0%, rgba(0,0,0,0.55) 100%)',
-          }}
-        />
+        {/* Soft tonal floor only — vignette removed so the face stays crisp.
+            The dark page background already frames the portrait without it. */}
         <div
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
           style={{
-            background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.7) 100%)',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.6) 100%)',
           }}
         />
       </div>
@@ -124,61 +120,69 @@ export function HeroIntelligenceModule() {
       {/* ── HUD overlay — stage chips top, label bottom ─────────────── */}
       <div className="absolute inset-0 pointer-events-none">
 
-        {/* Top — stage indicators */}
-        <div className="absolute top-5 left-5 right-5 flex items-center justify-between gap-3 z-10">
-          <div className="flex items-center gap-2">
-            {STAGES.map((s, i) => {
-              const active = stage === i
-              const done = stage > i
-              return (
-                <motion.span
-                  key={s.roman}
-                  animate={{
-                    width: active ? 28 : 6,
-                    opacity: active || done ? 1 : 0.35,
-                  }}
-                  transition={{ duration: 0.4, ease: easeLux }}
-                  className={`h-px ${active || done ? 'bg-gold' : 'bg-soft/30'}`}
-                />
-              )
-            })}
-            <span className="ml-3 text-[9px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums">
-              {meta.roman}
+        {/* Top — stage indicators (sit on a soft tonal scrim so the
+            hairlines + roman numeral stay crisp over light hair) */}
+        <div className="absolute top-0 inset-x-0 px-5 sm:px-6 pt-5 sm:pt-6 z-10
+                        bg-gradient-to-b from-ink/55 via-ink/15 to-transparent">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              {STAGES.map((s, i) => {
+                const active = stage === i
+                const done = stage > i
+                return (
+                  <motion.span
+                    key={s.roman}
+                    animate={{
+                      width: active ? 32 : 8,
+                      opacity: active || done ? 1 : 0.4,
+                    }}
+                    transition={{ duration: 0.4, ease: easeLux }}
+                    className={`h-[2px] rounded-full ${active || done ? 'bg-gold' : 'bg-soft/30'}`}
+                  />
+                )
+              })}
+              <span className="ml-3 text-[11px] font-semibold tracking-[0.32em] uppercase text-gold tabular-nums">
+                {meta.roman}
+              </span>
+            </div>
+            <span className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.32em] uppercase text-soft/80">
+              <span aria-hidden="true" className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+              Live
             </span>
           </div>
-          <span className="text-[9px] font-medium tracking-[0.32em] uppercase text-soft/55">
-            Live
-          </span>
         </div>
 
-        {/* Bottom — stage label + dynamic metric */}
-        <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3 z-10">
-          <div className="flex-1 min-w-0">
+        {/* Bottom — stage label + dynamic metric on tonal scrim for readability */}
+        <div className="absolute bottom-0 inset-x-0 px-5 sm:px-6 pb-5 sm:pb-6 z-10
+                        bg-gradient-to-t from-ink/85 via-ink/40 to-transparent pt-10">
+          <div className="flex items-end justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={`label-${stage}`}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.3, ease: easeLux }}
+                  className="text-[11px] sm:text-[12px] font-semibold tracking-[0.32em] uppercase text-soft truncate"
+                >
+                  {meta.label}
+                </motion.p>
+              </AnimatePresence>
+            </div>
             <AnimatePresence mode="wait">
               <motion.p
-                key={`label-${stage}`}
+                key={`metric-${stage}`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.3, ease: easeLux }}
-                className="text-[10px] font-medium tracking-[0.32em] uppercase text-soft truncate"
+                className="text-[11px] sm:text-[12px] font-semibold tracking-[0.32em] uppercase text-gold tabular-nums shrink-0"
               >
-                {meta.label}
+                {meta.metric}
               </motion.p>
             </AnimatePresence>
           </div>
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={`metric-${stage}`}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.3, ease: easeLux }}
-              className="text-[10px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums shrink-0"
-            >
-              {meta.metric}
-            </motion.p>
-          </AnimatePresence>
         </div>
       </div>
     </div>

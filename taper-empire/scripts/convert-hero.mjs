@@ -1,5 +1,7 @@
-// Convert the source hero portrait PNG to optimized WebP at 1024x1280
-// (hero portrait aspect ~4:5). Stores into /public/hero/.
+// Convert the source hero portrait PNG to a sharp, high-density WebP.
+// next/image generates srcset variants from this source so it must contain
+// enough pixels for retina rendering. A 1200x1200 source at q=94 with full
+// chroma + smartSubsample disabled looks crisp at 2x DPR on a 600px column.
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import sharp from 'sharp'
@@ -9,28 +11,31 @@ const root = path.resolve(import.meta.dirname, '..')
 const outDir = path.join(root, 'public', 'hero')
 await fs.mkdir(outDir, { recursive: true })
 
-const inputBuf = await fs.readFile(src)
+const input = sharp(await fs.readFile(src))
+const meta = await input.metadata()
+console.log(`Source: ${meta.width}x${meta.height} ${meta.format} ${meta.size ? (meta.size/1024).toFixed(0)+' kB' : ''}`)
 
-// Hero portrait — keep aspect, target ~1024 wide for crisp HiDPI
-const heroBuf = await sharp(inputBuf)
-  .resize({ width: 1024, withoutEnlargement: false, fit: 'inside' })
-  .webp({ quality: 88, effort: 6 })
+// Primary delivery — full source resolution, near-lossless WebP.
+// next/image will downsize from this as needed via responsive srcset.
+const heroBuf = await sharp(await fs.readFile(src))
+  .webp({
+    quality: 94,
+    alphaQuality: 100,
+    effort: 6,
+    smartSubsample: false,   // preserve chroma detail — important for skin tone & beard stubble
+  })
   .toBuffer()
 await fs.writeFile(path.join(outDir, 'subject.webp'), heroBuf)
 
-// 2x retina variant — sharp 2048
-const hero2xBuf = await sharp(inputBuf)
-  .resize({ width: 2048, withoutEnlargement: false, fit: 'inside' })
-  .webp({ quality: 86, effort: 6 })
+// Tiny blur placeholder — 24w q=40 for instant pop while the main loads.
+const blurBuf = await sharp(await fs.readFile(src))
+  .resize(24)
+  .webp({ quality: 40 })
   .toBuffer()
-await fs.writeFile(path.join(outDir, 'subject@2x.webp'), hero2xBuf)
-
-// Blur placeholder — tiny 24px wide for instant pop
-const blurBuf = await sharp(inputBuf).resize(24).webp({ quality: 40 }).toBuffer()
 await fs.writeFile(path.join(outDir, 'subject-blur.webp'), blurBuf)
 
 const stat = (b) => `${(b.length / 1024).toFixed(0)} kB`
-console.log(`Wrote:
-  /public/hero/subject.webp        ${stat(heroBuf)}
-  /public/hero/subject@2x.webp     ${stat(hero2xBuf)}
+console.log(`
+Wrote:
+  /public/hero/subject.webp        ${stat(heroBuf)} (full ${meta.width}px, q94)
   /public/hero/subject-blur.webp   ${stat(blurBuf)}`)
