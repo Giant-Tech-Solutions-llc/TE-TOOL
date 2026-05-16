@@ -143,6 +143,9 @@ export function AuthorityContent() {
               </p>
             </div>
           </div>
+          {/* Phase 08 — visual glyph strip above the table */}
+          <FaceShapeGlyphStrip />
+
           <LuxuryTable
             caption="Face shape matching system"
             headers={['Face Shape', 'Recommended Taper', 'Why It Works', 'Barber Anchor']}
@@ -172,6 +175,9 @@ export function AuthorityContent() {
               </p>
             </div>
           </div>
+          {/* Phase 08 — visual glyph strip above the texture table */}
+          <HairTextureGlyphStrip />
+
           <LuxuryTable
             caption="Hair texture recommendation system"
             headers={['Hair Type', 'Best Taper Direction', 'Core Risk', 'Execution Note']}
@@ -250,5 +256,81 @@ export function AuthorityContent() {
 
       </div>
     </section>
+  )
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ *  Phase 08 — Visual glyph strips above the editorial tables
+ * ─────────────────────────────────────────────────────────────────────── */
+
+const FACE_SHAPES = [
+  { name: 'Round',   draw: 'M 60 18 a 28 28 0 1 0 0.001 0 z' },
+  { name: 'Oval',    draw: 'M 60 18 a 24 32 0 1 0 0.001 0 z' },
+  { name: 'Square',  draw: 'M 36 22 h 48 v 38 a 6 6 0 0 1 -6 6 h -36 a 6 6 0 0 1 -6 -6 z' },
+  { name: 'Diamond', draw: 'M 60 18 L 86 46 L 60 78 L 34 46 Z' },
+  { name: 'Heart',   draw: 'M 36 26 q -10 22 8 36 q 16 16 16 18 q 0 -2 16 -18 q 18 -14 8 -36 q -8 -8 -16 4 q -3 4 -8 4 q -5 0 -8 -4 q -8 -12 -16 -4 z' },
+] as const
+
+function FaceShapeGlyphStrip() {
+  return (
+    <div className="grid grid-cols-5 gap-2 sm:gap-3 mb-6 lg:mb-8">
+      {FACE_SHAPES.map(({ name, draw }) => (
+        <div
+          key={name}
+          className="group/g rounded-lg-x border border-line bg-surface/30 py-4 px-2 flex flex-col items-center hover:border-lineHover hover:bg-surface/60 transition-all duration-300 ease-lux"
+        >
+          <svg
+            viewBox="0 0 120 92"
+            className="w-12 h-10 sm:w-14 sm:h-11 text-gold/80 group-hover/g:text-gold transition-colors"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
+            <path d={draw} />
+          </svg>
+          <p className="mt-2 type-eyebrow text-soft/85 group-hover/g:text-soft transition-colors">
+            {name}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function HairTextureGlyphStrip() {
+  /* Hair textures rendered as stylized line patterns — straight / wavy /
+     curly / coily — drawn with deterministic SVG paths. */
+  const TEXTURES = [
+    { name: 'Straight', path: 'M10 18 V60 M30 18 V60 M50 18 V60 M70 18 V60 M90 18 V60' },
+    { name: 'Wavy',     path: 'M10 20 Q20 32 10 44 T10 60 M30 20 Q40 32 30 44 T30 60 M50 20 Q60 32 50 44 T50 60 M70 20 Q80 32 70 44 T70 60 M90 20 Q100 32 90 44 T90 60' },
+    { name: 'Curly',    path: 'M14 20 a8 8 0 1 1 0 16 a8 8 0 1 0 0 16 M40 20 a8 8 0 1 1 0 16 a8 8 0 1 0 0 16 M66 20 a8 8 0 1 1 0 16 a8 8 0 1 0 0 16 M92 20 a8 8 0 1 1 0 16 a8 8 0 1 0 0 16' },
+    { name: 'Coily',    path: 'M10 22 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0 M10 42 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0 a5 5 0 1 1 10 0 a5 5 0 1 0 10 0' },
+  ] as const
+
+  return (
+    <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-6 lg:mb-8">
+      {TEXTURES.map(({ name, path }) => (
+        <div
+          key={name}
+          className="group/t rounded-lg-x border border-line bg-surface/30 py-4 px-2 flex flex-col items-center hover:border-lineHover hover:bg-surface/60 transition-all duration-300 ease-lux"
+        >
+          <svg
+            viewBox="0 0 100 78"
+            className="w-14 h-10 sm:w-16 sm:h-11 text-gold/80 group-hover/t:text-gold transition-colors"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d={path} />
+          </svg>
+          <p className="mt-2 type-eyebrow text-soft/85 group-hover/t:text-soft transition-colors">
+            {name}
+          </p>
+        </div>
+      ))}
+    </div>
   )
 }
