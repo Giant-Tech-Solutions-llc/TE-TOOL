@@ -5,6 +5,16 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import type { Recommendation } from '@/types'
+import { SectionEyebrow } from '@/components/shared'
+import { easeLux } from '@/lib/motion'
+
+/**
+ * Phase 06 — Secondary Rail (horizontal lookbook)
+ *
+ * Replaces the prior 3-equal-card grid with a horizontal snap-scrolling
+ * lookbook of alternate matches. Reads as a fashion editorial filmstrip
+ * rather than a SaaS card pile.
+ */
 
 interface Props {
   recs: Recommendation[]
@@ -25,17 +35,13 @@ export function SecondaryRail({ recs, imageLoading }: Props) {
 
   return (
     <section aria-labelledby="alt-heading" className="relative">
+
       <div className="flex items-end justify-between gap-6 mb-10 pb-6 border-b border-line">
         <div>
-          <p className="text-[10px] font-medium tracking-[0.4em] uppercase text-gold mb-4 flex items-center gap-4">
-            <span aria-hidden="true" className="block h-px w-12 bg-gold/70" />
-            Lookbook
-          </p>
-          <h2
-            id="alt-heading"
-            className="font-display font-extrabold tracking-[-0.035em] text-3xl lg:text-5xl leading-[0.95]"
-          >
-            Alternate matches.
+          <SectionEyebrow className="mb-4">Lookbook — Alternate Matches</SectionEyebrow>
+          <h2 id="alt-heading" className="font-display font-extrabold tracking-[-0.035em] leading-[0.95] text-[clamp(2rem,4vw,3.5rem)]">
+            More that
+            <span className="italic font-medium text-mute"> nearly hit.</span>
           </h2>
         </div>
         <div className="hidden sm:flex items-center gap-2">
@@ -43,7 +49,7 @@ export function SecondaryRail({ recs, imageLoading }: Props) {
             type="button"
             onClick={() => scroll('left')}
             aria-label="Scroll left"
-            className="w-12 h-12 rounded-full grid place-items-center border border-line text-soft hover:bg-soft hover:text-ink hover:border-soft hover:scale-105 transition-all duration-300"
+            className="w-12 h-12 rounded-full grid place-items-center border border-line text-soft hover:bg-soft hover:text-ink hover:border-soft hover:scale-105 transition-all duration-300 ease-lux"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -51,7 +57,7 @@ export function SecondaryRail({ recs, imageLoading }: Props) {
             type="button"
             onClick={() => scroll('right')}
             aria-label="Scroll right"
-            className="w-12 h-12 rounded-full grid place-items-center border border-line text-soft hover:bg-soft hover:text-ink hover:border-soft hover:scale-105 transition-all duration-300"
+            className="w-12 h-12 rounded-full grid place-items-center border border-line text-soft hover:bg-soft hover:text-ink hover:border-soft hover:scale-105 transition-all duration-300 ease-lux"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -78,11 +84,11 @@ function RailItem({ rec, index, loading }: { rec: Recommendation; index: number;
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.8, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-      className="flex-none w-[78vw] sm:w-[420px] lg:w-[460px] snap-start group"
+      transition={{ duration: 0.9, delay: index * 0.08, ease: easeLux }}
+      className="flex-none w-[78vw] sm:w-[440px] lg:w-[480px] snap-start group"
     >
       {/* Image */}
-      <div className="relative aspect-[4/5] bg-surface overflow-hidden mb-5 rounded-3xl border border-line shadow-[0_18px_48px_-16px_rgba(0,0,0,0.6)]">
+      <div className="relative aspect-[4/5] bg-surface overflow-hidden mb-5 rounded-hero border border-line shadow-luxury-sm">
         {loading && !rec.image_url ? (
           <div className="absolute inset-0 flex items-center justify-center">
             <Loader2 className="w-6 h-6 text-gold animate-spin" />
@@ -92,7 +98,7 @@ function RailItem({ rec, index, loading }: { rec: Recommendation; index: number;
             src={rec.image_url}
             alt={rec.style_name}
             fill
-            sizes="(max-width: 640px) 78vw, 460px"
+            sizes="(max-width: 640px) 78vw, 480px"
             className="object-cover object-top transition-transform duration-[1.4s] ease-out group-hover:scale-[1.04]"
             unoptimized
           />
@@ -101,15 +107,17 @@ function RailItem({ rec, index, loading }: { rec: Recommendation; index: number;
             No preview
           </div>
         )}
+
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"
-          style={{ background: 'linear-gradient(180deg, transparent 55%, rgba(10,10,10,0.5) 100%)' }}
+          style={{ background: 'linear-gradient(180deg, transparent 55%, rgba(7,7,7,0.55) 100%)' }}
         />
-        <div className="absolute top-4 left-4 text-[10px] font-medium tracking-[0.32em] uppercase text-soft/80">
+
+        <div className="absolute top-4 left-4 type-eyebrow text-soft/80">
           № {rank}
         </div>
-        <div className="absolute top-4 right-4 text-[10px] font-medium tracking-[0.32em] uppercase bg-soft text-ink px-2.5 py-1 rounded-full shadow-[0_4px_14px_rgba(0,0,0,0.5)]">
+        <div className="absolute top-4 right-4 type-eyebrow bg-soft text-ink px-2.5 py-1 rounded-pill shadow-[0_4px_14px_rgba(0,0,0,0.5)]">
           {rec.match_score}%
         </div>
       </div>
@@ -122,17 +130,17 @@ function RailItem({ rec, index, loading }: { rec: Recommendation; index: number;
         <p className="text-sm text-soft/65 leading-[1.75] mb-5 line-clamp-3">{rec.why_it_works}</p>
 
         <details className="group/d">
-          <summary className="list-none cursor-pointer flex items-center justify-between gap-3 border-t border-line pt-4 text-[10px] font-medium tracking-[0.32em] uppercase text-soft hover:text-gold transition-colors duration-300">
+          <summary className="list-none cursor-pointer flex items-center justify-between gap-3 border-t border-line pt-4 type-eyebrow text-soft hover:text-gold transition-colors duration-300">
             <span>Barber brief</span>
             <span aria-hidden="true" className="grid place-items-center w-7 h-7 rounded-full border border-line transition-all duration-300 group-open/d:rotate-180 group-open/d:border-gold group-open/d:text-gold">↓</span>
           </summary>
           <div className="mt-4 space-y-4 text-sm text-soft/65 leading-[1.85]">
             <p>
-              <span className="text-[10px] tracking-[0.32em] uppercase text-mute block mb-1.5">Cut details</span>
+              <span className="type-eyebrow text-mute block mb-1.5">Cut details</span>
               {rec.barber_instructions}
             </p>
             <p>
-              <span className="text-[10px] tracking-[0.32em] uppercase text-mute block mb-1.5">Maintenance</span>
+              <span className="type-eyebrow text-mute block mb-1.5">Maintenance</span>
               {rec.maintenance}
             </p>
           </div>
