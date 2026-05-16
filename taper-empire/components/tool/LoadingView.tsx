@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { AuthWall } from './AuthWall'
+import { hasAuthenticated } from '@/lib/api-client'
+import { useToolStore } from '@/store/useToolStore'
+import { track } from '@/lib/analytics'
 
 const STATES = [
   { label: 'Mapping facial proportions',     tag: 'PROPORTIONS' },
@@ -11,28 +15,58 @@ const STATES = [
   { label: 'Finalizing style compatibility', tag: 'COMPATIBILITY' },
 ] as const
 
+const AUTH_TRIGGER_PCT = 80
+
 interface LoadingViewProps { mode: 'photo' | 'quiz' }
 
 export function LoadingView({ mode }: LoadingViewProps) {
   const [stateIdx, setStateIdx] = useState(0)
   const [progress, setProgress] = useState(2)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [authed, setAuthed] = useState(false)
 
+  const recommendations = useToolStore((s) => s.recommendations)
+  const setAuthenticatedStore = useToolStore((s) => s.setAuthenticated)
+  const previewImageUrl = recommendations[0]?.image_url ?? null
+  const topStyle = recommendations[0]?.style_name
+  const topScore = recommendations[0]?.match_score
+
+  // Skip wall if already authed this session
+  useEffect(() => { setAuthed(hasAuthenticated()) }, [])
+
+  // Fake progress curve — caps at 80 % until auth completes
   useEffect(() => {
-    const DURATION = 38000, MAX = 92
+    const DURATION = 38000
     const start = Date.now()
     const tick = setInterval(() => {
       const t = Math.min((Date.now() - start) / DURATION, 1)
       const eased = 1 - Math.pow(1 - t, 2.2)
-      setProgress(Math.round(2 + eased * (MAX - 2)))
+      const computedMax = authed ? 96 : AUTH_TRIGGER_PCT
+      const next = Math.round(2 + eased * (computedMax - 2))
+      setProgress(next)
       if (t >= 1) clearInterval(tick)
     }, 400)
     return () => clearInterval(tick)
-  }, [])
+  }, [authed])
 
   useEffect(() => {
     const cycle = setInterval(() => setStateIdx((p) => (p + 1) % STATES.length), 3600)
     return () => clearInterval(cycle)
   }, [])
+
+  // Trigger the hard auth wall once progress crosses the threshold
+  useEffect(() => {
+    if (!authed && progress >= AUTH_TRIGGER_PCT && !authOpen) {
+      setAuthOpen(true)
+      track('auth_wall_triggered', { progress, flow: mode })
+    }
+  }, [progress, authed, authOpen, mode])
+
+  const handleAuthenticated = () => {
+    setAuthed(true)
+    setAuthOpen(false)
+    setAuthenticatedStore(true)
+  }
 
   return (
     <div className="relative bg-ink text-soft min-h-screen pt-32 lg:pt-40 pb-24 grain-soft">
@@ -136,6 +170,18 @@ export function LoadingView({ mode }: LoadingViewProps) {
           </div>
         </div>
       </div>
+
+      {/* Phase 07.5 — Hard auth gate (no dismiss; results stay locked) */}
+      <AuthWall
+        open={authOpen}
+        previewImageUrl={previewImageUrl}
+        topStyle={topStyle}
+        topScore={topScore}
+        flow={mode}
+        uploadMethod={mode}
+        quizComplete={mode === 'quiz'}
+        onAuthenticated={handleAuthenticated}
+      />
     </div>
   )
 }

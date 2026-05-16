@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PhotoUpload } from './PhotoUpload'
 import { Quiz } from './Quiz'
@@ -8,6 +8,7 @@ import { LoadingView } from './LoadingView'
 import { Results } from './Results'
 import { useToolStore } from '@/store/useToolStore'
 import { getRecommendations } from '@/lib/api-client'
+import { track } from '@/lib/analytics'
 import type { QuizData, ToolInput } from '@/types'
 import type { PreparedPhoto } from '@/lib/image'
 
@@ -17,7 +18,14 @@ export function ToolFlow() {
   const { step, submit, success, validation, validationError } = useToolStore()
   const [tab, setTab] = useState<Tab>('photo')
 
+  // Funnel telemetry — fire entry events the first time the tool mounts
+  useEffect(() => {
+    track('upload_started', { initialTab: tab })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const dispatch = async (input: ToolInput) => {
+    track('analysis_started', { flow: input.type })
     submit(input)
     try {
       const r = await getRecommendations(input)
@@ -36,7 +44,10 @@ export function ToolFlow() {
   const handlePhoto = (photo: PreparedPhoto) =>
     dispatch({ type: 'photo', data: { photo: photo.dataUrl, mimeType: photo.mimeType } as any })
 
-  const handleQuiz = (data: QuizData) => dispatch({ type: 'quiz', data })
+  const handleQuiz = (data: QuizData) => {
+    track('quiz_started', { completed: true })
+    dispatch({ type: 'quiz', data })
+  }
 
   if (step === 'loading') return <LoadingView mode={tab} />
   if (step === 'results') return <Results />
