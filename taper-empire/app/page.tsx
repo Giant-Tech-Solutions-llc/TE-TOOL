@@ -1,6 +1,7 @@
 import { Header } from '@/components/landing/Header'
 import { Hero } from '@/components/landing/Hero'
 import { HowItWorks } from '@/components/landing/HowItWorks'
+import { RealMatchExamples } from '@/components/landing/RealMatchExamples'
 import { AuthorityContent } from '@/components/landing/AuthorityContent'
 import { FAQ } from '@/components/landing/FAQ'
 import { FinalCTA } from '@/components/landing/FinalCTA'
@@ -65,6 +66,7 @@ export default function HomePage() {
       <main>
         <Hero />
         <HowItWorks />
+        <RealMatchExamples />
         <AuthorityContent />
         <FAQ />
         <FinalCTA />
