@@ -227,12 +227,14 @@ function SubjectPanel({ match }: { match: Match }) {
     <div className="lg:sticky lg:top-32">
       <div className="relative aspect-[4/5] rounded-hero overflow-hidden border border-line bg-surface">
         <Image
-          src="/hero/subject.webp"
+          src="/matches/subject.webp"
           alt="Example subject for facial structure analysis"
           fill
-          quality={92}
-          sizes="(max-width: 1024px) 100vw, 500px"
-          className="object-cover object-top"
+          quality={95}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
+          placeholder="blur"
+          blurDataURL="/matches/subject-blur.webp"
+          className="object-cover object-center"
         />
 
         {/* Tonal floor for label readability */}
@@ -279,7 +281,7 @@ function SubjectPanel({ match }: { match: Match }) {
       <div className="mt-6 grid grid-cols-3 divide-x divide-line border border-line rounded-med overflow-hidden bg-surface/30">
         {[
           ['Face Shape', 'Oval'],
-          ['Hair',       'Wavy'],
+          ['Hair',       'Curly'],
           ['Beard',      'Stubble'],
         ].map(([k, v]) => (
           <div key={k as string} className="px-4 py-4 text-center">
