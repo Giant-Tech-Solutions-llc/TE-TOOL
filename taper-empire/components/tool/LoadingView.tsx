@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { AuthWall } from './AuthWall'
+import { hasAuthenticated } from '@/lib/api-client'
+import { useToolStore } from '@/store/useToolStore'
 
 const STATES = [
   { label: 'Mapping facial proportions',     tag: 'PROPORTIONS' },
@@ -11,11 +14,25 @@ const STATES = [
   { label: 'Finalizing style compatibility', tag: 'COMPATIBILITY' },
 ] as const
 
+/**
+ * Auth wall trigger point. Spec says 80 % — set high enough that emotional
+ * investment has built but the report is genuinely almost ready.
+ */
+const AUTH_TRIGGER_PCT = 80
+
 interface LoadingViewProps { mode: 'photo' | 'quiz' }
 
 export function LoadingView({ mode }: LoadingViewProps) {
   const [stateIdx, setStateIdx] = useState(0)
   const [progress, setProgress] = useState(2)
+  const [authOpen, setAuthOpen] = useState(false)
+  const [authenticated, setAuthenticated] = useState(false)
+  const previewImageUrl = useToolStore((s) => s.recommendations[0]?.image_url) ?? null
+
+  // Skip the wall entirely if user already auth'd this session
+  useEffect(() => {
+    setAuthenticated(hasAuthenticated())
+  }, [])
 
   useEffect(() => {
     const DURATION = 38000, MAX = 92
@@ -23,11 +40,19 @@ export function LoadingView({ mode }: LoadingViewProps) {
     const tick = setInterval(() => {
       const t = Math.min((Date.now() - start) / DURATION, 1)
       const eased = 1 - Math.pow(1 - t, 2.2)
-      setProgress(Math.round(2 + eased * (MAX - 2)))
+      const pct = Math.round(2 + eased * (MAX - 2))
+      setProgress(pct)
       if (t >= 1) clearInterval(tick)
     }, 400)
     return () => clearInterval(tick)
   }, [])
+
+  // Phase 07 — open the auth wall once progress crosses the trigger
+  useEffect(() => {
+    if (!authenticated && progress >= AUTH_TRIGGER_PCT && !authOpen) {
+      setAuthOpen(true)
+    }
+  }, [progress, authenticated, authOpen])
 
   useEffect(() => {
     const cycle = setInterval(() => setStateIdx((p) => (p + 1) % STATES.length), 3600)
@@ -136,6 +161,16 @@ export function LoadingView({ mode }: LoadingViewProps) {
           </div>
         </div>
       </div>
+
+      {/* Phase 07 — Auth Wall (triggers at 80 % progress, soft gate) */}
+      <AuthWall
+        open={authOpen}
+        gate="soft"
+        previewImageUrl={previewImageUrl}
+        flow={mode}
+        onClose={() => { setAuthOpen(false); setAuthenticated(true) }}
+        onAuthenticated={() => { setAuthOpen(false); setAuthenticated(true) }}
+      />
     </div>
   )
 }
