@@ -8,16 +8,16 @@ import { Twitter, Facebook, Instagram, Youtube } from 'lucide-react'
 const productLinks = [
   { href: '/tool',                  label: 'Get My Match' },
   { href: '#how-it-works',          label: 'The Method' },
-  { href: '#face-shape',            label: 'Face Shapes' },
-  { href: '#hair-type',             label: 'Hair Textures' },
-  { href: '#maintenance',           label: 'Maintenance' },
+  { href: '/guide',                 label: 'The Guide' },
+  { href: '/guide/face-shapes',     label: 'Face Shapes' },
+  { href: '/guide/maintenance',     label: 'Maintenance' },
 ]
 
 const sectionLinks = [
-  { href: '#direct-answer',         label: 'Direct Answer' },
-  { href: '#comparisons',           label: 'Comparisons' },
-  { href: '#faq',                   label: 'FAQ' },
-  { href: '/results',               label: 'Sample Report' },
+  { href: '/guide/taper-styles',           label: 'Taper Styles' },
+  { href: '/guide/hair-textures',          label: 'Hair Textures' },
+  { href: '/guide/barber-communication',   label: 'Barber Guide' },
+  { href: '/guide/compare/taper-vs-fade',  label: 'Taper vs Fade' },
 ]
 
 const companyLinks = [

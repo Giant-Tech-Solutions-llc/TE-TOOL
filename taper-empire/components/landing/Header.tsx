@@ -22,8 +22,8 @@ import { MobileNav } from './MobileNav'
 
 const NAV_LINKS = [
   { href: '#how-it-works', label: 'Method' },
+  { href: '/guide',        label: 'Guide' },
   { href: '#face-shape',   label: 'Face' },
-  { href: '#hair-type',    label: 'Hair' },
   { href: '#maintenance',  label: 'Maintenance' },
   { href: '#faq',          label: 'FAQ' },
 ] as const
