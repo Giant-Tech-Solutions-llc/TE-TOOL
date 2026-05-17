@@ -70,15 +70,10 @@ export function HeroIntelligenceModule() {
         />
       </div>
 
-      {/* Layer A — Stage II: face landmarks + jaw/hairline arcs */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        initial={false}
-        animate={{ opacity: stage >= 1 && stage < 3 ? 1 : stage === 3 ? 0.4 : 0 }}
-        transition={{ duration: 0.65, ease: easeLux }}
-      >
-        <FaceLandmarksLayer active={stage >= 1} />
-      </motion.div>
+      {/* Phase 08 polish — Layer A (landmark dots + arcs over the head)
+          removed at user request. The Stage II 'Mapping facial structure'
+          state is now carried by the HUD chrome alone (label + metric
+          AnimatePresence swap), keeping the portrait clean. */}
 
       {/* Layer B — Stage III: geometry readouts + angle arcs */}
       <motion.div
@@ -200,9 +195,10 @@ function FaceLandmarksLayer({ active }: { active: boolean }) {
       className="absolute inset-x-0 bottom-0 mx-auto h-[96%] w-auto text-gold"
       aria-hidden="true"
     >
-      {/* Hairline arc — top of head, mapped to real subject coordinates */}
+      {/* Hairline arc — top of head, calibrated to the new subject.
+          Face sits higher in this portrait (eyes ≈ y 14 % of source). */}
       <motion.path
-        d="M168 163 Q230 88 293 163"
+        d="M170 50 Q230 18 290 50"
         fill="none"
         stroke="currentColor"
         strokeWidth="0.6"
@@ -213,7 +209,7 @@ function FaceLandmarksLayer({ active }: { active: boolean }) {
       />
       {/* Jaw arc — bottom contour through chin */}
       <motion.path
-        d="M143 388 Q230 470 317 388"
+        d="M180 169 Q230 190 280 169"
         fill="none"
         stroke="currentColor"
         strokeWidth="0.6"
@@ -223,16 +219,17 @@ function FaceLandmarksLayer({ active }: { active: boolean }) {
         transition={{ duration: 1, ease: easeLux, delay: 0.15 }}
       />
 
-      {/* Landmark dots — repositioned to align with the real subject */}
+      {/* Landmark dots — recalibrated for the new portrait
+           (eyes y≈69, chin y≈176, hairline y≈36). */}
       {[
-        [192, 219, 0.05], [268, 219, 0.10],   // eyes
-        [230, 88,  0.15],                      // hairline center
-        [168, 163, 0.18], [293, 163, 0.22],    // temples
-        [230, 244, 0.28], [230, 306, 0.33],    // nose bridge top + tip
-        [205, 406, 0.40], [255, 406, 0.45],    // mouth corners
-        [143, 388, 0.50], [317, 388, 0.55],    // jaw corners
-        [230, 456, 0.60],                      // chin
-        [186, 200, 0.65], [273, 200, 0.70],    // brows
+        [190, 69,  0.05], [270, 69,  0.10],    // eyes
+        [230, 36,  0.15],                       // hairline center
+        [170, 50,  0.18], [290, 50,  0.22],     // temples (along hairline)
+        [230, 95,  0.28], [230, 116, 0.33],     // nose bridge top + tip
+        [210, 149, 0.40], [250, 149, 0.45],     // mouth corners
+        [180, 169, 0.50], [280, 169, 0.55],     // jaw corners
+        [230, 176, 0.60],                       // chin
+        [188, 62,  0.65], [272, 62,  0.70],     // brows
       ].map(([x, y, d], i) => (
         <motion.circle
           key={i}
@@ -261,9 +258,9 @@ function GeometryLayer({ active }: { active: boolean }) {
         className="absolute inset-x-0 bottom-0 mx-auto h-[96%] w-auto text-gold"
         aria-hidden="true"
       >
-        {/* Vertical symmetry axis — through real subject's nose */}
+        {/* Vertical symmetry axis — through new subject's nose */}
         <motion.line
-          x1="230" y1="88" x2="230" y2="470"
+          x1="230" y1="36" x2="230" y2="185"
           stroke="currentColor"
           strokeWidth="0.5"
           strokeDasharray="3 5"
@@ -272,9 +269,9 @@ function GeometryLayer({ active }: { active: boolean }) {
           transition={{ duration: 0.9, ease: easeLux }}
         />
 
-        {/* Horizontal eye line — runs across at real eye y=219 */}
+        {/* Horizontal eye line — runs across at new eye y=69 */}
         <motion.line
-          x1="130" y1="219" x2="330" y2="219"
+          x1="140" y1="69" x2="320" y2="69"
           stroke="currentColor"
           strokeWidth="0.5"
           strokeDasharray="3 5"
@@ -283,9 +280,9 @@ function GeometryLayer({ active }: { active: boolean }) {
           transition={{ duration: 0.9, delay: 0.15, ease: easeLux }}
         />
 
-        {/* Jaw angle arc — at the left jaw corner */}
+        {/* Jaw angle arc — at the new left jaw corner */}
         <motion.path
-          d="M143 388 Q170 420 200 440"
+          d="M180 169 Q195 178 215 180"
           fill="none"
           stroke="currentColor"
           strokeWidth="0.8"
@@ -294,24 +291,25 @@ function GeometryLayer({ active }: { active: boolean }) {
           transition={{ duration: 0.9, delay: 0.3, ease: easeLux }}
         />
 
-        {/* Width gauge — spans across the cheekbone level */}
+        {/* Width gauge — spans across the new subject's cheekbone level */}
         <motion.g
           initial={{ opacity: 0 }}
           animate={{ opacity: active ? 0.9 : 0 }}
           transition={{ duration: 0.6, delay: 0.5, ease: easeLux }}
         >
-          <line x1="143" y1="290" x2="143" y2="310" stroke="currentColor" strokeWidth="0.6" />
-          <line x1="317" y1="290" x2="317" y2="310" stroke="currentColor" strokeWidth="0.6" />
-          <line x1="143" y1="300" x2="317" y2="300" stroke="currentColor" strokeWidth="0.4" />
+          <line x1="160" y1="100" x2="160" y2="116" stroke="currentColor" strokeWidth="0.6" />
+          <line x1="300" y1="100" x2="300" y2="116" stroke="currentColor" strokeWidth="0.6" />
+          <line x1="160" y1="108" x2="300" y2="108" stroke="currentColor" strokeWidth="0.4" />
         </motion.g>
       </svg>
 
-      {/* Floating readouts — positioned as percentages so they scale fluidly */}
+      {/* Floating readouts — positioned as percentages so they scale fluidly.
+          Repositioned upward to track the new portrait's higher face placement. */}
       <motion.div
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: active ? 1 : 0, x: active ? 0 : -8 }}
         transition={{ duration: 0.5, delay: 0.55, ease: easeLux }}
-        className="absolute top-[44%] left-[8%] text-[9px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums"
+        className="absolute top-[18%] left-[8%] text-[9px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums"
       >
         Width <span className="text-soft/80">92mm</span>
       </motion.div>
@@ -319,7 +317,7 @@ function GeometryLayer({ active }: { active: boolean }) {
         initial={{ opacity: 0, x: 8 }}
         animate={{ opacity: active ? 1 : 0, x: active ? 0 : 8 }}
         transition={{ duration: 0.5, delay: 0.7, ease: easeLux }}
-        className="absolute top-[44%] right-[8%] text-[9px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums"
+        className="absolute top-[18%] right-[8%] text-[9px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums"
       >
         Sym <span className="text-soft/80">0.94</span>
       </motion.div>
@@ -327,7 +325,7 @@ function GeometryLayer({ active }: { active: boolean }) {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: active ? 1 : 0, y: active ? 0 : 8 }}
         transition={{ duration: 0.5, delay: 0.85, ease: easeLux }}
-        className="absolute bottom-[28%] left-[14%] text-[9px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums"
+        className="absolute top-[34%] left-[10%] text-[9px] font-medium tracking-[0.32em] uppercase text-gold tabular-nums"
       >
         Jaw <span className="text-soft/80">38°</span>
       </motion.div>
