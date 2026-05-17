@@ -225,36 +225,20 @@ function Step({ index, num, branded, title, body, activeIndex }: StepProps) {
 
 function FaceReadVisual() {
   return (
-    <div className="relative w-full aspect-[5/3] overflow-hidden rounded-lg-x bg-surface2 border border-line">
+    <div className="relative w-full aspect-video overflow-hidden rounded-lg-x bg-surface2 border border-line">
+      {/* Full 16:9 source from the brand team — shows the entire face-scan
+          composition. No crop. object-contain preserves the framing the
+          art director intended; the surface2 fill handles any letterboxing. */}
       <Image
-        src="/hero/subject.webp"
-        alt=""
+        src="/method/face-read.webp"
+        alt="Face structure read — biometric scan overlay on the editorial subject"
         fill
-        sizes="280px"
-        className="object-cover object-top opacity-90 grayscale-[10%]"
+        quality={94}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 280px"
+        placeholder="blur"
+        blurDataURL="/method/face-read-blur.webp"
+        className="object-cover object-center"
       />
-      {/* Landmark dots — same coordinate system as hero, scaled down */}
-      <svg viewBox="0 0 460 600" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 w-full h-full text-gold">
-        {[
-          [192, 219], [268, 219],   // eyes
-          [230, 88],                 // hairline center
-          [168, 163], [293, 163],    // temples
-          [205, 406], [255, 406],    // mouth corners
-          [230, 456],                // chin
-        ].map(([x, y], i) => (
-          <motion.circle
-            key={i}
-            cx={x}
-            cy={y}
-            r="4"
-            fill="currentColor"
-            initial={{ opacity: 0, scale: 0.4 }}
-            whileInView={{ opacity: 0.95, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 + i * 0.06, ease: easeLux }}
-          />
-        ))}
-      </svg>
       <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-medium tracking-[0.32em] uppercase text-soft/70">
         <span>Landmarks</span>
         <span className="text-gold tabular-nums">14 / 14</span>

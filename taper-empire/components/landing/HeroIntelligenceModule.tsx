@@ -70,15 +70,10 @@ export function HeroIntelligenceModule() {
         />
       </div>
 
-      {/* Layer A — Stage II: face landmarks + jaw/hairline arcs */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        initial={false}
-        animate={{ opacity: stage >= 1 && stage < 3 ? 1 : stage === 3 ? 0.4 : 0 }}
-        transition={{ duration: 0.65, ease: easeLux }}
-      >
-        <FaceLandmarksLayer active={stage >= 1} />
-      </motion.div>
+      {/* Phase 08 polish — Layer A (landmark dots + arcs over the head)
+          removed at user request. The Stage II 'Mapping facial structure'
+          state is now carried by the HUD chrome alone (label + metric
+          AnimatePresence swap), keeping the portrait clean. */}
 
       {/* Layer B — Stage III: geometry readouts + angle arcs */}
       <motion.div
