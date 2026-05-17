@@ -318,6 +318,43 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
+ *  SKIP LINK — accessibility landing point for keyboard / SR users
+ * ───────────────────────────────────────────────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  font-size: 12px;
+  transform: translateY(-200%);
+  transition: transform 0.25s var(--ease-lux);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--accent-bronze);
+  outline-offset: 3px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  SHIMMER — loading skeleton animation
+ * ───────────────────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.animate-shimmer {
+  animation: shimmer 1.8s linear infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
  *  REDUCED MOTION
  * ───────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

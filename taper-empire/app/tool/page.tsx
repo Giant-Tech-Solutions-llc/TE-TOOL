@@ -12,7 +12,7 @@ export default function ToolPage() {
   return (
     <>
       <Header />
-      <main className="min-h-[calc(100vh-4rem)]">
+      <main id="main-content" className="min-h-[calc(100vh-4rem)]">
         <ToolFlow />
       </main>
       <Footer />

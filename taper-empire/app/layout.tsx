@@ -47,8 +47,21 @@ export const metadata: Metadata = {
     description: 'Find the taper that actually fits your face. Barber-ready recommendations.',
     images: ['/og-image.png'],
   },
-  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   alternates: { canonical: SITE_URL },
+  category: 'lifestyle',
+  formatDetection: { email: false, address: false, telephone: false },
+  applicationName: 'Taper Empire',
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -69,6 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${bricolage.variable}`}>
       <body className="bg-ink text-soft antialiased font-sans">
+        <a href="#main-content" className="skip-link">Skip to content</a>
         {children}
         <Analytics />
       </body>

@@ -22,7 +22,7 @@ export function ArticleShell({ article, breadcrumbs }: ArticleShellProps) {
   const tocItems = article.sections.map((s) => ({ id: s.id, label: s.heading }))
 
   return (
-    <section className="relative bg-ink text-soft border-t border-line grain-soft">
+    <article className="relative bg-ink text-soft border-t border-line grain-soft">
       <Cinematic className="pt-32 lg:pt-40 pb-28 lg:pb-36">
         <Breadcrumb items={breadcrumbs} />
 
@@ -103,7 +103,7 @@ export function ArticleShell({ article, breadcrumbs }: ArticleShellProps) {
           </div>
         </div>
       </Cinematic>
-    </section>
+    </article>
   )
 }
 

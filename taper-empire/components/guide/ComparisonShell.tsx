@@ -18,7 +18,7 @@ interface ComparisonShellProps {
  */
 export function ComparisonShell({ comparison, breadcrumbs }: ComparisonShellProps) {
   return (
-    <section className="relative bg-ink text-soft border-t border-line grain-soft">
+    <article className="relative bg-ink text-soft border-t border-line grain-soft">
       <Cinematic className="pt-32 lg:pt-40 pb-28 lg:pb-36">
         <Breadcrumb items={breadcrumbs} />
 
@@ -157,7 +157,7 @@ export function ComparisonShell({ comparison, breadcrumbs }: ComparisonShellProp
           </div>
         </div>
       </Cinematic>
-    </section>
+    </article>
   )
 }
 
