@@ -15,9 +15,11 @@ const input = sharp(await fs.readFile(src))
 const meta = await input.metadata()
 console.log(`Source: ${meta.width}x${meta.height} ${meta.format} ${meta.size ? (meta.size/1024).toFixed(0)+' kB' : ''}`)
 
-// Primary delivery — full source resolution, near-lossless WebP.
-// next/image will downsize from this as needed via responsive srcset.
+// Primary delivery — cap longest edge at 1600 px (hero column ≤ 600 px
+// display × 2 DPR = 1200; adds headroom for ultra-wide retina). Sources
+// 3000 px+ otherwise blow up file size with no visible quality gain.
 const heroBuf = await sharp(await fs.readFile(src))
+  .resize({ width: 1600, height: 1600, withoutEnlargement: true, fit: 'inside' })
   .webp({
     quality: 94,
     alphaQuality: 100,
