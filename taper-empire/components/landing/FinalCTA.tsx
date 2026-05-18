@@ -49,7 +49,6 @@ export function FinalCTA() {
           >
             <h2 className="font-display font-extrabold tracking-[-0.045em] leading-[0.88] text-[clamp(3rem,10vw,11rem)] mb-16">
               Stop guessing.
-              <br />
               <span className="italic font-medium text-mute">Start matching.</span>
             </h2>
 
