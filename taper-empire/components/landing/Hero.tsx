@@ -48,10 +48,7 @@ export function Hero() {
               transition={{ duration: 1.1, delay: 0.15, ease: easeLux }}
               className="type-hero-xl"
             >
-              Find the taper
-              <br />
-              that actually
-              <br />
+              Find the taper that actuall
               <span className="italic font-medium text-mute">fits your face.</span>
             </motion.h1>
 
