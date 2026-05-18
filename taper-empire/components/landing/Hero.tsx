@@ -49,7 +49,7 @@ export function Hero() {
               className="type-hero-xl"
             >
               Find the taper that actuall
-              <span className="italic font-medium text-mute">fits your face.</span>
+              <span className="italic font-medium text-mute"> fits your face.</span>
             </motion.h1>
 
             <motion.p
