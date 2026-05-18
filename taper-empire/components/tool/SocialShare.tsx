@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Share2, Link2, Twitter, Bookmark, Download, Check, Instagram } from 'lucide-react'
 import type { Recommendation } from '@/types'
+import { encodeShare } from '@/lib/share'
+import { getSelfId } from '@/lib/referral'
 
 interface Props { rec: Recommendation }
 
@@ -10,11 +12,17 @@ export function SocialShare({ rec }: Props) {
   const [copied, setCopied] = useState(false)
   const [busy, setBusy]     = useState(false)
 
-  const shareUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}/results/${encodeURIComponent(rec.related_url || rec.style_name)}`
-      : 'https://taperempire.com'
-  const shareText = `${rec.match_score}% TaperMatch™ — ${rec.style_name} · taperempire.com`
+  // Build a real /share/[token] link with the user's stable self-id as the
+  // referrer hook. Recomputed only when the recommendation changes.
+  const { shareUrl, shareText } = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://taperempire.com'
+    const selfId = typeof window !== 'undefined' ? getSelfId() : undefined
+    const token = encodeShare(rec, selfId)
+    return {
+      shareUrl: `${origin}/share/${token}`,
+      shareText: `${rec.match_score}% TaperMatch™ — ${rec.style_name} · taperempire.com`,
+    }
+  }, [rec])
 
   const handleNative = async () => {
     if (navigator.share) {
@@ -38,8 +46,18 @@ export function SocialShare({ rec }: Props) {
     try {
       const key = 'taperempire-saved'
       const saved = JSON.parse(localStorage.getItem(key) || '[]')
+      // Pull the token out of the prebuilt share URL — it's the last
+      // path segment of /share/[token]. Lets /saved re-open the brief
+      // directly without recomputing.
+      const token = shareUrl.split('/share/')[1] || undefined
       const next = [
-        { name: rec.style_name, score: rec.match_score, url: rec.related_url, ts: Date.now() },
+        {
+          name: rec.style_name,
+          score: rec.match_score,
+          url: rec.related_url,
+          token,
+          ts: Date.now(),
+        },
         ...saved.filter((s: any) => s.name !== rec.style_name),
       ].slice(0, 12)
       localStorage.setItem(key, JSON.stringify(next))

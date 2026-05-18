@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PhotoUpload } from './PhotoUpload'
 import { Quiz } from './Quiz'
@@ -8,6 +8,7 @@ import { LoadingView } from './LoadingView'
 import { Results } from './Results'
 import { useToolStore } from '@/store/useToolStore'
 import { getRecommendations } from '@/lib/api-client'
+import { captureReferral } from '@/lib/referral'
 import type { QuizData, ToolInput } from '@/types'
 import type { PreparedPhoto } from '@/lib/image'
 
@@ -16,6 +17,23 @@ type Tab = 'photo' | 'quiz'
 export function ToolFlow() {
   const { step, submit, success, validation, validationError } = useToolStore()
   const [tab, setTab] = useState<Tab>('photo')
+
+  // Phase 11 — capture inbound ?ref=<id> attribution on first paint.
+  // First attribution wins; subsequent ?ref= visits don't overwrite. The
+  // captured id flows through to outbound share links and the lifecycle
+  // API so the upstream sharer gets credit.
+  useEffect(() => {
+    const ref = captureReferral()
+    if (ref) {
+      // Best-effort attribution ping — fire-and-forget, no UX cost.
+      fetch('/api/lifecycle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: 'referral', refererId: ref }),
+        keepalive: true,
+      }).catch(() => {})
+    }
+  }, [])
 
   const dispatch = async (input: ToolInput) => {
     submit(input)
