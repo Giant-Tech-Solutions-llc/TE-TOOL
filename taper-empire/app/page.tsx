@@ -16,6 +16,15 @@ const TaperHeightStudy = dynamic(
 const RealMatchExamples = dynamic(
   () => import('@/components/landing/RealMatchExamples').then((m) => m.RealMatchExamples),
 )
+const FaceGeometry = dynamic(
+  () => import('@/components/landing/FaceGeometry').then((m) => m.FaceGeometry),
+)
+const RealResults = dynamic(
+  () => import('@/components/landing/RealResults').then((m) => m.RealResults),
+)
+const TextureBehavior = dynamic(
+  () => import('@/components/landing/TextureBehavior').then((m) => m.TextureBehavior),
+)
 const BarberBriefShowcase = dynamic(
   () => import('@/components/landing/BarberBriefShowcase').then((m) => m.BarberBriefShowcase),
 )
@@ -86,8 +95,11 @@ export default function HomePage() {
       <main id="main-content">
         <Hero />
         <HowItWorks />
-        <TaperHeightStudy />
+        <FaceGeometry />
         <RealMatchExamples />
+        <RealResults />
+        <TaperHeightStudy />
+        <TextureBehavior />
         <BarberBriefShowcase />
         <AuthorityContent />
         <FAQ />

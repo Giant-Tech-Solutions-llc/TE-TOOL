@@ -98,7 +98,7 @@ export function Header() {
 
           {/* Right cluster — CTA + mobile trigger */}
           <div className="flex items-center gap-2 shrink-0">
-            <Button asChild variant="cream" size="sm" shape="pill" className="hidden sm:inline-flex">
+            <Button asChild variant="gold" size="sm" shape="pill" className="hidden sm:inline-flex">
               <Link href="/tool">
                 Begin
                 <span aria-hidden="true">→</span>

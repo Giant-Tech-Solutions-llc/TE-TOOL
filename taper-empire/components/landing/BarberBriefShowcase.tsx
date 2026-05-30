@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
@@ -29,7 +30,7 @@ export function BarberBriefShowcase() {
 
           {/* LEFT — editorial copy */}
           <div className="col-span-12 lg:col-span-5 lg:pt-4">
-            <SectionEyebrow className="mb-6">Chapter IV — Barber-Ready Brief</SectionEyebrow>
+            <SectionEyebrow className="mb-6">Chapter VI — Barber-Ready Brief</SectionEyebrow>
             <h2 className="type-section mb-7">
               Exact language.
               <br />
@@ -154,6 +155,7 @@ function BriefCard() {
             Guard progression
           </p>
           <GuardLadder />
+          <GuardReferenceStrip />
         </div>
 
         {/* Maintenance row */}
@@ -196,6 +198,58 @@ function BriefCard() {
         </div>
       </div>
     </article>
+  )
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ *  GuardReferenceStrip — Phase 12, 4 editorial thumbnails matching the
+ *  guard ladder above so the brief reads with both numbers AND visuals.
+ * ─────────────────────────────────────────────────────────────────────── */
+const GUARD_REFS = [
+  { src: '/heights/low.webp',   blur: '/heights/low-blur.webp',   label: 'Low',   sub: 'Nape only' },
+  { src: '/heights/mid.webp',   blur: '/heights/mid-blur.webp',   label: 'Mid',   sub: 'Mid temple' },
+  { src: '/heights/high.webp',  blur: '/heights/high-blur.webp',  label: 'High',  sub: 'Above ear' },
+  { src: '/heights/burst.webp', blur: '/heights/burst-blur.webp', label: 'Burst', sub: 'Ear arc' },
+] as const
+
+function GuardReferenceStrip() {
+  return (
+    <div className="mt-5 grid grid-cols-4 gap-2 sm:gap-3">
+      {GUARD_REFS.map((g, i) => (
+        <motion.figure
+          key={g.label}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6, delay: i * 0.06, ease: easeLux }}
+          className="relative aspect-square overflow-hidden rounded-md border border-line bg-surface2"
+        >
+          <Image
+            src={g.src}
+            alt={`${g.label} taper guard reference`}
+            fill
+            quality={86}
+            sizes="(max-width: 640px) 25vw, 160px"
+            placeholder="blur"
+            blurDataURL={g.blur}
+            className="object-cover object-center"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none"
+            style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.85) 100%)' }}
+          />
+          <figcaption className="absolute inset-x-0 bottom-1.5 px-2 text-center">
+            <p className="font-display font-extrabold tracking-[-0.02em] text-soft text-[11px] sm:text-xs leading-none mb-0.5">
+              {g.label}
+            </p>
+            <p className="text-[8px] sm:text-[9px] font-medium tracking-[0.24em] uppercase text-gold leading-none">
+              {g.sub}
+            </p>
+          </figcaption>
+        </motion.figure>
+      ))}
+    </div>
   )
 }
 

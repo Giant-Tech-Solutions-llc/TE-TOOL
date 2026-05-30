@@ -121,7 +121,7 @@ export function MobileNav({ open, onClose, links }: MobileNavProps) {
             transition={{ duration: 0.6, delay: 0.45, ease: easeLux }}
             className="absolute inset-x-0 bottom-0 px-6 pb-8 pt-6 border-t border-[rgba(255,255,255,0.06)] bg-[rgba(7,7,7,0.6)] backdrop-blur-md"
           >
-            <Button asChild variant="cream" size="lg" shape="pill" className="w-full">
+            <Button asChild variant="gold" size="lg" shape="pill" className="w-full">
               <Link href="/tool" onClick={onClose}>
                 Begin the analysis
                 <span aria-hidden="true">→</span>
