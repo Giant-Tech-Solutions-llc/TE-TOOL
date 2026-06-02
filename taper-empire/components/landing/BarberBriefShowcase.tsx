@@ -154,8 +154,7 @@ function BriefCard() {
             <span aria-hidden="true" className="block h-px w-10 bg-gold/70" />
             Guard progression
           </p>
-          <GuardLadder />
-          <GuardReferenceStrip />
+          <GuardProgression />
         </div>
 
         {/* Maintenance row */}
@@ -202,90 +201,59 @@ function BriefCard() {
 }
 
 /* ───────────────────────────────────────────────────────────────────────
- *  GuardReferenceStrip — Phase 12, 4 editorial thumbnails matching the
- *  guard ladder above so the brief reads with both numbers AND visuals.
+ *  GuardProgression — Phase 12.1
+ *  Single row of five portrait reference cards matching the updated brief
+ *  reference design. Each card is a crop of the actual taper at that
+ *  guard height, captioned with guard number and head position so the
+ *  brief reads as visual instruction the barber can scan in one glance.
  * ─────────────────────────────────────────────────────────────────────── */
-const GUARD_REFS = [
-  { src: '/heights/low.webp',   blur: '/heights/low-blur.webp',   label: 'Low',   sub: 'Nape only' },
-  { src: '/heights/mid.webp',   blur: '/heights/mid-blur.webp',   label: 'Mid',   sub: 'Mid temple' },
-  { src: '/heights/high.webp',  blur: '/heights/high-blur.webp',  label: 'High',  sub: 'Above ear' },
-  { src: '/heights/burst.webp', blur: '/heights/burst-blur.webp', label: 'Burst', sub: 'Ear arc' },
+const GUARD_STEPS = [
+  { src: '/guards/nape.webp',      blur: '/guards/nape-blur.webp',      label: '#1',      position: 'Nape' },
+  { src: '/guards/lower.webp',     blur: '/guards/lower-blur.webp',     label: '#1½',     position: 'Lower' },
+  { src: '/guards/temple.webp',    blur: '/guards/temple-blur.webp',    label: '#2',      position: 'Temple' },
+  { src: '/guards/above-ear.webp', blur: '/guards/above-ear-blur.webp', label: '#3',      position: 'Above ear' },
+  { src: '/guards/top.webp',       blur: '/guards/top-blur.webp',       label: 'Scissor', position: 'Top' },
 ] as const
 
-function GuardReferenceStrip() {
+function GuardProgression() {
   return (
-    <div className="mt-5 grid grid-cols-4 gap-2 sm:gap-3">
-      {GUARD_REFS.map((g, i) => (
-        <motion.figure
-          key={g.label}
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.6, delay: i * 0.06, ease: easeLux }}
-          className="relative aspect-square overflow-hidden rounded-md border border-line bg-surface2"
-        >
-          <Image
-            src={g.src}
-            alt={`${g.label} taper guard reference`}
-            fill
-            quality={86}
-            sizes="(max-width: 640px) 25vw, 160px"
-            placeholder="blur"
-            blurDataURL={g.blur}
-            className="object-cover object-center"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none"
-            style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.85) 100%)' }}
-          />
-          <figcaption className="absolute inset-x-0 bottom-1.5 px-2 text-center">
-            <p className="font-display font-extrabold tracking-[-0.02em] text-soft text-[11px] sm:text-xs leading-none mb-0.5">
-              {g.label}
-            </p>
-            <p className="text-[8px] sm:text-[9px] font-medium tracking-[0.24em] uppercase text-gold leading-none">
-              {g.sub}
-            </p>
-          </figcaption>
-        </motion.figure>
-      ))}
-    </div>
-  )
-}
-
-/* ───────────────────────────────────────────────────────────────────────
- *  GuardLadder — visual progression diagram
- * ─────────────────────────────────────────────────────────────────────── */
-function GuardLadder() {
-  const guards = [
-    { label: '#1',     position: 'Nape',      height: 100 },   // shortest
-    { label: '#1½',    position: 'Lower',     height: 78  },
-    { label: '#2',     position: 'Temple',    height: 56  },
-    { label: '#3',     position: 'Above ear', height: 38  },
-    { label: 'Scissor',position: 'Top',       height: 18  },
-  ]
-
-  return (
-    <div className="rounded-lg-x border border-line bg-ink/40 px-4 sm:px-6 py-5">
-      <div className="flex items-end gap-2 sm:gap-3 h-32 sm:h-36">
-        {guards.map((g, i) => (
-          <div key={g.label} className="flex-1 flex flex-col items-center justify-end gap-2">
-            <p className="type-eyebrow text-mute tabular-nums">{i + 1}</p>
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              whileInView={{ height: `${g.height}%`, opacity: 1 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.9, delay: i * 0.08, ease: easeLux }}
-              className="w-full rounded-t-md bg-gradient-to-t from-gold/80 to-gold/30 origin-bottom"
-              style={{ minHeight: '12px' }}
-            />
-            <p className="font-display text-sm font-extrabold tracking-tight text-soft text-center leading-none">
-              {g.label}
-            </p>
-            <p className="text-[10px] tracking-[0.18em] uppercase text-mute text-center leading-tight">
-              {g.position}
-            </p>
-          </div>
+    <div className="rounded-lg-x border border-line bg-ink/40 p-3 sm:p-4">
+      <div className="grid grid-cols-5 gap-2 sm:gap-3">
+        {GUARD_STEPS.map((g, i) => (
+          <motion.figure
+            key={g.label}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7, delay: i * 0.07, ease: easeLux }}
+            className="group/guard relative overflow-hidden rounded-md border border-line bg-surface2"
+          >
+            <div className="relative aspect-[3/4]">
+              <Image
+                src={g.src}
+                alt={`${g.label} guard — ${g.position} reference`}
+                fill
+                quality={88}
+                sizes="(max-width: 640px) 20vw, 140px"
+                placeholder="blur"
+                blurDataURL={g.blur}
+                className="object-cover object-center transition-transform duration-700 ease-lux group-hover/guard:scale-[1.04]"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 h-2/5 pointer-events-none"
+                style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.92) 100%)' }}
+              />
+            </div>
+            <figcaption className="absolute inset-x-0 bottom-2 sm:bottom-2.5 px-1.5 text-center">
+              <p className="font-display font-extrabold tracking-[-0.02em] text-soft text-[12px] sm:text-sm leading-none mb-1">
+                {g.label}
+              </p>
+              <p className="text-[8px] sm:text-[9px] font-medium tracking-[0.24em] uppercase text-gold leading-none">
+                {g.position}
+              </p>
+            </figcaption>
+          </motion.figure>
         ))}
       </div>
     </div>
