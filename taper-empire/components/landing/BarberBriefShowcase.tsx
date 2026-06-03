@@ -30,7 +30,7 @@ export function BarberBriefShowcase() {
 
           {/* LEFT — editorial copy */}
           <div className="col-span-12 lg:col-span-5 lg:pt-4">
-            <SectionEyebrow className="mb-6">Chapter IV — Barber-Ready Brief</SectionEyebrow>
+            <SectionEyebrow className="mb-6">Chapter VI — Barber-Ready Brief</SectionEyebrow>
             <h2 className="type-section mb-7">
               Exact language.
               <br />
