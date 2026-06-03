@@ -75,7 +75,7 @@ export function TaperHeightStudy() {
           className="grid grid-cols-12 gap-y-10 lg:gap-x-12 mb-16 lg:mb-20"
         >
           <div className="col-span-12 md:col-span-6">
-            <SectionEyebrow className="mb-6">Chapter IV — Taper Heights</SectionEyebrow>
+            <SectionEyebrow className="mb-6">Chapter III — Taper Heights</SectionEyebrow>
             <h2 className="type-section">
               Four heights.
               <br />
