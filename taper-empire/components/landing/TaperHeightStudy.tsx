@@ -6,62 +6,55 @@ import { Cinematic, SectionEyebrow } from '@/components/shared'
 import { easeLux } from '@/lib/motion'
 
 /**
- * Phase 08 — Taper Height Study
+ * Phase Z — Taper Height Study (v2 — uncropped annotated diagrams).
  *
- * 4-up visual comparison of the four canonical taper heights with full
- * editorial portrait plates. Each plate shows the actual cut on a real
- * subject with gold annotation lines tracing the taper area, blend
- * transition, and guard progression — replacing the prior abstract SVG
- * silhouettes with product-grade reference imagery.
+ * 4-up comparison of the four canonical taper heights. The plates are
+ * full editorial diagrams with side annotations (TAPER AREA, TEMPLE
+ * CORNER BLEND, HAIRLINE DEFINITION scale, nape transition labels), so
+ * the renderer uses object-contain on a square frame — never cropping —
+ * to keep every annotation visible.
  *
- * Plates live in /public/heights/ (low/mid/high/burst) and are served
- * via next/image at 1200px with q=90 WebP, ~150 kB each.
+ * Cards are centered: image -> title -> description -> CONTRAST + UPKEEP
+ * dot pair -> classification tagline. Mirrors the updated reference.
  */
 
 interface HeightSpec {
   slug:     'low' | 'mid' | 'high' | 'burst'
-  position: 'Low' | 'Mid' | 'High' | 'Burst'
   label:    string
   summary:  string
   fit:      string
   contrast: 1 | 2 | 3 | 4
   upkeep:   1 | 2 | 3 | 4
-  /** Vertical focus of the cut on this plate — used by object-position */
-  focal:    string
 }
 
 const HEIGHTS: HeightSpec[] = [
   {
     slug: 'low',
-    position: 'Low',
     label: 'Low Taper',
     summary: 'Subtle contrast around the temples and nape. Reads professional and grows out cleanly.',
     fit: 'Conservative · Long grow-out',
-    contrast: 1, upkeep: 1, focal: 'center 32%',
+    contrast: 1, upkeep: 1,
   },
   {
     slug: 'mid',
-    position: 'Mid',
     label: 'Mid Taper',
     summary: 'Balanced height. Adds visible structure without overstating the silhouette.',
     fit: 'Versatile · Modern',
-    contrast: 2, upkeep: 2, focal: 'center 30%',
+    contrast: 2, upkeep: 2,
   },
   {
     slug: 'high',
-    position: 'High',
     label: 'High Taper',
     summary: 'Sharp contrast carried high up the head. Bold, intentional, weekly upkeep.',
     fit: 'Bold · Sharp profile',
-    contrast: 3, upkeep: 3, focal: 'center 28%',
+    contrast: 3, upkeep: 3,
   },
   {
     slug: 'burst',
-    position: 'Burst',
     label: 'Burst Fade',
     summary: 'Fade arcs around the ear instead of running level. Trend-forward, high-styling.',
     fit: 'Trend-forward · Style-led',
-    contrast: 4, upkeep: 4, focal: 'center 30%',
+    contrast: 4, upkeep: 4,
   },
 ]
 
@@ -102,56 +95,45 @@ export function TaperHeightStudy() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
           {HEIGHTS.map((h, i) => (
             <motion.article
-              key={h.position}
+              key={h.slug}
               initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.9, delay: i * 0.08, ease: easeLux }}
-              className="group/h relative rounded-hero border border-line bg-surface/30 p-5 lg:p-6 transition-all duration-500 ease-lux hover:bg-surface/60 hover:border-lineHover hover:-translate-y-1 hover:shadow-luxury-sm"
+              className="group/h relative flex flex-col rounded-hero border border-line bg-surface/30 p-5 lg:p-6 transition-all duration-500 ease-lux hover:bg-surface/60 hover:border-lineHover hover:-translate-y-1 hover:shadow-luxury-sm"
             >
-              {/* Editorial plate — real portrait with gold annotations */}
-              <div className="relative aspect-[4/5] rounded-lg-x bg-ink/60 overflow-hidden mb-5 border border-line">
+              {/* Annotated diagram — full image, never cropped */}
+              <div className="relative aspect-square rounded-lg-x bg-ink/60 overflow-hidden mb-6 border border-line">
                 <Image
                   src={`/heights/${h.slug}.webp`}
-                  alt={`${h.label} — editorial reference plate showing taper area, blend transition, and guard progression`}
+                  alt={`${h.label} — full annotated diagram showing taper area, temple corner blend, hairline definition, and nape transition`}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+                  sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 320px"
                   quality={95}
                   placeholder="blur"
                   blurDataURL={`/heights/${h.slug}-blur.webp`}
-                  className="object-cover transition-transform duration-[1.6s] ease-out group-hover/h:scale-[1.03]"
-                  style={{ objectPosition: h.focal }}
+                  className="object-contain transition-transform duration-[1.6s] ease-out group-hover/h:scale-[1.015]"
                 />
-                {/* Subtle tonal floor for label readability */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-x-0 bottom-0 h-2/5 pointer-events-none"
-                  style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.55) 100%)' }}
-                />
-                <div className="absolute top-3 left-3 type-eyebrow text-gold tabular-nums z-10">
-                  № {String(i + 1).padStart(2, '0')}
-                </div>
-                <div className="absolute top-3 right-3 type-eyebrow text-soft/85 z-10">
-                  {h.position}
-                </div>
               </div>
 
-              {/* Label */}
-              <h3 className="font-display font-extrabold tracking-[-0.02em] text-xl lg:text-2xl leading-tight mb-3">
+              {/* Title — centered */}
+              <h3 className="font-display font-extrabold tracking-[-0.025em] text-2xl lg:text-[26px] leading-tight mb-3 text-center text-soft">
                 {h.label}
               </h3>
 
-              <p className="text-sm text-soft/65 leading-[1.7] mb-5 line-clamp-3">
+              {/* Description — centered */}
+              <p className="text-[14px] lg:text-[14.5px] text-soft/65 leading-[1.65] mb-6 text-center min-h-[4.5em]">
                 {h.summary}
               </p>
 
-              {/* Quick stats */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              {/* CONTRAST + UPKEEP — centered, side by side */}
+              <div className="flex items-start justify-center gap-10 lg:gap-12 mb-5">
                 <DotStat label="Contrast" value={h.contrast} />
                 <DotStat label="Upkeep"   value={h.upkeep} />
               </div>
 
-              <p className="text-[10px] tracking-[0.28em] uppercase text-mute leading-relaxed">
+              {/* Tagline */}
+              <p className="mt-auto pt-5 border-t border-line/70 text-[10px] tracking-[0.28em] uppercase text-gold leading-relaxed text-center">
                 {h.fit}
               </p>
             </motion.article>
@@ -178,9 +160,9 @@ export function TaperHeightStudy() {
 
 function DotStat({ label, value }: { label: string; value: 1 | 2 | 3 | 4 }) {
   return (
-    <div>
-      <p className="type-eyebrow text-mute mb-2">{label}</p>
-      <div className="flex items-center gap-1">
+    <div className="flex flex-col items-center">
+      <p className="type-eyebrow text-soft mb-2">{label}</p>
+      <div className="flex items-center gap-1.5" aria-label={`${label}: ${value} of 4`}>
         {[1, 2, 3, 4].map((i) => (
           <span
             key={i}
