@@ -121,69 +121,14 @@ export function AuthorityContent() {
           </div>
         </motion.div>
 
-        {/* FACE SHAPE INTELLIGENCE */}
-        <motion.div
-          id="face-shape"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="grid grid-cols-12 gap-y-8 lg:gap-x-12 mb-12">
-            <div className="col-span-12 lg:col-span-7">
-              <Eyebrow className="mb-6">Chapter III — Face Geometry</Eyebrow>
-              <h2 className="font-display font-extrabold tracking-[-0.035em] leading-[0.95] text-[clamp(2rem,5vw,4rem)]">
-                Mapped to taper strategy.
-              </h2>
-            </div>
-            <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pt-4">
-              <p className="text-base text-soft/65 leading-[1.75]">
-                Every row is engineered to be quotable in a barber chair —
-                not just readable on a screen.
-              </p>
-            </div>
-          </div>
-          {/* Phase 08 — visual glyph strip above the table */}
-          <FaceShapeGlyphStrip />
-
-          <LuxuryTable
-            caption="Face shape matching system"
-            headers={['Face Shape', 'Recommended Taper', 'Why It Works', 'Barber Anchor']}
-            rows={faceShapeRows}
-          />
-        </motion.div>
-
-        {/* HAIR TEXTURE INTELLIGENCE */}
-        <motion.div
-          id="hair-type"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="grid grid-cols-12 gap-y-8 lg:gap-x-12 mb-12">
-            <div className="col-span-12 lg:col-span-7">
-              <Eyebrow className="mb-6">Chapter IV — Texture Behavior</Eyebrow>
-              <h2 className="font-display font-extrabold tracking-[-0.035em] leading-[0.95] text-[clamp(2rem,5vw,4rem)]">
-                How hair grows out matters.
-              </h2>
-            </div>
-            <div className="col-span-12 lg:col-span-4 lg:col-start-9 lg:pt-4">
-              <p className="text-base text-soft/65 leading-[1.75]">
-                A taper that flatters on day one but collapses by week two is a failed
-                recommendation. Texture defines week-three behavior.
-              </p>
-            </div>
-          </div>
-          {/* Phase 08 — visual glyph strip above the texture table */}
-          <HairTextureGlyphStrip />
-
-          <LuxuryTable
-            caption="Hair texture recommendation system"
-            headers={['Hair Type', 'Best Taper Direction', 'Core Risk', 'Execution Note']}
-            rows={hairTypeRows}
-          />
-        </motion.div>
+        {/* Face Geometry + Texture Behavior panels removed from the
+            AuthorityContent block — they previously rendered the legacy
+            abstract-icon glyph strips (FaceShapeGlyphStrip,
+            HairTextureGlyphStrip) that lingered on production. The home
+            page already carries dedicated <FaceGeometry /> and
+            <TextureBehavior /> sections built on real portrait
+            references, so the AuthorityContent duplicates were retiring
+            this content twice on the same page. */}
 
         {/* PULL QUOTE */}
         <motion.figure
