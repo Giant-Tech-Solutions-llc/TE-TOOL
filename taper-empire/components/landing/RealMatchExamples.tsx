@@ -227,13 +227,13 @@ function SubjectPanel({ match }: { match: Match }) {
     <div className="lg:sticky lg:top-32">
       <div className="relative aspect-[4/5] rounded-hero overflow-hidden border border-line bg-surface">
         <Image
-          src="/matches/subject.webp"
+          src="/matches/real-match.webp"
           alt="Example subject for facial structure analysis"
           fill
           quality={95}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 560px"
           placeholder="blur"
-          blurDataURL="/matches/subject-blur.webp"
+          blurDataURL="/matches/real-match-blur.webp"
           className="object-cover object-center"
         />
 

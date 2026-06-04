@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
@@ -29,7 +30,7 @@ export function BarberBriefShowcase() {
 
           {/* LEFT — editorial copy */}
           <div className="col-span-12 lg:col-span-5 lg:pt-4">
-            <SectionEyebrow className="mb-6">Chapter IV — Barber-Ready Brief</SectionEyebrow>
+            <SectionEyebrow className="mb-6">Chapter VI — Barber-Ready Brief</SectionEyebrow>
             <h2 className="type-section mb-7">
               Exact language.
               <br />
@@ -153,7 +154,7 @@ function BriefCard() {
             <span aria-hidden="true" className="block h-px w-10 bg-gold/70" />
             Guard progression
           </p>
-          <GuardLadder />
+          <GuardProgression />
         </div>
 
         {/* Maintenance row */}
@@ -200,38 +201,59 @@ function BriefCard() {
 }
 
 /* ───────────────────────────────────────────────────────────────────────
- *  GuardLadder — visual progression diagram
+ *  GuardProgression — Phase 12.1
+ *  Single row of five portrait reference cards matching the updated brief
+ *  reference design. Each card is a crop of the actual taper at that
+ *  guard height, captioned with guard number and head position so the
+ *  brief reads as visual instruction the barber can scan in one glance.
  * ─────────────────────────────────────────────────────────────────────── */
-function GuardLadder() {
-  const guards = [
-    { label: '#1',     position: 'Nape',      height: 100 },   // shortest
-    { label: '#1½',    position: 'Lower',     height: 78  },
-    { label: '#2',     position: 'Temple',    height: 56  },
-    { label: '#3',     position: 'Above ear', height: 38  },
-    { label: 'Scissor',position: 'Top',       height: 18  },
-  ]
+const GUARD_STEPS = [
+  { src: '/guards/nape.webp',      blur: '/guards/nape-blur.webp',      label: '#1',      position: 'Nape' },
+  { src: '/guards/lower.webp',     blur: '/guards/lower-blur.webp',     label: '#1½',     position: 'Lower' },
+  { src: '/guards/temple.webp',    blur: '/guards/temple-blur.webp',    label: '#2',      position: 'Temple' },
+  { src: '/guards/above-ear.webp', blur: '/guards/above-ear-blur.webp', label: '#3',      position: 'Above ear' },
+  { src: '/guards/top.webp',       blur: '/guards/top-blur.webp',       label: 'Scissor', position: 'Top' },
+] as const
 
+function GuardProgression() {
   return (
-    <div className="rounded-lg-x border border-line bg-ink/40 px-4 sm:px-6 py-5">
-      <div className="flex items-end gap-2 sm:gap-3 h-32 sm:h-36">
-        {guards.map((g, i) => (
-          <div key={g.label} className="flex-1 flex flex-col items-center justify-end gap-2">
-            <p className="type-eyebrow text-mute tabular-nums">{i + 1}</p>
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              whileInView={{ height: `${g.height}%`, opacity: 1 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.9, delay: i * 0.08, ease: easeLux }}
-              className="w-full rounded-t-md bg-gradient-to-t from-gold/80 to-gold/30 origin-bottom"
-              style={{ minHeight: '12px' }}
-            />
-            <p className="font-display text-sm font-extrabold tracking-tight text-soft text-center leading-none">
-              {g.label}
-            </p>
-            <p className="text-[10px] tracking-[0.18em] uppercase text-mute text-center leading-tight">
-              {g.position}
-            </p>
-          </div>
+    <div className="rounded-lg-x border border-line bg-ink/40 p-3 sm:p-4">
+      <div className="grid grid-cols-5 gap-2 sm:gap-3">
+        {GUARD_STEPS.map((g, i) => (
+          <motion.figure
+            key={g.label}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.7, delay: i * 0.07, ease: easeLux }}
+            className="group/guard relative overflow-hidden rounded-md border border-line bg-surface2"
+          >
+            <div className="relative aspect-[3/4]">
+              <Image
+                src={g.src}
+                alt={`${g.label} guard — ${g.position} reference`}
+                fill
+                quality={88}
+                sizes="(max-width: 640px) 20vw, 140px"
+                placeholder="blur"
+                blurDataURL={g.blur}
+                className="object-cover object-center transition-transform duration-700 ease-lux group-hover/guard:scale-[1.04]"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 h-2/5 pointer-events-none"
+                style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.92) 100%)' }}
+              />
+            </div>
+            <figcaption className="absolute inset-x-0 bottom-2 sm:bottom-2.5 px-1.5 text-center">
+              <p className="font-display font-extrabold tracking-[-0.02em] text-soft text-[12px] sm:text-sm leading-none mb-1">
+                {g.label}
+              </p>
+              <p className="text-[8px] sm:text-[9px] font-medium tracking-[0.24em] uppercase text-gold leading-none">
+                {g.position}
+              </p>
+            </figcaption>
+          </motion.figure>
         ))}
       </div>
     </div>

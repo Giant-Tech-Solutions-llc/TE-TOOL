@@ -1,13 +1,40 @@
+import dynamic from 'next/dynamic'
 import { Header } from '@/components/landing/Header'
 import { Hero } from '@/components/landing/Hero'
 import { HowItWorks } from '@/components/landing/HowItWorks'
-import { TaperHeightStudy } from '@/components/landing/TaperHeightStudy'
-import { RealMatchExamples } from '@/components/landing/RealMatchExamples'
-import { BarberBriefShowcase } from '@/components/landing/BarberBriefShowcase'
-import { AuthorityContent } from '@/components/landing/AuthorityContent'
-import { FAQ } from '@/components/landing/FAQ'
-import { FinalCTA } from '@/components/landing/FinalCTA'
 import { Footer } from '@/components/landing/Footer'
+
+/**
+ * Below-the-fold sections — code-split out of the initial bundle so the
+ * Hero + HowItWorks columns ship first. Each section still renders during
+ * SSR (ssr: true is the dynamic() default in Next 14 server components),
+ * but its client JS is fetched separately as the page scrolls in.
+ */
+const TaperHeightStudy = dynamic(
+  () => import('@/components/landing/TaperHeightStudy').then((m) => m.TaperHeightStudy),
+)
+const RealMatchExamples = dynamic(
+  () => import('@/components/landing/RealMatchExamples').then((m) => m.RealMatchExamples),
+)
+const RealResults = dynamic(
+  () => import('@/components/landing/RealResults').then((m) => m.RealResults),
+)
+const FaceGeometry = dynamic(
+  () => import('@/components/landing/FaceGeometry').then((m) => m.FaceGeometry),
+)
+const TextureBehavior = dynamic(
+  () => import('@/components/landing/TextureBehavior').then((m) => m.TextureBehavior),
+)
+const BarberBriefShowcase = dynamic(
+  () => import('@/components/landing/BarberBriefShowcase').then((m) => m.BarberBriefShowcase),
+)
+const AuthorityContent = dynamic(
+  () => import('@/components/landing/AuthorityContent').then((m) => m.AuthorityContent),
+)
+const FAQ = dynamic(() => import('@/components/landing/FAQ').then((m) => m.FAQ))
+const FinalCTA = dynamic(
+  () => import('@/components/landing/FinalCTA').then((m) => m.FinalCTA),
+)
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://taperempire.com'
 
@@ -65,11 +92,14 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       <Header />
-      <main>
+      <main id="main-content">
         <Hero />
         <HowItWorks />
-        <TaperHeightStudy />
         <RealMatchExamples />
+        <FaceGeometry />
+        <RealResults />
+        <TaperHeightStudy />
+        <TextureBehavior />
         <BarberBriefShowcase />
         <AuthorityContent />
         <FAQ />

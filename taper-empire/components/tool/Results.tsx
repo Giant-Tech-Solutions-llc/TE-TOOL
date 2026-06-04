@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { PrimaryMatch } from './PrimaryMatch'
 import { SecondaryRail } from './SecondaryRail'
 import { SocialShare } from './SocialShare'
+import { RemindMe } from './RemindMe'
 import { InlineFeedback } from './InlineFeedback'
 import { FeedbackToast } from './FeedbackToast'
 import { useToolStore } from '@/store/useToolStore'
@@ -114,6 +115,11 @@ export function Results() {
               {/* Sharing module — sits directly below the primary match */}
               <Cinematic className="mt-6">
                 <SocialShare rec={primary} />
+              </Cinematic>
+
+              {/* Save & remind — pairs with lifecycle email API */}
+              <Cinematic className="mt-6">
+                <RemindMe rec={primary} />
               </Cinematic>
             </motion.section>
           )}

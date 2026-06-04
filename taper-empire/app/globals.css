@@ -297,6 +297,28 @@ body {
   100% { transform: translateX(-50%); }
 }
 
+/* Real Results — opposing infinite marquees. Two copies of the source
+   list mean a -33.333% translate hops exactly one copy width, looping
+   seamlessly. Animation duration set per-element via inline style. */
+.animate-marquee-left {
+  animation-name: marquee-left;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.animate-marquee-right {
+  animation-name: marquee-right;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes marquee-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-33.3333%); }
+}
+@keyframes marquee-right {
+  0%   { transform: translateX(-33.3333%); }
+  100% { transform: translateX(0); }
+}
+
 /* ─────────────────────────────────────────────────────────────────────────
  *  FONT WEIGHT / TABULAR HELPERS
  * ───────────────────────────────────────────────────────────────────────── */
@@ -315,6 +337,43 @@ body {
     padding-top: var(--space-section-mobile);
     padding-bottom: var(--space-section-mobile);
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  SKIP LINK — accessibility landing point for keyboard / SR users
+ * ───────────────────────────────────────────────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  font-size: 12px;
+  transform: translateY(-200%);
+  transition: transform 0.25s var(--ease-lux);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--accent-bronze);
+  outline-offset: 3px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ *  SHIMMER — loading skeleton animation
+ * ───────────────────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.animate-shimmer {
+  animation: shimmer 1.8s linear infinite;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
