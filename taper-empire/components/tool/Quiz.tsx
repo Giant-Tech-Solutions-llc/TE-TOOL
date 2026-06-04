@@ -1,12 +1,21 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check } from 'lucide-react'
 import type { QuizData } from '@/types'
 import { Button } from '@/components/ui/button'
 
-interface Option { value: string; label: string; desc: string }
+interface Option {
+  value: string
+  label: string
+  desc: string
+  /** Optional reference image displayed above the label */
+  image?: string
+  imageBlur?: string
+  imageAlt?: string
+}
 interface Question { key: keyof QuizData; label: string; hint: string; options: Option[] }
 
 const questions: Question[] = [
@@ -15,11 +24,46 @@ const questions: Question[] = [
     label: "What's your face shape?",
     hint: 'Pull your hair back and look straight into a mirror',
     options: [
-      { value: 'round',   label: 'Round',   desc: 'Full cheeks, equal width & length' },
-      { value: 'oval',    label: 'Oval',    desc: 'Longer than wide, balanced jaw' },
-      { value: 'square',  label: 'Square',  desc: 'Strong jaw, defined corners' },
-      { value: 'heart',   label: 'Heart',   desc: 'Wide forehead, narrow chin' },
-      { value: 'diamond', label: 'Diamond', desc: 'Wide cheekbones, narrow jaw' },
+      {
+        value: 'round',
+        label: 'Round',
+        desc: 'Full cheeks, equal width & length',
+        image: '/quiz/faces/round.webp',
+        imageBlur: '/quiz/faces/round-blur.webp',
+        imageAlt: 'Round face reference portrait',
+      },
+      {
+        value: 'oval',
+        label: 'Oval',
+        desc: 'Longer than wide, balanced jaw',
+        image: '/quiz/faces/oval.webp',
+        imageBlur: '/quiz/faces/oval-blur.webp',
+        imageAlt: 'Oval face reference portrait',
+      },
+      {
+        value: 'square',
+        label: 'Square',
+        desc: 'Strong jaw, defined corners',
+        image: '/quiz/faces/square.webp',
+        imageBlur: '/quiz/faces/square-blur.webp',
+        imageAlt: 'Square face reference portrait',
+      },
+      {
+        value: 'heart',
+        label: 'Heart',
+        desc: 'Wide forehead, narrow chin',
+        image: '/quiz/faces/heart.webp',
+        imageBlur: '/quiz/faces/heart-blur.webp',
+        imageAlt: 'Heart face reference portrait',
+      },
+      {
+        value: 'diamond',
+        label: 'Diamond',
+        desc: 'Wide cheekbones, narrow jaw',
+        image: '/quiz/faces/diamond.webp',
+        imageBlur: '/quiz/faces/diamond-blur.webp',
+        imageAlt: 'Diamond face reference portrait',
+      },
     ],
   },
   {
@@ -154,21 +198,44 @@ export function Quiz({ onComplete }: QuizProps) {
                   whileTap={{ scale: advancing ? 1 : 0.98 }}
                   transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                   onClick={() => handleAnswer(opt.value)}
-                  className={`relative text-left p-6 rounded-2xl border transition-all duration-300 ${
+                  className={`group/opt relative text-left overflow-hidden rounded-2xl border transition-all duration-300 ${
                     isSel
                       ? 'bg-surface2 text-soft border-gold/60 shadow-[0_8px_24px_rgba(0,0,0,0.4)]'
                       : 'bg-surface/60 hover:bg-surface2 text-soft border-line hover:border-soft/30 hover:shadow-[0_6px_18px_rgba(0,0,0,0.35)]'
                   }`}
                 >
-                  <div className={`absolute top-4 right-4 w-5 h-5 border rounded-full transition-colors ${
-                    isSel ? 'bg-gold border-gold text-ink' : 'border-line'
-                  } grid place-items-center`}>
-                    {isSel && <Check className="w-3 h-3" strokeWidth={3} />}
+                  {/* Reference portrait — shown when the option carries one (face shape question) */}
+                  {opt.image && (
+                    <div className="relative aspect-[4/5] overflow-hidden bg-ink/60 border-b border-line">
+                      <Image
+                        src={opt.image}
+                        alt={opt.imageAlt ?? `${opt.label} reference`}
+                        fill
+                        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 30vw, 180px"
+                        quality={90}
+                        placeholder={opt.imageBlur ? 'blur' : 'empty'}
+                        blurDataURL={opt.imageBlur}
+                        className="object-cover object-center transition-transform duration-[1.4s] ease-out group-hover/opt:scale-[1.04]"
+                      />
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-x-0 bottom-0 h-1/3 pointer-events-none"
+                        style={{ background: 'linear-gradient(180deg, transparent 0%, rgba(7,7,7,0.65) 100%)' }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="relative p-6">
+                    <div className={`absolute top-4 right-4 w-5 h-5 border rounded-full transition-colors ${
+                      isSel ? 'bg-gold border-gold text-ink' : 'border-line'
+                    } grid place-items-center`}>
+                      {isSel && <Check className="w-3 h-3" strokeWidth={3} />}
+                    </div>
+                    <p className="font-display font-extrabold text-lg tracking-tight mb-2 pr-8">
+                      {opt.label}
+                    </p>
+                    <p className="text-xs text-mute leading-relaxed">{opt.desc}</p>
                   </div>
-                  <p className="font-display font-extrabold text-lg tracking-tight mb-2 pr-8">
-                    {opt.label}
-                  </p>
-                  <p className="text-xs text-mute leading-relaxed">{opt.desc}</p>
                 </motion.button>
               )
             })}
