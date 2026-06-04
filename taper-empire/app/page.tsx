@@ -19,6 +19,12 @@ const RealMatchExamples = dynamic(
 const RealResults = dynamic(
   () => import('@/components/landing/RealResults').then((m) => m.RealResults),
 )
+const FaceGeometry = dynamic(
+  () => import('@/components/landing/FaceGeometry').then((m) => m.FaceGeometry),
+)
+const TextureBehavior = dynamic(
+  () => import('@/components/landing/TextureBehavior').then((m) => m.TextureBehavior),
+)
 const BarberBriefShowcase = dynamic(
   () => import('@/components/landing/BarberBriefShowcase').then((m) => m.BarberBriefShowcase),
 )
@@ -90,8 +96,10 @@ export default function HomePage() {
         <Hero />
         <HowItWorks />
         <RealMatchExamples />
+        <FaceGeometry />
         <RealResults />
         <TaperHeightStudy />
+        <TextureBehavior />
         <BarberBriefShowcase />
         <AuthorityContent />
         <FAQ />
