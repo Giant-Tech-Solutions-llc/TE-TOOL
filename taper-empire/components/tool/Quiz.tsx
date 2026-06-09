@@ -188,9 +188,30 @@ const questions: Question[] = [
     label: 'How much upkeep can you commit to?',
     hint: 'Determines taper height and how sharp the blend looks',
     options: [
-      { value: 'low',    label: 'Low effort',  desc: 'Cut every 4–6 weeks, minimal styling' },
-      { value: 'medium', label: 'Some effort', desc: 'Trim every 3–4 weeks, quick styling' },
-      { value: 'high',   label: 'High effort', desc: 'Weekly touch-ups, daily styling' },
+      {
+        value: 'low',
+        label: 'Low effort',
+        desc: 'Cut every 4–6 weeks, minimal styling',
+        image: '/quiz/maintenance/low.webp',
+        imageBlur: '/quiz/maintenance/low-blur.webp',
+        imageAlt: 'Low-effort maintenance reference portrait',
+      },
+      {
+        value: 'medium',
+        label: 'Some effort',
+        desc: 'Trim every 3–4 weeks, quick styling',
+        image: '/quiz/maintenance/medium.webp',
+        imageBlur: '/quiz/maintenance/medium-blur.webp',
+        imageAlt: 'Medium-effort maintenance reference portrait',
+      },
+      {
+        value: 'high',
+        label: 'High effort',
+        desc: 'Weekly touch-ups, daily styling',
+        image: '/quiz/maintenance/high.webp',
+        imageBlur: '/quiz/maintenance/high-blur.webp',
+        imageAlt: 'High-effort maintenance reference portrait',
+      },
     ],
   },
 ]
