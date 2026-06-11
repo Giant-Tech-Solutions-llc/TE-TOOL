@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STATES = [
@@ -142,85 +143,174 @@ export function LoadingView({ mode }: LoadingViewProps) {
 
 function FaceLandmarks() {
   return (
-    <div className="relative aspect-[4/5] bg-surface overflow-hidden grain rounded-3xl">
-      {/* Tonal base */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse 70% 60% at 60% 30%, #232017 0%, #14110E 50%, #0A0A0A 100%)' }}
+    <div className="relative aspect-square bg-ink overflow-hidden grain rounded-3xl border border-line">
+      {/* Subject portrait — sourced from the Phase II scanner reference plate.
+          object-cover keeps the face centered while the SVG overlay traces
+          its proportions. */}
+      <Image
+        src="/scanner/subject.webp"
+        alt="Subject portrait — facial proportion analysis"
+        fill
+        priority
+        quality={94}
+        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 600px"
+        placeholder="blur"
+        blurDataURL="/scanner/subject-blur.webp"
+        className="object-cover object-center"
       />
 
-      {/* Corner brackets */}
-      <Bracket pos="tl" /><Bracket pos="tr" /><Bracket pos="bl" /><Bracket pos="br" />
-
-      {/* Face structural overlay */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <svg
-          viewBox="0 0 200 250"
-          className="w-3/4 h-3/4 text-gold/70"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="0.4"
-          aria-hidden="true"
-        >
-          <ellipse cx="100" cy="120" rx="60" ry="78" />
-          <line x1="100" y1="40" x2="100" y2="200" strokeDasharray="2 3" />
-          <line x1="36" y1="120" x2="164" y2="120" strokeDasharray="2 3" />
-          {/* Eye markers */}
-          <circle cx="78" cy="105" r="2" fill="currentColor">
-            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="122" cy="105" r="2" fill="currentColor">
-            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" begin="0.4s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="100" cy="135" r="1.5" fill="currentColor">
-            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" begin="0.8s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="100" cy="160" r="1.5" fill="currentColor">
-            <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" begin="1.2s" repeatCount="indefinite" />
-          </circle>
-          {/* Hairline arc */}
-          <path d="M40 80 Q100 50 160 80" />
-          {/* Jaw arc */}
-          <path d="M50 165 Q100 200 150 165" />
-          {/* Brow line */}
-          <path d="M60 95 Q100 88 140 95" />
-        </svg>
-      </div>
-
-      {/* Scanning beam */}
-      <motion.div
+      {/* Subtle tonal floor to keep meta-labels legible */}
+      <div
         aria-hidden="true"
-        animate={{ y: ['0%', '100%', '0%'] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute inset-x-0 h-32 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'linear-gradient(180deg, transparent 0%, rgba(143,122,88,0.20) 50%, transparent 100%)',
+            'linear-gradient(180deg, rgba(7,7,7,0.55) 0%, rgba(7,7,7,0.05) 22%, rgba(7,7,7,0.05) 78%, rgba(7,7,7,0.75) 100%)',
         }}
       />
 
-      {/* Meta labels */}
-      <div className="absolute top-5 left-5 text-[9px] font-medium tracking-[0.32em] uppercase text-soft/70">
-        Face Structure Index™
+      {/* Scanner SVG overlay — face geometry + landmark dots + scanning
+          beam. Coordinates match the brand reference (viewBox 0 0 1000 1000). */}
+      <svg
+        viewBox="0 0 1000 1000"
+        preserveAspectRatio="xMidYMid meet"
+        className="absolute inset-0 w-full h-full text-gold pointer-events-none"
+        aria-hidden="true"
+      >
+        <defs>
+          {/* Horizontal scanning beam — gold gradient with bright center */}
+          <linearGradient id="scan-beam" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0"    stopColor="#C27D0E" stopOpacity="0"   />
+            <stop offset="0.30" stopColor="#C27D0E" stopOpacity="0.85"/>
+            <stop offset="0.50" stopColor="#FFFFFF" stopOpacity="1"   />
+            <stop offset="0.70" stopColor="#C27D0E" stopOpacity="0.85"/>
+            <stop offset="1"    stopColor="#C27D0E" stopOpacity="0"   />
+          </linearGradient>
+          <radialGradient id="scan-glow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0"   stopColor="#FFE9B8" stopOpacity="0.95" />
+            <stop offset="0.4" stopColor="#C27D0E" stopOpacity="0.55" />
+            <stop offset="1"   stopColor="#C27D0E" stopOpacity="0"    />
+          </radialGradient>
+        </defs>
+
+        {/* Vertical center line */}
+        <line
+          x1="500" y1="60" x2="500" y2="940"
+          stroke="currentColor" strokeWidth="1" strokeDasharray="3 5" opacity="0.45"
+        />
+
+        {/* Face oval (dashed gold outline) — sized to the portrait crop */}
+        <ellipse
+          cx="500" cy="540" rx="240" ry="290"
+          fill="none" stroke="currentColor" strokeWidth="1.2"
+          strokeDasharray="5 4" opacity="0.85"
+        />
+
+        {/* Landmark dots — eyes / brows / nose / mouth / jaw / chin / temple */}
+        <g fill="currentColor">
+          {[
+            // eyes
+            [432, 470, 0.0], [568, 470, 0.15],
+            // brows
+            [432, 440, 0.25], [568, 440, 0.30],
+            // temples
+            [330, 470, 0.35], [670, 470, 0.40],
+            // cheekbones
+            [380, 560, 0.45], [620, 560, 0.50],
+            // nose bridge + tip
+            [500, 510, 0.55], [500, 590, 0.60],
+            // mouth corners + center
+            [460, 670, 0.65], [540, 670, 0.70], [500, 670, 0.75],
+            // jaw line
+            [380, 720, 0.80], [620, 720, 0.85],
+            // chin
+            [500, 800, 0.90],
+            // hairline crown
+            [500, 280, 0.95],
+          ].map(([x, y, d]) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r="5">
+              <animate
+                attributeName="opacity"
+                values="0.25;1;0.25"
+                dur="2.6s"
+                begin={`${d as number}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          ))}
+        </g>
+
+        {/* Edge tick clusters — the small 5-dot column on either side from
+            the brand SVG. Acts as a visual scale reference. */}
+        <g fill="currentColor">
+          {[480, 510, 540, 570, 600].map((y, i) => (
+            <circle key={`L${i}`} cx="50" cy={y} r="3" opacity="0.7" />
+          ))}
+          {[480, 510, 540, 570, 600].map((y, i) => (
+            <circle key={`R${i}`} cx="950" cy={y} r="3" opacity="0.7" />
+          ))}
+        </g>
+
+        {/* Horizontal scanning beam — animates up and down across the face,
+            crossing the eye line at peak brightness. */}
+        <motion.g
+          animate={{ y: [-220, 220, -220] }}
+          transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          {/* Beam line */}
+          <rect x="20" y="538" width="960" height="3" fill="url(#scan-beam)" />
+          {/* Central glow */}
+          <circle cx="500" cy="540" r="60" fill="url(#scan-glow)" />
+          {/* Edge tick marks */}
+          <line x1="30"  y1="540" x2="80"  y2="540" stroke="currentColor" strokeWidth="1.5" />
+          <line x1="920" y1="540" x2="970" y2="540" stroke="currentColor" strokeWidth="1.5" />
+        </motion.g>
+
+        {/* Top-left scanner bracket icon */}
+        <g
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          opacity="0.9"
+          transform="translate(40, 50)"
+        >
+          <path d="M0 14 L0 0 L14 0" />
+          <path d="M40 0 L54 0 L54 14" />
+          <path d="M54 40 L54 54 L40 54" />
+          <path d="M14 54 L0 54 L0 40" />
+          <circle cx="27" cy="27" r="4" fill="currentColor" />
+        </g>
+      </svg>
+
+      {/* Top-left scanner label */}
+      <div className="absolute top-5 left-5 max-w-[60%]">
+        <p className="text-[9px] font-semibold tracking-[0.32em] uppercase text-gold mb-3 mt-[80px]">
+          Scanning
+        </p>
+        <p className="text-[12px] font-semibold tracking-[0.24em] uppercase text-soft leading-[1.4]">
+          Analyzing facial
+          <br />
+          proportions
+        </p>
+        <span aria-hidden="true" className="mt-3 block h-px w-14 bg-gold/70" />
       </div>
-      <div className="absolute top-5 right-5 text-[9px] font-medium tracking-[0.32em] uppercase text-gold">
+
+      {/* Top-right live indicator */}
+      <div className="absolute top-5 right-5 inline-flex items-center gap-2 text-[9px] font-semibold tracking-[0.32em] uppercase text-gold">
+        <motion.span
+          aria-hidden="true"
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.6, repeat: Infinity }}
+          className="inline-block w-1.5 h-1.5 rounded-full bg-gold"
+        />
         Live
       </div>
-      <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3 text-[9px] font-medium tracking-[0.32em] uppercase">
-        <span className="text-mute">Geometry · Live trace</span>
-        <span className="text-soft/70">No image stored</span>
+
+      {/* Bottom meta strip */}
+      <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3 text-[9px] font-semibold tracking-[0.32em] uppercase">
+        <span className="text-soft/85">Geometry · Live trace</span>
+        <span className="text-mute">No image stored</span>
       </div>
     </div>
   )
-}
-
-function Bracket({ pos }: { pos: 'tl' | 'tr' | 'bl' | 'br' }) {
-  const map = {
-    tl: 'top-4 left-4 border-t border-l rounded-tl-xl',
-    tr: 'top-4 right-4 border-t border-r rounded-tr-xl',
-    bl: 'bottom-4 left-4 border-b border-l rounded-bl-xl',
-    br: 'bottom-4 right-4 border-b border-r rounded-br-xl',
-  }
-  return <div className={`absolute w-6 h-6 border-gold/60 ${map[pos]}`} aria-hidden="true" />
 }
