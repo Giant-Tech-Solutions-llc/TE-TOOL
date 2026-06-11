@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useToolStore } from '@/store/useToolStore'
 
 const STATES = [
   { label: 'Mapping facial proportions',     tag: 'PROPORTIONS' },
@@ -15,8 +16,18 @@ const STATES = [
 interface LoadingViewProps { mode: 'photo' | 'quiz' }
 
 export function LoadingView({ mode }: LoadingViewProps) {
+  const { inputData } = useToolStore()
   const [stateIdx, setStateIdx] = useState(0)
   const [progress, setProgress] = useState(2)
+
+  // Pull the user's uploaded photo (if any) out of the store. ToolFlow
+  // dispatches photo input as { type: 'photo', data: { photo: dataUrl, ... } }
+  // — we never persist it server-side, we just render the same data URL
+  // in the scanner panel so the user sees their own face being analyzed.
+  const photoSrc =
+    inputData?.type === 'photo' && typeof (inputData.data as any)?.photo === 'string'
+      ? ((inputData.data as any).photo as string)
+      : null
 
   useEffect(() => {
     const DURATION = 38000, MAX = 92
@@ -62,7 +73,7 @@ export function LoadingView({ mode }: LoadingViewProps) {
         <div className="grid grid-cols-12 gap-y-12 lg:gap-x-12 border-t border-line pt-12 lg:pt-16">
 
           <div className="col-span-12 lg:col-span-6">
-            <FaceLandmarks />
+            <FaceLandmarks photoSrc={photoSrc} />
           </div>
 
           <div className="col-span-12 lg:col-span-6">
@@ -141,23 +152,34 @@ export function LoadingView({ mode }: LoadingViewProps) {
   )
 }
 
-function FaceLandmarks() {
+function FaceLandmarks({ photoSrc }: { photoSrc?: string | null }) {
   return (
     <div className="relative aspect-square bg-ink overflow-hidden grain rounded-3xl border border-line">
-      {/* Subject portrait — sourced from the Phase II scanner reference plate.
-          object-cover keeps the face centered while the SVG overlay traces
-          its proportions. */}
-      <Image
-        src="/scanner/subject.webp"
-        alt="Subject portrait — facial proportion analysis"
-        fill
-        priority
-        quality={94}
-        sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 600px"
-        placeholder="blur"
-        blurDataURL="/scanner/subject-blur.webp"
-        className="object-cover object-center"
-      />
+      {/* Subject portrait — if the user uploaded a photo we render that
+          directly (data URL via a plain <img>; next/image rejects raw
+          data: URLs in production). Otherwise fall back to the Phase II
+          scanner reference plate so the panel still reads correctly when
+          the flow is the Quick Quiz. */}
+      {photoSrc ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={photoSrc}
+          alt="Your uploaded photo — facial proportion analysis"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
+      ) : (
+        <Image
+          src="/scanner/subject.webp"
+          alt="Subject portrait — facial proportion analysis"
+          fill
+          priority
+          quality={94}
+          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 600px"
+          placeholder="blur"
+          blurDataURL="/scanner/subject-blur.webp"
+          className="object-cover object-center"
+        />
+      )}
 
       {/* Subtle tonal floor to keep meta-labels legible */}
       <div
