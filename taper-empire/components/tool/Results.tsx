@@ -10,9 +10,11 @@ import { SocialShare } from './SocialShare'
 import { RemindMe } from './RemindMe'
 import { InlineFeedback } from './InlineFeedback'
 import { FeedbackToast } from './FeedbackToast'
+import { AuthWall } from './AuthWall'
 import { useToolStore } from '@/store/useToolStore'
-import { generateImage } from '@/lib/api-client'
+import { generateImage, hasAuthenticated } from '@/lib/api-client'
 import { easeLux } from '@/lib/motion'
+import { track } from '@/lib/analytics'
 import type { Recommendation } from '@/types'
 
 /**
@@ -34,12 +36,25 @@ import type { Recommendation } from '@/types'
  */
 
 export function Results() {
-  const { recommendations, diagnostics, inputData, reset, setRecommendation } = useToolStore()
+  const {
+    recommendations, diagnostics, inputData, reset, setRecommendation,
+    authenticated, setAuthenticated,
+  } = useToolStore()
   const [imageLoading, setImageLoading] = useState<Record<number, boolean>>({})
-  const flow = (diagnostics?.proxy as string) || 'next'
+  const [authedLocal, setAuthedLocal] = useState(authenticated)
+  const flow = inputData?.type ?? 'photo'
 
+  // Phase 07.5 — sync auth state from sessionStorage on mount
   useEffect(() => {
-    if (!recommendations.length) return
+    const auth = authenticated || hasAuthenticated()
+    setAuthedLocal(auth)
+    if (auth && !authenticated) setAuthenticated(true)
+  }, [authenticated, setAuthenticated])
+
+  // Progressive image generation — only run after auth (avoids burning API
+  // quota on a session that never unlocks).
+  useEffect(() => {
+    if (!authedLocal || !recommendations.length) return
     const photo = inputData?.type === 'photo' ? (inputData.data as any).photo : undefined
     const mimeType = inputData?.type === 'photo' ? (inputData.data as any).mimeType : undefined
 
@@ -52,7 +67,57 @@ export function Results() {
         .finally(() => setImageLoading((m) => ({ ...m, [idx]: false })))
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [authedLocal])
+
+  // Fire the result_viewed funnel event the moment results unlock
+  useEffect(() => {
+    if (authedLocal && recommendations.length > 0) {
+      const top = recommendations[0]
+      track('result_viewed', {
+        flow,
+        topStyle: top.style_name,
+        topScore: top.match_score,
+        count: recommendations.length,
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authedLocal])
+
+  // HARD GATE — if not authenticated, results stay locked behind the wall.
+  // The wall renders here too as a defense-in-depth in case the user lands
+  // on this step without passing through the LoadingView trigger.
+  if (!authedLocal) {
+    const top = recommendations[0]
+    return (
+      <div className="bg-ink text-soft min-h-screen pt-32 lg:pt-40 pb-24 grain-soft">
+        <Cinematic>
+          <p className="type-eyebrow text-gold mb-6 flex items-center gap-4">
+            <span aria-hidden="true" className="block h-px w-12 bg-gold/70" />
+            Your Grooming Report — Locked
+          </p>
+          <h1 className="type-hero-lg">
+            One moment.
+            <br />
+            <span className="italic font-medium text-mute">Claim your profile.</span>
+          </h1>
+        </Cinematic>
+
+        <AuthWall
+          open
+          previewImageUrl={top?.image_url ?? null}
+          topStyle={top?.style_name}
+          topScore={top?.match_score}
+          flow={flow}
+          uploadMethod={flow}
+          quizComplete={flow === 'quiz'}
+          onAuthenticated={() => {
+            setAuthedLocal(true)
+            setAuthenticated(true)
+          }}
+        />
+      </div>
+    )
+  }
 
   const [primary, ...secondary] = recommendations
 

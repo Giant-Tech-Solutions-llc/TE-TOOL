@@ -48,3 +48,72 @@ export function markFeedbackGiven(): void {
   if (typeof sessionStorage === 'undefined') return
   sessionStorage.setItem(FEEDBACK_KEY, '1')
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+ *  Phase 07.5 — Hard auth gate + email acquisition
+ * ───────────────────────────────────────────────────────────────────── */
+
+export type AuthProvider = 'google' | 'apple' | 'email'
+
+export interface EmailSignupPayload {
+  email: string
+  name?: string
+  provider?: AuthProvider                    // which OAuth path the user picked
+  source?: 'auth-wall' | 'footer' | 'cta'
+  flow?: 'photo' | 'quiz' | string
+  uploadMethod?: 'photo' | 'quiz' | string
+  quizComplete?: boolean
+  topStyle?: string
+  topScore?: number
+  sessionId?: string
+}
+
+export async function submitEmail(payload: EmailSignupPayload): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const r = await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...payload,
+        page: typeof window !== 'undefined' ? window.location.pathname : '',
+        referrer: typeof document !== 'undefined' ? document.referrer : '',
+      }),
+    })
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}))
+      return { ok: false, error: data?.error || 'Could not submit email.' }
+    }
+    return { ok: true }
+  } catch {
+    return { ok: false, error: 'Network error — try again in a moment.' }
+  }
+}
+
+const AUTH_KEY = 'taper-empire-auth'
+const AUTH_META_KEY = 'taper-empire-auth-meta'
+
+export interface AuthMeta {
+  email: string
+  provider: AuthProvider
+  ts: number
+  name?: string
+}
+
+export function hasAuthenticated(): boolean {
+  if (typeof sessionStorage === 'undefined') return false
+  return sessionStorage.getItem(AUTH_KEY) === '1'
+}
+
+export function markAuthenticated(meta: AuthMeta): void {
+  if (typeof sessionStorage === 'undefined') return
+  sessionStorage.setItem(AUTH_KEY, '1')
+  try { sessionStorage.setItem(AUTH_META_KEY, JSON.stringify(meta)) } catch {}
+}
+
+export function getAuthMeta(): AuthMeta | null {
+  if (typeof sessionStorage === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(AUTH_META_KEY)
+    return raw ? JSON.parse(raw) as AuthMeta : null
+  } catch { return null }
+}

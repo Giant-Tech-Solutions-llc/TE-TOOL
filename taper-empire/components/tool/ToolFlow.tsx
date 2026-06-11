@@ -9,6 +9,7 @@ import { Results } from './Results'
 import { useToolStore } from '@/store/useToolStore'
 import { getRecommendations } from '@/lib/api-client'
 import { captureReferral } from '@/lib/referral'
+import { track } from '@/lib/analytics'
 import type { QuizData, ToolInput } from '@/types'
 import type { PreparedPhoto } from '@/lib/image'
 
@@ -18,11 +19,12 @@ export function ToolFlow() {
   const { step, submit, success, validation, validationError } = useToolStore()
   const [tab, setTab] = useState<Tab>('photo')
 
-  // Phase 11 — capture inbound ?ref=<id> attribution on first paint.
-  // First attribution wins; subsequent ?ref= visits don't overwrite. The
-  // captured id flows through to outbound share links and the lifecycle
-  // API so the upstream sharer gets credit.
+  // Phase 11 — capture inbound ?ref=<id> attribution + funnel entry telemetry
+  // on first paint. First attribution wins; subsequent ?ref= visits don't
+  // overwrite. The captured id flows through to outbound share links and the
+  // lifecycle API so the upstream sharer gets credit.
   useEffect(() => {
+    track('upload_started', { initialTab: tab })
     const ref = captureReferral()
     if (ref) {
       // Best-effort attribution ping — fire-and-forget, no UX cost.
@@ -33,9 +35,11 @@ export function ToolFlow() {
         keepalive: true,
       }).catch(() => {})
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const dispatch = async (input: ToolInput) => {
+    track('analysis_started', { flow: input.type })
     submit(input)
     try {
       const r = await getRecommendations(input)
@@ -54,7 +58,10 @@ export function ToolFlow() {
   const handlePhoto = (photo: PreparedPhoto) =>
     dispatch({ type: 'photo', data: { photo: photo.dataUrl, mimeType: photo.mimeType } as any })
 
-  const handleQuiz = (data: QuizData) => dispatch({ type: 'quiz', data })
+  const handleQuiz = (data: QuizData) => {
+    track('quiz_started', { completed: true })
+    dispatch({ type: 'quiz', data })
+  }
 
   if (step === 'loading') return <LoadingView mode={tab} />
   if (step === 'results') return <Results />
