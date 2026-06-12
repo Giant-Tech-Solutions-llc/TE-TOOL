@@ -97,3 +97,70 @@ All work on `feature/supabase-email-capture`, PR against `main`.
 5. Every marketing email needs a working unsubscribe link:
    `https://tool.taperempire.com/api/email/unsubscribe?token=<token>`
 6. GDPR: capture consent metadata; `/api/email/delete` hard-deletes.
+
+---
+
+## TODO(post-resubscribe-flow) — defense-in-depth `consent_at` trigger
+
+**Status:** designed, not applied. Land alongside the re-subscribe endpoint.
+
+### What we know
+The DB-LOGIC PRE-MERGE PASS (staging, pre-83ba680, 12-test schema sweep)
+intentionally proved that `consent_at` is **overwritable at the DB layer**.
+Test 4: a plain `UPDATE leads SET consent_at = '2030-01-01' WHERE id = ?`
+succeeded. Stickiness is enforced **only** by the `/api/email/route.ts`
+upsert logic, which skips `consent_at` in the update payload when the
+existing row already has one set.
+
+That's adequate today because `/api/email/route.ts` is the only writer in
+production. But the moment a second writer exists — an admin tool, a
+manual backfill, a future endpoint that touches `leads` — a stray
+`UPDATE` can quietly clobber a consent timestamp, which is the one column
+you least want changing silently for a CAN-SPAM/GDPR audit trail.
+
+### Proposed trigger (do not apply yet)
+```sql
+-- 0003_protect_consent_at.sql  (defense-in-depth; route still enforces too)
+create or replace function public.protect_consent_at()
+returns trigger language plpgsql set search_path = '' as $$
+begin
+  if old.consent_at is not null then
+    new.consent_at := old.consent_at;  -- once set, immutable at the DB floor
+  end if;
+  return new;
+end;
+$$;
+
+create trigger leads_protect_consent_at
+  before update on public.leads
+  for each row execute function public.protect_consent_at();
+```
+
+### Gating decision — why we did NOT land this with Phase S
+The spec mentions a re-subscribe flow ("re-subscription requires explicit
+user action via a separate flow"). That endpoint is **not built yet**.
+Once it exists it will legitimately need to set a fresh `consent_at` —
+either by `null`-ing first then updating, or by the trigger having an
+explicit carve-out (e.g. a `_force_consent_reset` session GUC or a
+`SECURITY DEFINER` function the re-subscribe endpoint calls).
+
+Landing the trigger without that carve-out designed makes re-subscribe a
+two-step write that breaks under retry/idempotency assumptions. Landing
+the trigger *with* a carve-out before the endpoint is built risks
+designing the wrong carve-out shape.
+
+### When to land
+- Same PR that introduces `/api/email/resubscribe` (or whatever the
+  endpoint is named).
+- The PR must decide the carve-out mechanism, document it here, and ship
+  both the trigger and the carve-out in `0003_protect_consent_at.sql` as
+  one atomic schema change.
+- Apply to **both** Supabase projects (`huxryszbzyprmfykumsf` +
+  `pyqdfkjzwsnatkdxgddh`) in the same release.
+
+### Not landing as a staged migration file
+Deliberately NOT placing this SQL in `supabase/migrations/` yet. A
+staged-but-unapplied migration in that folder will confuse future
+contributors ("why isn't this on prod?") and will get picked up by any
+future `supabase db push` workflow. The runbook is the right home for
+designed-but-not-yet-applied schema work.
