@@ -98,13 +98,82 @@ On a Preview deploy that has the **staging** Supabase wired:
 - [ ] No client bundle includes `SUPABASE_SERVICE_ROLE_KEY`:
       `grep -r "SERVICE_ROLE" .next/static` → empty.
 
-## 6. Provider wiring (Phase 7/8 follow-up)
+## 6. Resend setup (Phase T — required for launch day sends)
 
-Once Resend is connected and `RESEND_API_KEY` + `FROM_EMAIL` are set, the
-cron stub at `app/api/cron/lifecycle/route.ts` becomes the active send loop
-— replace the `provider: null` line with the Resend send call and capture
-the returned `id` as `email_sends.provider_id`. The webhook route already
-handles the Resend / Svix signature header.
+The cron is now wired to send via Resend. Without `RESEND_API_KEY` it
+returns **503** and the schedule does NOT advance, so leads aren't
+skipped — they wait until the key is set.
 
-See `docs/SUPABASE_EMAIL_CAPTURE_RUNBOOK.md` for the full lifecycle of a
-captured lead.
+### One-time setup
+
+1. **Create a Resend account** at https://resend.com.
+2. **Add the sending domain** (`taperempire.com`) → Resend gives you
+   three DNS records to add at your registrar:
+   - `resend._domainkey` TXT — DKIM
+   - `send` MX + TXT — bounces / replies
+   - DMARC TXT at `_dmarc.taperempire.com`:
+     `v=DMARC1; p=quarantine; rua=mailto:dmarc@taperempire.com; pct=100`
+3. **Wait for verification** at Resend (usually 5-30 min after DNS
+   propagates; up to 48h if your DNS is slow).
+4. **Generate an API key** at Resend dashboard → API Keys →
+   Create API Key → scope: `emails:send`. Copy it.
+5. **Add the webhook endpoint** at Resend dashboard → Webhooks → Add
+   Endpoint → `https://tool.taperempire.com/api/email/webhook`. Resend
+   uses Svix; copy the **endpoint signing secret** — this is what
+   goes into `EMAIL_WEBHOOK_SECRET` (overrides the temporary value
+   you generated in step 2). Enable these events: `email.delivered`,
+   `email.bounced`, `email.complained`, `email.opened`, `email.clicked`.
+6. **Set the Vercel env vars** for both Production + Preview:
+   ```bash
+   vercel env add RESEND_API_KEY production
+   vercel env add FROM_EMAIL production
+   # paste: Taper Empire <brief@taperempire.com>
+   vercel env add NEXT_PUBLIC_SITE_URL production
+   # paste: https://tool.taperempire.com
+
+   vercel env add RESEND_API_KEY preview
+   vercel env add FROM_EMAIL preview
+   # paste: Taper Empire <brief+staging@taperempire.com>
+   vercel env add NEXT_PUBLIC_SITE_URL preview
+   # paste the actual preview URL (auto per-deploy is fine too)
+
+   # Also rotate the webhook secret to the Resend signing secret:
+   vercel env rm EMAIL_WEBHOOK_SECRET production
+   vercel env add EMAIL_WEBHOOK_SECRET production
+   ```
+
+### Verification
+
+After redeploy:
+
+- [ ] Trigger the cron manually with at least one consenting lead older
+      than 1 day in the table:
+      `curl -H "Authorization: Bearer $CRON_SECRET" https://tool.taperempire.com/api/cron/lifecycle`
+- [ ] Resend dashboard → Emails → confirm the send shows.
+- [ ] Supabase `email_sends` → confirm a row with `provider='resend'`,
+      `status='sent'`, `provider_id` populated.
+- [ ] Supabase `leads` → the matching `dayN_sent_at` column is now set.
+- [ ] Wait a minute, hit the webhook trigger: open the email →
+      `email_sends.opened_at` populates via the webhook handler.
+- [ ] Hard-bounce test: send to `bounce@simulator.amazonses.com` (or
+      Resend's equivalent simulator) — `email_sends.status` flips to
+      `bounced`, lead row's `status` flips to `bounced` too.
+- [ ] One-click unsubscribe: Gmail / Apple Mail show the native button
+      (proves `List-Unsubscribe` headers are landing).
+
+### What's already in the code
+
+Already wired in `app/api/cron/lifecycle/route.ts`:
+- Six template renderers in `lib/email-templates.ts`
+  (`day1_profile_ready` through `day21_loyalty`).
+- Per-lead try/catch — a single send failure does not block the rest
+  of the batch.
+- `dayN_sent_at` advances ONLY on successful send; failures retry next
+  hour.
+- `List-Unsubscribe` + `List-Unsubscribe-Post` headers on every send.
+- Resend `tags` for stage + template so the Resend dashboard segments
+  cleanly.
+- `lead_events` audit row for every `sent` and `failed`.
+
+See `docs/SUPABASE_EMAIL_CAPTURE_RUNBOOK.md` for the full lifecycle of
+a captured lead.
