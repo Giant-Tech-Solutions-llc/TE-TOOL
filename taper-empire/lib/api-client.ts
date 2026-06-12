@@ -66,9 +66,25 @@ export interface EmailSignupPayload {
   topStyle?: string
   topScore?: number
   sessionId?: string
+  // Phase S — Supabase lead capture
+  refererId?: string | null
+  selfId?: string | null
+  utm?: {
+    source?: string | null
+    medium?: string | null
+    campaign?: string | null
+    term?: string | null
+    content?: string | null
+  }
+  landingPath?: string | null
+  consentTerms?: boolean
+  consentMarketing?: boolean
+  shareToken?: string
 }
 
-export async function submitEmail(payload: EmailSignupPayload): Promise<{ ok: boolean; error?: string }> {
+export async function submitEmail(
+  payload: EmailSignupPayload,
+): Promise<{ ok: boolean; error?: string; leadId?: string | null }> {
   try {
     const r = await fetch('/api/email', {
       method: 'POST',
@@ -79,11 +95,11 @@ export async function submitEmail(payload: EmailSignupPayload): Promise<{ ok: bo
         referrer: typeof document !== 'undefined' ? document.referrer : '',
       }),
     })
-    if (!r.ok) {
-      const data = await r.json().catch(() => ({}))
+    const data = await r.json().catch(() => ({} as any))
+    if (!r.ok || data?.ok === false) {
       return { ok: false, error: data?.error || 'Could not submit email.' }
     }
-    return { ok: true }
+    return { ok: true, leadId: data?.leadId ?? null }
   } catch {
     return { ok: false, error: 'Network error — try again in a moment.' }
   }

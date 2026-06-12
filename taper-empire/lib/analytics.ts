@@ -18,6 +18,7 @@ export type AnalyticsEvent =
   | 'auth_wall_viewed'
   | 'auth_method_selected'
   | 'signup_completed'
+  | 'lead_captured'
   | 'auth_abandoned'
   | 'result_viewed'
   | 'result_shared'

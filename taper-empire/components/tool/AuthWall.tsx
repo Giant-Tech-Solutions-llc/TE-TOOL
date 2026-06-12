@@ -8,6 +8,7 @@ import {
   submitEmail, markAuthenticated, type AuthProvider,
 } from '@/lib/api-client'
 import { track, getSessionId } from '@/lib/analytics'
+import { getReferrer, getSelfId } from '@/lib/referral'
 import { easeLux } from '@/lib/motion'
 
 /**
@@ -65,12 +66,17 @@ export function AuthWall({
   const [provider, setProvider] = useState<AuthProvider>('email')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // Phase S — GDPR/CAN-SPAM consent.
+  // Terms is hard-required; marketing is opt-in (pre-UNCHECKED).
+  const [consentTerms, setConsentTerms] = useState(false)
+  const [consentMarketing, setConsentMarketing] = useState(false)
   const emailRef = useRef<HTMLInputElement>(null)
 
   // Reset to choice each time the wall opens
   useEffect(() => {
     if (open) {
       setView('choice'); setError(null); setProvider('email')
+      setConsentTerms(false); setConsentMarketing(false)
       track('auth_wall_viewed', { flow })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,7 +118,25 @@ export function AuthWall({
     e.preventDefault()
     if (submitting) return
     setError(null)
+
+    // Phase S — Terms consent is the lawful basis for storing the lead.
+    // Marketing consent stays optional; the /api/email endpoint also
+    // re-validates this server-side.
+    if (!consentTerms) {
+      setError('Please accept the Terms & Privacy Policy to continue.')
+      return
+    }
+
     setSubmitting(true)
+
+    // UTM + landing path + referral attribution — read at submit time so the
+    // values reflect the actual session, not a stale snapshot.
+    const params =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search)
+        : new URLSearchParams()
+    const landingPath =
+      typeof window !== 'undefined' ? window.location.pathname : null
 
     const res = await submitEmail({
       email,
@@ -125,6 +149,19 @@ export function AuthWall({
       topStyle,
       topScore,
       sessionId: getSessionId(),
+      // Phase S — Supabase email capture
+      refererId: getReferrer(),
+      selfId: getSelfId(),
+      utm: {
+        source: params.get('utm_source'),
+        medium: params.get('utm_medium'),
+        campaign: params.get('utm_campaign'),
+        term: params.get('utm_term'),
+        content: params.get('utm_content'),
+      },
+      landingPath,
+      consentTerms,
+      consentMarketing,
     })
     setSubmitting(false)
 
@@ -140,6 +177,7 @@ export function AuthWall({
       name: name.trim() || undefined,
     })
 
+    track('lead_captured', { leadId: res.leadId ?? null, flow })
     track('signup_completed', { method: provider, flow, topStyle, topScore: topScore ?? null })
     setView('done')
 
@@ -380,6 +418,50 @@ export function AuthWall({
                       />
                     </div>
 
+                    {/* Phase S — required consent + opt-in marketing */}
+                    <div className="space-y-3 pt-2">
+                      <label className="flex items-start gap-3 text-[13px] text-soft/85 leading-[1.5] cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={consentTerms}
+                          onChange={(e) => setConsentTerms(e.target.checked)}
+                          required
+                          className="mt-1 h-4 w-4 shrink-0 accent-gold cursor-pointer"
+                        />
+                        <span>
+                          I agree to the{' '}
+                          <a
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline decoration-soft/40 hover:decoration-gold hover:text-soft transition-colors"
+                          >
+                            Terms
+                          </a>{' '}
+                          and{' '}
+                          <a
+                            href="/privacy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline decoration-soft/40 hover:decoration-gold hover:text-soft transition-colors"
+                          >
+                            Privacy Policy
+                          </a>
+                          .
+                        </span>
+                      </label>
+
+                      <label className="flex items-start gap-3 text-[13px] text-soft/75 leading-[1.5] cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={consentMarketing}
+                          onChange={(e) => setConsentMarketing(e.target.checked)}
+                          className="mt-1 h-4 w-4 shrink-0 accent-gold cursor-pointer"
+                        />
+                        <span>Email me lifecycle tips and product picks.</span>
+                      </label>
+                    </div>
+
                     {error && (
                       <p role="alert" className="text-sm text-error">{error}</p>
                     )}
@@ -390,7 +472,7 @@ export function AuthWall({
                       size="xl"
                       shape="pill"
                       loading={submitting}
-                      disabled={submitting}
+                      disabled={submitting || !consentTerms}
                       className="w-full !justify-between !px-6"
                     >
                       <span>{submitting ? 'Unlocking…' : 'Unlock my profile'}</span>
